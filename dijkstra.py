@@ -16,7 +16,6 @@ class dijkstra(object):
         with np.errstate(divide='ignore', invalid='ignore'):
             cost = np.divide(1, np.zeros((n)))
         cost[self.s] = 0
-        print cost
         for y in range(0, n, 1):
             temp = []
             for h in range(0, n, 1):
