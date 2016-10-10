@@ -1,4 +1,5 @@
 import numpy as np
+from updateonentry1 import updateonentry1
 # Network Parameters
 
 # Total Number of Nodes
@@ -254,7 +255,8 @@ arrivalratesize1 = 1
 print flowarrivaltime.min()
 print flowarrivaltime.argmin()
 # Flow starts
-while(countarrival < limit):
+# while(countarrival < limit):
+while(countarrival < 1):
     c = flowarrivaltime.min()  # Minimum Value
     I = flowarrivaltime.argmin()  # Index of the Minimum Value
     if countarrival == 0:
@@ -270,18 +272,23 @@ while(countarrival < limit):
         # New Arrival time computation for the next flow
         flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
         # Source node of the considered flow
-        sflow(counterarrival) = source[I]
+        sflow[countarrival] = source[I]
         # Destination node of the considered flow
-        dflow(counterarrival) = destination[I]
+        dflow[countarrival] = destination[I]
         # Type of flow of the considered flow
-        flowtype(counterarrival) = flow_type1[I]
+        flowtype[countarrival] = flow_type1[I]
         # Rate of the considered flow
-        minrate(counterarrival) = min_rate[I]
+        minrate[countarrival] = min_rate1[I]
         # Priority set to 1 for the first flow
-        userpriority1(counterarrival) = userpriority_new
+        userpriority1[countarrival] = userpriority_new
         # Flow number for Adapted Dijsktra set to 1 for first flow
         flownumber_new = flownumber_new + 1
         # Flow number for Multicommodity set to 1 for the first flow
-        flownumber_new_multi = flow_number_multi + 1
+        flownumber_new_multi = flownumber_new_multi + 1
         # Flow number for Enhanced Adapted Dijkstra set to 1 for the first flow
         flownumber_new_block = flownumber_new_block + 1
+        print (min_rate)
+        updateonentry1 = updateonentry1(p, s, d, flow_type, min_rate, flownumber, userpriority, source[I],
+                                        destination[I], flow_type1[I], min_rate1[I], flownumber_new, userpriority_new,
+                                        path_final, wt_matx, wt_matx_real, wt_matx_real1, blockstate)
+        updateonentry1.execute()

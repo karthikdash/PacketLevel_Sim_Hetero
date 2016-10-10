@@ -1,0 +1,4 @@
+<PDQ> Potential delay for Queing
+
+TypeError: 'numpy.ndarray' object is not callable
+Replace () with []

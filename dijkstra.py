@@ -4,8 +4,8 @@ import numpy as np
 class dijkstra(object):
 
     def __init__(self, s, d, wt_matx):
-        self.s = s
-        self.d = d
+        self.s = np.array(s, dtype=np.int)
+        self.d = np.array(d, dtype=np.int)
         self.wt_matx = wt_matx
 
     def execute(self):
@@ -41,8 +41,8 @@ class dijkstra(object):
         if parent[self.d] != 0:
             t = self.d
             path = self.d
-            while (t != s):
-                p = parent(t)
+            while (t != self.s):
+                p = int(parent[t])
                 path = np.append(p, path)
                 t = p
         return path

@@ -2,13 +2,13 @@ import numpy as np
 from dijkstra import dijkstra
 
 
-class call1:
+class call1(object):
     path = []
     wt_matx = []
     wt_matx_real = []
     wt_matx_real1 = []
 
-    def _init_(self, p, s, d, flow_type, min_rate, wt_matx, wt_matx_real, wt_matx_real1):
+    def __init__(self, p, s, d, flow_type, min_rate, wt_matx, wt_matx_real, wt_matx_real1):
         self.p = p
         self.s = s
         self.d = d
@@ -21,10 +21,14 @@ class call1:
     def execute(self):
         if self.flow_type == 2:
             dummy = np.divide(1, self.wt_matx)
-            dummy1 = dummy - self.min_rate
+            if len(self.min_rate) == 0:
+                dummy1 = dummy
+            else:
+                dummy1 = np.subtract(dummy, self.min_rate)
             dummy2 = dummy1 > 0
             dummy3 = np.multiply(dummy1, dummy2)
-            dummy4 = np.divide(1, dummy3)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                dummy4 = np.divide(1, dummy3)
             for i in range(0, self.p, 1):
                 for j in range(0, self.p, 1):
                     # Could be an erroneous declaration of negative Inf
@@ -32,7 +36,7 @@ class call1:
                         dummy4[i][j] == float('inf')
             dij = dijkstra(self.s, self.d, dummy4)
             path = dij.execute()
-            [s1, s2] = np.shape(path)
+            s2 = np.shape(path)[0]
             if s2 == 0:
                 path = np.zeros((self.p))
             else:
@@ -45,28 +49,40 @@ class call1:
                     for j in range(s2, self.p, 1):
                         path[j] = 0
         else:
-            dummy = np.divide(1, self.wt_matx_real1)
-            dummy2 = np.subtract(dummy1, self.min_rate)
+            dummy1 = np.divide(1, self.wt_matx_real1)
+            print(dummy1)
+            if len(self.min_rate) == 0:
+                dummy2 = dummy1
+            else:
+                dummy2 = np.subtract(dummy1 - self.min_rate)
             dummy3 = dummy2 > 0
-            dummy4 = np.divide(1, self.wt_matx)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                dummy4 = np.divide(1, self.wt_matx)
             dummy5 = np.multiply(dummy4, dummy3)
-            dummy6 = np.subtract(dummy5, self.min_rate)
+            if len(self.min_rate) == 0:
+                dummy6 = dummy5
+            else:
+                dummy6 = np.subtract(dummy5, self.min_rate)
             dummy7 = dummy6 > 0
             dummy8 = np.multiply(dummy6, dummy7)
-            dummy9 = np.divide(1, dummy8)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                dummy9 = np.divide(1, dummy8)
             for i in range(0, self.p, 1):
                 for j in range(0, self.p, 1):
                     if dummy9[i][j] == -float('inf'):
                         dummy9[i][j] == float('inf')
             dij = dijkstra(self.s, self.d, dummy9)
             path = dij.execute()
-            [s1, s2] = np.shape(path)
+            s2 = np.shape(path)[0]
             if s2 == 0:
                 path = np.zeros((self.p))
             else:
-                flow = np.zerps((self.p))
-                for i in range(0, s2-1, 1):
-                    flow[path[i]][path[i+1]] = self.min_rate
+                flow = np.zeros((self.p))
+                for i in range(0, s2 - 1, 1):
+                    print(path[i])
+                    print(path[i+1])
+                    print "k2"
+                    flow[path[i], path[i+1]] = self.min_rate
                 dummy10 = np.subtract(np.divide(1, self.wt_matx_real), flow)
                 dummy11 = np.subtract(dummy1, flow)
                 dummy12 = np.subtract(dummy4, flow)
