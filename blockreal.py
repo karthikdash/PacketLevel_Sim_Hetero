@@ -82,4 +82,14 @@ class blockreal(object):
         if dummy3[Anodes3[index], self.d_new] > 0:
             # Routing Real-time flow
             for loop1 in range(0, p-1, 1):
-                if paths[loop1, 1] == Anodes3[index]
+                if paths[loop1, 1] == Anodes3[index]:
+                    pathA = paths[loop1][2:np.where(paths[loop1, 2:self.p+1] == Anodes3[index])+1]
+            pathreal = np.append(pathA, self.d_new)
+            [pathrealsize1, pathrealsize] = np.shape(pathreal)
+            if pathrealsize < self.p:
+                for loop1 in range(pathrealsize, p, 1):
+                    pathreal[loop1] = 0
+            # End of Routing Real Time flow
+            # Updating weight matrix after Routing Real-time flow
+            flow = np.zeros((self.p))
+            
