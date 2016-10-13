@@ -2,6 +2,9 @@ import numpy as np
 
 
 class dijkstra(object):
+    cost = []
+    visited = []
+    parent = []
 
     def __init__(self, s, d, wt_matx):
         self.s = np.array(s, dtype=np.int)
@@ -46,3 +49,6 @@ class dijkstra(object):
                 path = np.append(p, path)
                 t = p
         return path
+        self.cost = cost
+        self.visited = visited
+        self.parent = parent

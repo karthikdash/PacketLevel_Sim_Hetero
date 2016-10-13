@@ -38,6 +38,7 @@ class call2(object):
                 if path[i+1] == 0:
                     break
                 else:
+                    print self.path[i]
                     flow[self.path[i], self.path[i+1]] = self.min_rate
             dummy3 = np.add(dummy, flow)
             dummy4 = np.add(dummy1, flow)
