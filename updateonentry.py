@@ -6,7 +6,7 @@ from dijkstra import dijkstra
 class updateonentry(object):
     blockstate_new1 = 0
 
-    __init__(p, s, d, flow_type, min_rate, flownumber, userpriority, s_new, d_new,
+    __init__(self, p, s, d, flow_type, min_rate, flownumber, userpriority, s_new, d_new,
              flow_type_new, min_rate_new, flownumber_new, userpriority_new, path_final,
              wt_matx, wt_matx_real, wt_matx_real1, eff_capacity_matx, blockstate):
         self.s = s

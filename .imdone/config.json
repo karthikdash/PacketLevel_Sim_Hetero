@@ -1,0 +1,177 @@
+{
+  "exclude": [
+    "^(node_modules|bower_components|\\.imdone|target|build|dist|logs)[\\/\\\\]?|\\.(git|svn|hg|npmignore)|\\~$|\\.(jpg|png|gif|swp|ttf|otf)$"
+  ],
+  "watcher": true,
+  "keepEmptyPriority": false,
+  "code": {
+    "include_lists": [
+      "TODO",
+      "DOING",
+      "DONE",
+      "PLANNING",
+      "FIXME",
+      "ARCHIVE",
+      "HACK",
+      "CHANGED",
+      "XXX",
+      "IDEA",
+      "NOTE",
+      "REVIEW"
+    ]
+  },
+  "lists": [
+    {
+      "name": "XXX",
+      "hidden": false
+    },
+    {
+      "name": "NOTE",
+      "hidden": true
+    },
+    {
+      "name": "FIXME",
+      "hidden": false
+    },
+    {
+      "name": "TODO",
+      "hidden": false
+    },
+    {
+      "name": "doctest",
+      "hidden": false
+    },
+    {
+      "name": "Fixme",
+      "hidden": false
+    },
+    {
+      "name": "25",
+      "hidden": false
+    },
+    {
+      "name": "backend_fallback",
+      "hidden": false
+    },
+    {
+      "name": "Author",
+      "hidden": false
+    },
+    {
+      "name": "DISABLED",
+      "hidden": false
+    },
+    {
+      "name": "3068",
+      "hidden": false
+    },
+    {
+      "name": "1796",
+      "hidden": false
+    },
+    {
+      "name": "3886",
+      "hidden": false
+    },
+    {
+      "name": "1973",
+      "hidden": false
+    },
+    {
+      "name": "1005",
+      "hidden": false
+    },
+    {
+      "name": "1258",
+      "hidden": false
+    },
+    {
+      "name": "2642",
+      "hidden": false
+    },
+    {
+      "name": "else",
+      "hidden": false
+    },
+    {
+      "name": "771",
+      "hidden": false
+    },
+    {
+      "name": "1078",
+      "hidden": false
+    },
+    {
+      "name": "1081",
+      "hidden": false
+    },
+    {
+      "name": "1345",
+      "hidden": false
+    },
+    {
+      "name": "786",
+      "hidden": false
+    },
+    {
+      "name": "1",
+      "hidden": false
+    },
+    {
+      "name": "2",
+      "hidden": false
+    },
+    {
+      "name": "random",
+      "hidden": false
+    },
+    {
+      "name": "801",
+      "hidden": false
+    },
+    {
+      "name": "74",
+      "hidden": false
+    },
+    {
+      "name": "17980",
+      "hidden": false
+    },
+    {
+      "name": "1100429",
+      "hidden": false
+    },
+    {
+      "name": "45",
+      "hidden": false
+    },
+    {
+      "name": "50",
+      "hidden": false
+    },
+    {
+      "name": "51",
+      "hidden": false
+    },
+    {
+      "name": "20007",
+      "hidden": false
+    },
+    {
+      "name": "HACK",
+      "hidden": false
+    },
+    {
+      "name": "Multicommodity",
+      "hidden": false
+    }
+  ],
+  "marked": {
+    "gfm": true,
+    "tables": true,
+    "breaks": false,
+    "pedantic": false,
+    "smartLists": true,
+    "langPrefix": "language-"
+  }
+}

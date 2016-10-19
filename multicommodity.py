@@ -82,21 +82,27 @@ np.savetxt("foo3.csv", a, delimiter=',')
 
 # To ignore Division by O warnings. /0 taken as Inf
 with np.errstate(divide='ignore', invalid='ignore'):
+    # Adapted Dijkstra Weights
     wt_matx = np.divide(1, eff_capacity_matx)
     wt_matx_real = np.divide(1, eff_capacity_matx)
     wt_matx_real1 = np.divide(2, eff_capacity_matx)
+    # Multicommodity Weights
     wt_matx_multi = np.divide(1, eff_capacity_matx)
     wt_matx_real_multi = np.divide(1, eff_capacity_matx)
     wt_matx_real1_multi = np.divide(2, eff_capacity_matx)
+    # Enhanced Dijkstra Wights
     wt_matx_block = np.divide(1, eff_capacity_matx)
     wt_matx_real_block = np.divide(1, eff_capacity_matx)
     wt_matx_real1_block = np.divide(2, eff_capacity_matx)
 source = []
 destination = []
+
+# To get Source-Destination Pairs defined by problem statement. Since we have same S-D for different flows, we append source1 and destination1
 for i in range(0, connectiontypes):
     source = np.append(source, source1)
     destination = np.append(destination, destination1)
-# ##
+
+# Adapted Dijkstra Variable Definations
 s = []
 d = []
 flow_type = []
@@ -109,7 +115,7 @@ blockstate = []
 userpriority_new = 1
 flownumber_new = 0
 
-# ##
+# Multicommodity Variable Defination
 s_multi = []
 d_multi = []
 flow_type_multi = []
@@ -120,7 +126,7 @@ blockstate_multi = []
 userpriority_multi = 1
 flownumber_new_multi = 0
 
-# ##
+# Enhanced Dijkstra Variable Definations
 s_block = []
 d_block = []
 flow_type_block = []
