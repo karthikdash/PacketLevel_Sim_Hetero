@@ -10,7 +10,7 @@ class blockreal(object):
         self.min_rate_new = min_rate_new
         self.path_final = path_final
         self.wt_matx_real = wt_matx_real
-        self.wt_matx_real1 = self.wt_matx_real1
+        self.wt_matx_real1 = wt_matx_real1
         self.wt_matx = wt_matx
 
     def execute(object):
@@ -84,19 +84,19 @@ class blockreal(object):
                 for loop1 in range(0, p-1, 1):
                     if paths[loop1, 1] == Anodes3[index]:
                         pathA = paths[loop1][2:np.where(paths[loop1, 2:p+1] == Anodes3[index])+1]
-                pathreal = np.append(pathA, self.d_new)
-                [pathrealsize1, pathrealsize] = np.shape(pathreal)
-                if pathrealsize < p:
-                    for loop1 in range(pathrealsize, p, 1):
-                        pathreal[loop1] = 0
+                self.pathreal = np.append(pathA, self.d_new)
+                [self.pathrealsize1, self.pathrealsize] = np.shape(self.pathreal)
+                if self.pathrealsize < p:
+                    for loop1 in range(self.pathrealsize, p, 1):
+                        self.pathreal[loop1] = 0
                 # End of Routing Real Time flow
                 # Updating weight matrix after Routing Real-time flow
                 flow = np.zeros((p))  # No of Nodes
                 for loop1 in range(0, p-1, 1):
-                    if pathreal[loop1+1] == 0:
+                    if self.pathreal[loop1+1] == 0:
                         break
                     else:
-                        flow[pathreal[loop1]][pathreal[loop1+1]] = self.min_rate_new
+                        flow[self.pathreal[loop1]][self.pathreal[loop1+1]] = self.min_rate_new
                 dummy12 = np.subtract(dummy4, flow)
                 dummy13 = np.divide(1, dummy12)  # All Positive
                 dummy13[Anodes3[index]][self.d_new] = float('inf')  # Weight Matrix after including new real time flow
@@ -200,7 +200,7 @@ class blockreal(object):
                                     else:
                                         location1 = repeat[1]
                                         location2 = repeat[repeatsize]
-                                        path6[location1+1:path6size - (location2 - location)] = path6[location2+1: path6size]
+                                        path6[location1+1:path6size - (location2 - location1)] = path6[location2+1: path6size]
                                         path6 = path6[1:path6size-(location2 - location1)]
                                         [path6size1, path6size] = np.shape(path6)
                                 [path6size1, path6size] = np.shape(path6)
@@ -251,19 +251,19 @@ class blockreal(object):
                                 if paths[loop1, 1] == Anodes3[index]:
                                     pathA = paths[loop1][2:np.where(paths[loop1, 2:p+1] == Anodes[index])+1]
                                     break
-                            pathreal = np.append(pathA, path)
-                            [pathrealsize1, pathrealsize] = np.shape(pathreal)
-                            if pathrealsize < p:
-                                for loop1 in range(pathrealsize, p, 1):
-                                    pathreal[loop1] = 0
+                            self.pathreal = np.append(pathA, path)
+                            [self.pathrealsize1, self.pathrealsize] = np.shape(self.pathreal)
+                            if self.pathrealsize < p:
+                                for loop1 in range(self.pathrealsize, p, 1):
+                                    self.pathreal[loop1] = 0
                             # End of routing real-time flowarrivaltime
                             # Updating weight matrix after routing real-time flow
                             flow = np.zerps(p)
                             for loop2 in range(0, p-1, 1):
-                                if pathreal[loop1 + 1] == 0:
+                                if self.pathreal[loop1 + 1] == 0:
                                     break
                                 else:
-                                    flow[pathreal[loop1], pathreal[loop1 + 1]] = self.min_rate_new
+                                    flow[self.pathreal[loop1], self.pathreal[loop1 + 1]] = self.min_rate_new
                             dummy12 = np.subtract(dummy4, flow)
                             dummy13 = np.divide(1, dummy12)
                             dummy13[Anodes3[index], loop] = float('inf')  # Weight matrix after including realtime flow
@@ -365,7 +365,7 @@ class blockreal(object):
                                             else:
                                                 location1 = repeat[1]
                                                 location2 = repeat[repeatsize]
-                                                path6[location1+1:path6size - (location2 - location)] = path6[location2+1: path6size]
+                                                path6[location1+1:path6size - (location2 - location1)] = path6[location2+1: path6size]
                                                 path6 = path6[1:path6size-(location2 - location1)]
                                                 [path6size1, path6size] = np.shape(path6)
                                         [path6size1, path6size] = np.shape(path6)
@@ -422,7 +422,7 @@ class blockreal(object):
                                                 else:
                                                     location1 = repeat[1]
                                                     location2 = repeat[repeatsize]
-                                                    path6[location1+1:path6size - (location2 - location)] = path6[location2+1: path6size]
+                                                    path6[location1+1:path6size - (location2 - location1)] = path6[location2+1: path6size]
                                                     path6 = path6[1:path6size-(location2 - location1)]
                                                     [path6size1, path6size] = np.shape(path6)
                                             [path6size1, path6size] = np.shape(path6)
@@ -435,15 +435,15 @@ class blockreal(object):
                                             [pathreleasesize1, pathreleasesize] = np.shape(pathrelease)
                                             for loop3 in range(0, pathreleasesize - 1, 1):
                                                 if pathrelease[loop3] != 0 and pathrelease[loop3 + 1] != 0:
-                                                        dummy12[pathrelease[loop3], pathrelease[loop3 + 1]] = dummy12[pathrelease[loop3, pathrelease[loop3 + 1] + path_final[PF3[loop1], 5]]]
+                                                        dummy12[pathrelease[loop3], pathrelease[loop3 + 1]] = dummy12[pathrelease[loop3, pathrelease[loop3 + 1] + self.path_final[PF3[loop1], 5]]]
                                                 else:
                                                     break
                                             for loop3 in range(0, path6size, 1):
                                                 if path6[loop3] != 0 and path6[loop3 + 1] != 0:
-                                                    dummy12[path6[loop3], path6[loop3 + 1]] = dummy12[path6[loop3, path6[loop3 + 1] - path_final[PF3[loop1], 5]]]
+                                                    dummy12[path6[loop3], path6[loop3 + 1]] = dummy12[path6[loop3, path6[loop3 + 1] - self.path_final[PF3[loop1], 5]]]
                                                 else:
                                                     break
-                                            path_final[PF3[loop1], 6:nPF] = path7
+                                            self.path_final[PF3[loop1], 6:nPF] = path7
                                 self.wt_matx = np.divide(1, dummy12)
                                 self.wt_matx_real = np.divide(1, self.wt_matx_real - flow)
                                 self.wt_matx_real1 = np.divide(1, self.wt_matx_real1 - flow)
@@ -457,4 +457,4 @@ class blockreal(object):
                 Anodes[index] = []
                 [Anodes3size1, Anodes3size] = np.shape(Anodes3)
         if Anodes3size == 0:
-            pathreal = np.zeros((1, p))
+            self.pathreal = np.zeros((1, p))

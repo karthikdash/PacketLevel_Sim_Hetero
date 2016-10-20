@@ -43,6 +43,7 @@ class updateonentry1(object):
         [s1, s2] = np.shape(self.path_final)
         if self.flow_type_new == 0:
             # Calls call1.py
+            # Source to destination calculation
             cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
@@ -54,7 +55,7 @@ class updateonentry1(object):
             if v.all():
                 self.blockstate_new = 0  # Represents blockstate
             else:
-                # s_new and d_new interchanged. Maybe for destination to source calculation
+                # Destination to source calculation
                 cd = call1(self.p, self.d_new, self.s_new, self.flow_type_new, self.min_rate, self.wt_matx,
                            self.wt_matx_real, self.wt_matx_real1)
                 cd.execute()
@@ -68,6 +69,7 @@ class updateonentry1(object):
                 if v.all():
                     self.blockstate_new = 0
                     # Call2
+                    # If blocked by destination to source, we invoke Call2
                 else:
                     self.blockstate_new = 1
                     noofpaths = 1

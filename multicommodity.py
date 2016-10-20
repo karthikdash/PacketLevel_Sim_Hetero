@@ -1,6 +1,6 @@
 import numpy as np
 from updateonentry1 import updateonentry1
-from udpateonentry import updateonentry
+# from udpateonentry import updateonentry
 # Network Parameters
 
 # Total Number of Nodes
@@ -260,7 +260,8 @@ arrivaltime = []
 departuretime = []
 departuretime1 = []
 
-# Exponential Randome distribution at mean 1/lambda
+# Exponential Random distribution at mean 1/lambda
+# All the arrival times are computed here. So each flowarrival[] time corresponds to particular source[]
 flowarrivaltime = np.random.exponential(np.divide(1, arrivalrate))
 arrivalratesize = np.shape(arrivalrate)[0]
 arrivalratesize1 = 1
@@ -269,11 +270,12 @@ print flowarrivaltime.argmin()
 # Flow starts
 # while(countarrival < limit):
 while(countarrival < 1):
+    # We find the minimum get the first arriving flow and hence source node for that corresponding time
     c = flowarrivaltime.min()  # Minimum Value
     I = flowarrivaltime.argmin()  # Index of the Minimum Value
     if countarrival == 0:
         countarrival = countarrival + 1
-        timeprevious = flowarrivaltime[I]  # First Flow arrival time
+        timepreviuos1 = flowarrivaltime[I]  # First Flow arrival time
         # Arrivaltime vector is updated by appending the current flow arrival time which just arrived
         arrivaltime = np.append(arrivaltime, flowarrivaltime[I])
         # <PDQ> Time of departure udpated for the flow that as arrived
@@ -307,14 +309,71 @@ while(countarrival < 1):
                                         destination[I], flow_type1[I], min_rate1[I], flownumber_new, userpriority_new,
                                         path_final, wt_matx, wt_matx_real, wt_matx_real1, blockstate)
         updateonentry1.execute()
-        updateonentry1.wt_matx_real1
-        if updateonentry1.blockstate_new == 0:  # If call is blocked by apadted Dijkstra
+        s = updateonentry1.s
+        d = updateonentry1.d
+        flow_type = updateonentry1.flow_type
+        min_rate = updateonentry1.min_rate
+        flow_number = updateonentry1.flownumber
+        userpriority = updateonentry1.userpriority
+        blockstate_new = updateonentry1.blockstate_new
+        wt_matx = updateonentry1.wt_matx
+        wt_matx_real = updateonentry1.wt_matx_real
+        wt_matx_real1 = updateonentry1.wt_matx_real1
+        path_final = updateonentry1.path_final
+        blockstate = updateonentry1.blockstate
+        print blockstate, "blockstate"
+        if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
             count_algo1 = count_algo1 + 1
-        blockstate1[countarrival] = updateonentry1.blockstate_new
+        blockstate1[countarrival] = blockstate_new
         ################################################
         # updateonentry1 does routing using Enhanced Dijkstra
         ################################################
 
-        updateonentry = updateonentry(p, s_block, d_block, flow_type_block, min_rate_block, flownumber_block, userpriority_block, source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_block, userpriority_new_block, path_final_block, wt_matx_block, wt_matx_real_block, wt_matx_real1_block, eff_capacity_matx, blockstate_block)
+        # updateonentry = updateonentry(p, s_block, d_block, flow_type_block, min_rate_block, flownumber_block, userpriority_block, source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_block, userpriority_new_block, path_final_block, wt_matx_block, wt_matx_real_block, wt_matx_real1_block, eff_capacity_matx, blockstate_block)
 
-    else:
+    else:  # When countarrival > 1
+        # The flow whose departure time comes first
+        c1 = departuretime1.min()  # Minimum Value
+        I1 = departuretime1.argmin()  # Index of the Minimum Value
+        if c < c1:  # If the next arrival time < departure time
+            timecurrent = c  # Current Time = Arrival Time
+            countarrival = countarrival + 1  # Increase Call Counter
+            for loop1 in (0, countarrival - 1, 1):  # Checking for all calls till last arrival one by one
+                if departuretime1[loop1] != float('inf'):  # For calls who are yet to depart and already in Network
+                    if flow_type[loop1] == 0:  # For Calls which are Real
+                        if blockstate1[loop1] == 1:  # For Calls which are not blocked in adapted Dijkstra
+                            for loop2 in range(0, 3*limit, 1):
+                                if path_final[loop2, 0] == loop1:
+                                    path1 = path_final[loop2, 6:p+5]
+                                    path2 = path_final[loop2+1, 6:p+5]
+                                    break
+                            endtoenddelay1 = 0
+                            endtoenddelay2 = 0
+                            for loop2 in range(0, p-1, 1):
+                                if path1[loop2+1] != 0:
+                                    endtoenddelay1 = endtoenddelay1 + wt_matx_real[path1[loop2], path1[loop2+1]]  # Compute End to End delay of fwd path
+                                else:
+                                    break
+                            for loop2 in range(0, p-1, 1):
+                                if path1[loop2+1] != 0:
+                                    endtoenddelay2 = endtoenddelay2 + wt_matx_real[path1[loop2], path1[loop2+1]]  # Compute End to End delay of bkwd path
+                                else:
+                                    break
+                            delayvolume[loop1] = delayvolume[loop1] + (endtoenddelay1 + endtoenddelay2)*(timecurrent-timepreviuos1)  # timepreviuos1 = either last arrival or departure
+            timeprevious1 = timecurrent  # Set as latest arrival data_require
+            if countarrival == start + 1:  # Statistics are computed from here
+                timeoffirstarrival = flowarrivaltime[I]  # Note the first arrival timecurrent
+                timeprevious = flowarrivaltime[I]  # Set timeprevious = current arrival time, because network avg cost calculation starts from here
+
+                if timecurrent > timeprevious:  # Will be false till network avg cost calculation starts
+
+                    # Adapted Dijkstra avg network cost computation
+                    wt_matx1 = wt_matx
+                    for loop in range(0, p, 1):
+                        for loop1 in range(0, p, 1):
+                            if wt_matx1[loop, loop1] == float('inf'):
+                                wt_matx1[loop, loop1] = 0
+                    cost = sum(sum(wt_matx1))  # Sum up all link costs
+                    totalcost = totalcost_block+cost*(timecurrent-timeprevious)  # Update total cost by [cost * (time since last arrival or departure)]
+                    avgcost = totalcost/(timecurrent-timeoffirstarrival)  # Compute avg cost = totalcost/ (time since first arrival when tracking statistics started)
+                    avgcost1 = np.append(avgcost1, avgcost)
