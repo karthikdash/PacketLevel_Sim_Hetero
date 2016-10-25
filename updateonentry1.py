@@ -1,5 +1,6 @@
 import numpy as np
 from call1 import call1
+from call2 import call2
 from dijkstra import dijkstra
 
 
@@ -44,24 +45,23 @@ class updateonentry1(object):
         if self.flow_type_new == 0:
             # Calls call1.py
             # Source to destination calculation
-            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
             self.wt_matx = cd.wt_matx
             self.wt_matx_real = cd.wt_matx_real
             self.wt_matx_real1 = cd.wt_matx_real1
+            np.savetxt("pathfinal_flowtype0.csv", path1, delimiter=",")
             v = path1 == np.zeros((self.p))
             if v.all():
                 self.blockstate_new = 0  # Represents blockstate
             else:
                 # Destination to source calculation
-                cd = call1(self.p, self.d_new, self.s_new, self.flow_type_new, self.min_rate, self.wt_matx,
+                cd = call1(self.p, self.d_new, self.s_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                            self.wt_matx_real, self.wt_matx_real1)
                 cd.execute()
                 path2 = cd.path
-                print "PATH2"
-                print path2
                 self.wt_matx = cd.wt_matx
                 self.wt_matx_real = cd.wt_matx_real
                 self.wt_matx_real1 = cd.wt_matx_real1
@@ -70,14 +70,20 @@ class updateonentry1(object):
                     self.blockstate_new = 0
                     # Call2
                     # If blocked by destination to source, we invoke Call2
+                    cd1 = call2(self.p, path1, self.flow_type_new, self.min_rate_new, self.wt_matx,
+                                self.wt_matx_real, self.wt_matx_real1)
+                    cd1.execute()
+                    self.wt_matx = cd1.wt_matx
+                    self.wt_matx_real = cd1.wt_matx_real
+                    self.wt_matx_real1 = cd1.wt_matx_real1
                 else:
                     self.blockstate_new = 1
                     noofpaths = 1
-                    for loop in range(0, s1, 1):
+                    for loop in range(0, s1-1, 1):
                         # Not sure about this loop[0] or loop[1]
                         if self.path_final[loop][0] == 0:
-                            print self.path_final
-                            print path1
+                            # print self.path_final
+                            # print path1
                             v = [self.flownumber_new, self.flow_type_new,
                                  self.userpriority_new, noofpaths,
                                  self.min_rate_new]
@@ -86,9 +92,10 @@ class updateonentry1(object):
                                   self.userpriority_new, noofpaths,
                                   self.min_rate_new]
                             self.path_final[loop+1, :] = np.concatenate((v1, path2))
+                            np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
                             break
         elif self.flow_type_new == 1:
-            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
@@ -106,13 +113,15 @@ class updateonentry1(object):
                         self.path_final[loop, :] = np.append(self.flownumber_new, self.flow_type_new,
                                                              self.userpriority_new, noofpaths,
                                                              self.min_rate_new, path1)
+                        np.savetxt("pathfinal2.csv", self.path_final, delimiter=",")
+                        break
         elif self.flow_type_new == 2:
-            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
-            print "PATH12"
-            print path1
+            # print "PATH12"
+            # print path1
             self.wt_matx = cd.wt_matx
             self.wt_matx_real = cd.wt_matx_real
             self.wt_matx_real1 = cd.wt_matx_real1
@@ -123,13 +132,14 @@ class updateonentry1(object):
                 self.blockstate_new = 1
                 noofpaths = 1
                 for loop in range(0, s1, 1):
-                    print loop
+                    # print loop
                     # Not sure about this loop[0] or loop[1]
                     if self.path_final[loop][0] == 0:
                         v = [self.flownumber_new, self.flow_type_new,
                              self.userpriority_new, noofpaths,
                              self.min_rate_new]
                         self.path_final[loop, :] = np.concatenate((v, path1))
+                        break
         else:
             dij = dijkstra(self.s_new, self.d_new, self.wt_matx)
             path1 = dij.execute()
@@ -146,6 +156,8 @@ class updateonentry1(object):
                          self.userpriority_new, noofpaths,
                          self.min_rate_new]
                     self.path_final[loop, :] = np.concatenate((v, path1))
+                    np.savetxt("pathfinal3.csv", self.path_final, delimiter=",")
+                    break
         if self.blockstate_new == 1:
             self.s = np.append(self.s, self.s_new)
             self.d = np.append(self.d, self.d_new)

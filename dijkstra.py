@@ -12,13 +12,13 @@ class dijkstra(object):
         self.wt_matx = wt_matx
 
     def execute(self):
-        print (self.wt_matx)
+        # print (self.wt_matx), "lordvader"
         [m, n] = np.shape(self.wt_matx)
         visited = np.zeros((n))
         parent = np.zeros((n))
         with np.errstate(divide='ignore', invalid='ignore'):
             cost = np.divide(1, np.zeros((n)))
-        cost[self.s] = 0
+        cost[self.s-1] = 0
         for y in range(0, n, 1):
             temp = []
             for h in range(0, n, 1):
@@ -28,8 +28,8 @@ class dijkstra(object):
                     temp = np.append(temp, float('inf'))
             nxt1 = temp.min()  # Minimum Value
             nxt = temp.argmin()  # Index of the Minimum Value
-            print nxt
-            if nxt == self.d:
+            # print nxt
+            if nxt+1 == self.d:
                 break
             if nxt1 == float('inf'):
                 break
@@ -38,16 +38,17 @@ class dijkstra(object):
                 if visited[z] == 0:
                     newcost = cost[nxt] + self.wt_matx[nxt, z]
                     if newcost < cost[z]:
-                        parent[z] = nxt
+                        parent[z] = nxt+1
                         cost[z] = newcost
         path = []
-        if parent[self.d] != 0:
+        if parent[self.d-1] != 0:
             t = self.d
             path = self.d
             while (t != self.s):
-                p = int(parent[t])
+                p = int(parent[t-1])
                 path = np.append(p, path)
                 t = p
+        # print path
         return path
         self.cost = cost
         self.visited = visited

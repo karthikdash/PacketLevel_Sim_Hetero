@@ -4,7 +4,7 @@ from Packets import Packets
 import numpy as np
 
 # Network Parameters
-node_service_rate = 100000  # Bytes/second
+node_service_rate = 500000  # Bytes/second
 voice_rate = 22000  # Bps
 video_rate = 400000  # Bps
 file_rate = 300000  # Bps
@@ -28,9 +28,9 @@ flow_tag = 1  -> video
 flow_tag = 2  -> file
 '''
 
-arrival_rate = 0.09
-call_duration = 0.09
-file_duration = 0.001  # Same for file size as well
+arrival_rate = 0.01
+call_duration = 0.01
+file_duration = 0.01  # Same for file size as well
 
 print np.random.randint(0, 3, size=1)[0]
 print np.random.exponential(np.divide(1, arrival_rate))
