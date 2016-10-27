@@ -5,7 +5,7 @@ import numpy as np
 import bisect
 
 # Network Parameters
-node_service_rate = 5000000  # Bytes/second
+node_service_rate = 500000  # Bytes/second
 voice_rate = 22000  # Bps
 video_rate = 400000  # Bps
 file_rate = 300000  # Bps
@@ -30,8 +30,8 @@ flow_tag = 2  -> file
 '''
 
 arrival_rate = 0.01
-call_duration = 1.0 / 50
-file_duration = 1.0 / 50  # Same for file size as well
+call_duration = 1.0 / 150
+file_duration = 1.0 / 150  # Same for file size as well
 
 print np.random.randint(0, 3, size=1)[0]
 print np.random.exponential(np.divide(1, arrival_rate))
@@ -63,7 +63,7 @@ while t < limit:
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(voice_packet_rate) + j].arrival_time, flow_tag
-            timetracker.append([packets_realtime[len_tracker].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
+            # timetracker.append([packets_realtime[len_tracker].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
         elif flow_tag == 1:
             for i in range(1, int(flow_duration), 1):
                 for j in range(0, int(video_packet_rate), 1):
@@ -71,7 +71,7 @@ while t < limit:
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(video_packet_rate) + j].arrival_time, flow_tag
-            timetracker.append([packets_realtime[len_tracker].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
+            # timetracker.append([packets_realtime[len_tracker].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
             print i
         elif flow_tag == 2:
             flow_duration = np.random.exponential(np.divide(1, file_duration))*1000
@@ -90,11 +90,6 @@ while t < limit:
                 packets_realtime[0].service(packets_realtime[0].arrival_time, voice_rate, node_service_rate, False)
                 packets1.append(packets_realtime[0])
                 packets_realtime.pop(index)
-                for tracker in list(timetracker):
-                    if tracker[3] == packets_realtime[0].flownumber:
-                        tracker[1] = tracker[1] + 1
-                        tracker[2] = tracker[2] - 1
-                break
             elif len(packets) != 0:
                 packets[0].service(packets[0].arrival_time, file_rate, node_service_rate, False)
                 packets1.append(packets[0])
@@ -115,20 +110,20 @@ while t < limit:
             len_tracker =  len(packets_realtime)
             for i in range(1, int(flow_duration), 1):
                 for j in range(0, int(voice_packet_rate), 1):
-                    packets_realtime.append(Packets(arrival_time + float(i + (j)*1.0/voice_packet_rate), flow_duration, flow_tag, t))
+                    bisect.insort_left(packets_realtime, Packets(arrival_time + float(i + (j)*1.0/voice_packet_rate), flow_duration, flow_tag, t))
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(voice_packet_rate) + j].arrival_time, flow_tag
-            timetracker.append([packets_realtime[len_tracker-1].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
+            # timetracker.append([packets_realtime[len_tracker-1].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
         elif flow_tag == 1:
             len_tracker = len(packets_realtime)
             for i in range(1, int(flow_duration), 1):
                 for j in range(0, int(video_packet_rate), 1):
-                    packets_realtime.append(Packets(arrival_time + float(i + (j)*1.0/video_packet_rate), flow_duration, flow_tag, t))
+                    bisect.insort_left(packets_realtime, Packets(arrival_time + float(i + (j)*1.0/video_packet_rate), flow_duration, flow_tag, t))
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(video_packet_rate) + j].arrival_time, flow_tag
-            timetracker.append([packets_realtime[len_tracker-1].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
+            # timetracker.append([packets_realtime[len_tracker-1].arrival_time, len_tracker, len(packets_realtime) - len_tracker - 1, t])
         elif flow_tag == 2:
             flow_duration = np.random.exponential(np.divide(1, file_duration))*1000
             # print "insidetag2", flow_duration/file_packet_size
@@ -151,38 +146,15 @@ while t < limit:
         if (len(packets)>0 or len(packets_realtime)>0):
             # print i, len(packets) - 1
             if(len(packets_realtime) > 0):
-                if packets_realtime[0].flow_tag == 0:
+                if packets_realtime[0].flow_tag == 0 or  packets_realtime[0].flow_tag == 1:
                     # print len(packets1)
                     serviceend = packets1[len(packets1) - 1].service_end_time
                     # for i in range(0, int(node_service_rate/voice_packet_size) - 1, 1):
-                    for i in range(0, 100 - 1, 1):
+                    for i in range(0, 1000 - 1, 1):
                         if len(packets_realtime) == 0:
                             break
                         packets_realtime[0].service(max(packets_realtime[0].arrival_time, serviceend), voice_rate, node_service_rate, False)
                         packets1.append(packets_realtime[0])
-                        for tracker in timetracker:
-                            if tracker[3] != packets_realtime[0].flownumber and tracker[2] != -1:
-                                if tracker[0] < serviceend:
-                                    print "k"
-                                    serviceend = packets1[len(packets1) - 1].service_end_time
-                                    packets_realtime[tracker[1]].service(max(packets_realtime[tracker[1]].arrival_time, serviceend), voice_rate, node_service_rate, False)
-                                    packets1.append(tracker[1])
-                                    packets_realtime.pop(tracker[1])
-                                    # Tracking Updation
-                                    tracker[0] = packets_realtime[tracker[1] + 1].arrival_time
-                                    tracker[1] = tracker[1] + 1
-                                    tracker[2] = tracker[2] - 1
-                        if len(packets_realtime) == 1:
-                            # If all the realtime packets of a particular flow have been serviced, we have to remove that flow from time tracker
-                            # Why: This is no longer needed in checking if flows arrived at currentime of the system
-                            for tracker in timetracker:
-                                if tracker[3] == packets_realtime[0].flownumber:
-                                    timetracker.remove(tracker)
-                        for tracker in list(timetracker):
-                            if tracker[3] == packets_realtime[0].flownumber:
-                                tracker[0] = packets_realtime[0].arrival_time
-                                tracker[1] = tracker[1] + 1
-                                tracker[2] = tracker[2] - 1
                         packets_realtime.pop(0)
                 '''
                 if len(packets_realtime) > 0:
@@ -214,7 +186,7 @@ while t < limit:
             if len(packets) != 0 and len(packets_realtime) == 0:
                 serviceend = packets1[len(packets1) - 1].service_end_time
                 # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
-                for i in range(0, 50 - 1, 1):
+                for i in range(0, 100 - 1, 1):
                     if len(packets) == 0:
                         break
                     packets[0].service(max(packets[0].arrival_time, serviceend), voice_rate, node_service_rate, False)
