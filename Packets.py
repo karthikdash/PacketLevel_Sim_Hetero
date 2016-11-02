@@ -8,11 +8,16 @@ class Packets:
     video_packet_size = 1000.0
     file_packet_size = 1000.0
 
-    def __init__(self, arrival_time, flow_duration, flow_tag, flownumber):
+    def __init__(self, initial_arrival_time, arrival_time, flow_duration, flow_tag, path, flownumber):
+        self.initial_arrival_time = initial_arrival_time
         self.arrival_time = arrival_time
+        self.pre_arrival = arrival_time
         self.flow_duration = flow_duration
         self.flow_tag = flow_tag
+        self.path = path
         self.flownumber = flownumber
+        self.s_new = 0
+        self.d_new = 0
         '''
         self.service_start_date = service_start_date
         self.service_time = service_time
@@ -21,6 +26,11 @@ class Packets:
         '''
     def service(self, service_start_time, service_rate, node_service_rate, prioritised):
         # self.service_time = (self.service_rate * self.flow_duration)/node_service_rate
+        self.s_new = self.path.pop(0)
+        if len(self.path) == 1:
+            self.d_new = 99
+        else:
+            self.d_new = self.path[0]
         self.service_start_time = service_start_time
         if self.flow_tag == 0:
             self.service_time = self.voice_packet_size/node_service_rate
@@ -30,6 +40,7 @@ class Packets:
             self.service_time = self.file_packet_size/node_service_rate
         self.service_end_time = service_start_time + self.service_time
         self.wait = self.service_start_time - self.arrival_time
+        self.arrival_time = self.service_end_time
         self.prioritised = prioritised
     # For Sorting. Will be used for bisect module
     def __lt__(self, other):
