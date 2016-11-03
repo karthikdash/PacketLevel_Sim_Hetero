@@ -1,0 +1,5 @@
+image: python:2.7
+
+all_tests:
+  script:
+  - python FirstNode.py

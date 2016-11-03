@@ -38,7 +38,7 @@ print np.random.exponential(np.divide(1, arrival_rate))
 print np.random.exponential(call_duration)
 
 # limit = input('Limit:')
-limit = 200
+limit = 1000
 t = 0
 
 path = [0, 1, 2, 4]
@@ -162,6 +162,7 @@ while t < limit:
             for i in range(1, int(flow_duration), 1):
                 for j in range(0, int(voice_packet_rate), 1):
                     bisect.insort_left(packets_realtime0, Packets(arrival_time + float(i + (j)*1.0/voice_packet_rate), arrival_time + float(i + (j)*1.0/voice_packet_rate), flow_duration, flow_tag, path[:], t))
+                    # packets_realtime0.append(Packets(arrival_time + float(i + (j)*1.0/voice_packet_rate),arrival_time + float(i + (j)*1.0/voice_packet_rate), flow_duration, flow_tag, path[:], t))
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(voice_packet_rate) + j].arrival_time, flow_tag
@@ -171,6 +172,7 @@ while t < limit:
             for i in range(1, int(flow_duration), 1):
                 for j in range(0, int(video_packet_rate), 1):
                     bisect.insort_left(packets_realtime0, Packets(arrival_time + float(i + (j)*1.0/video_packet_rate), arrival_time + float(i + (j)*1.0/video_packet_rate), flow_duration, flow_tag, path[:], t))
+                    # packets_realtime0.append(Packets(arrival_time + float(i + (j)*1.0/video_packet_rate),arrival_time + float(i + (j)*1.0/video_packet_rate), flow_duration, flow_tag, path[:], t))
                     # service_start_time = arrival_time
                     # packets[i*Int(voice_packet_rate) + j].service(service_start_time, voice_rate, node_service_rate)
                     # print packets[i*int(video_packet_rate) + j].arrival_time, flow_tag
@@ -194,13 +196,14 @@ while t < limit:
         index = 0
         i = 0
         flag = 1
+
         # print i, len(packets) - 1
         for node_no in range(0, noOfNodes, 1):
             if len(nodes_real[str(node_no)]) > 0:
                 if nodes_real[str(node_no)][0].flow_tag == 0 or nodes_real[str(node_no)][0].flow_tag == 1:
                     # print len(packets_tracker)
                     # for i in range(0, int(node_service_rate/voice_packet_size) - 1, 1):
-                    for i in range(0, 1000 - 1, 1):
+                    for i in range(0, 2000 - 1, 1):
                         if len(nodes_real[str(node_no)]) == 0:
                             break
                         if len(packets_tracker[str(node_no)]) == 0:
@@ -251,6 +254,7 @@ while t < limit:
             queue_size.append(firstqueue)
         else:
             queue_size.append(len(packets_tracker))
+
     t = t + 1
 lenght = len(packets0)
 index = 0
