@@ -26,6 +26,7 @@ class Packets:
         '''
     def service(self, service_start_time, service_rate, node_service_rate, prioritised):
         # self.service_time = (self.service_rate * self.flow_duration)/node_service_rate
+        self.pre_arrival = self.arrival_time
         self.s_new = self.path.pop(0)
         if len(self.path) == 1:
             self.d_new = 99
@@ -40,7 +41,7 @@ class Packets:
             self.service_time = self.file_packet_size/node_service_rate
         self.service_end_time = service_start_time + self.service_time
         self.wait = self.service_start_time - self.arrival_time
-        self.arrival_time = self.service_end_time
+        # self.arrival_time = self.service_end_time
         self.prioritised = prioritised
     # For Sorting. Will be used for bisect module
     def __lt__(self, other):
