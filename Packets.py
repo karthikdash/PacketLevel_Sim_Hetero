@@ -4,9 +4,9 @@ import numpy as np
 
 
 class Packets:
-    voice_packet_size = 212.0  # Bytes
-    video_packet_size = 1000.0
-    file_packet_size = 1000.0
+    voice_packet_size = 2.12  # Bytes
+    video_packet_size = 10.00
+    file_packet_size = 10.00
 
     def __init__(self, initial_arrival_time, arrival_time, flow_duration, flow_tag, path, flownumber):
         self.initial_arrival_time = initial_arrival_time

@@ -5,14 +5,14 @@ import numpy as np
 import bisect
 
 # Network Parameters
-node_service_rate = 500000  # Bytes/second
-voice_rate = 224000  # Bps
-video_rate = 400000  # Bps
-file_rate = 300000  # Bps
+node_service_rate = 1000  # Bytes/second
+voice_rate = 400  # Bps
+video_rate = 400  # Bps
+file_rate = 300  # Bps
 
-voice_packet_size = 212  # Bytes
-video_packet_size = 1000
-file_packet_size = 1000
+voice_packet_size = 2.12  # Bytes
+video_packet_size = 10.00
+file_packet_size = 10.00
 
 voice_packet_rate = (voice_rate/voice_packet_size)
 video_packet_rate = (video_rate/video_packet_size)
@@ -29,9 +29,9 @@ flow_tag = 1  -> video
 flow_tag = 2  -> file / non-realtime data
 '''
 
-arrival_rate = 0.001
-call_duration = 1.0 / 150
-file_duration = 1.0 / 150  # Same for file size as well
+arrival_rate = 0.01
+call_duration = 1.0 / 100
+file_duration = 1.0 / 100  # Same for file size as well
 
 print np.random.randint(0, 3, size=1)[0]
 print np.random.exponential(np.divide(1, arrival_rate))
@@ -82,7 +82,40 @@ packets_tracker = {
                     '3': packets_tracker3,
                     '4': packets_tracker4
                   }
-
+Voice_Mean_Time0 = 0
+Voice_Mean_Time1 = 0
+Voice_Mean_Time2 = 0
+Voice_Mean_Time3 = 0
+Voice_Mean_Time = {
+    0: Voice_Mean_Time0,
+    1: Voice_Mean_Time1,
+    2: Voice_Mean_Time2,
+    3: Voice_Mean_Time3
+}
+Video_Mean_Time0 = 0
+Video_Mean_Time1 = 0
+Video_Mean_Time2 = 0
+Video_Mean_Time3 = 0
+Video_Mean_Time = {
+    0: Video_Mean_Time0,
+    1: Video_Mean_Time1,
+    2: Video_Mean_Time2,
+    3: Video_Mean_Time3
+}
+File_Mean_Time0 = 0
+File_Mean_Time1 = 0
+File_Mean_Time2 = 0
+File_Mean_Time3 = 0
+File_Mean_Time = {
+    0: File_Mean_Time0,
+    1: File_Mean_Time1,
+    2: File_Mean_Time2,
+    3: File_Mean_Time3
+}
+Voice_Mean = 0
+Video_Mean = 0
+File_Mean = 0
+serviceend_time = [0, 0, 0, 0, 0]
 final_packets_tracker = []
 timetracker = []
 len_tracker = 0
@@ -203,39 +236,70 @@ while t < limit:
                 if nodes_real[str(node_no)][0].flow_tag == 0 or nodes_real[str(node_no)][0].flow_tag == 1:
                     # print len(packets_tracker)
                     # for i in range(0, int(node_service_rate/voice_packet_size) - 1, 1):
-                    for i in range(0, 2000 - 1, 1):
+                    i = 0
+                    initial_service_end = serviceend_time[0]
+                    if serviceend_time[0] == 0:
+                        initial_service_end = 1
+                    while (serviceend_time[node_no] - initial_service_end <= 50):
+                        i = i+1
                         if len(nodes_real[str(node_no)]) == 0:
                             break
-                        if len(packets_tracker[str(node_no)]) == 0:
+                        if serviceend_time[0] == 0:
                             nodes_real[str(node_no)][0].service(nodes_real[str(node_no)][0].arrival_time, voice_rate, node_service_rate, False)
+                            initial_service_end = nodes_real[str(node_no)][0].arrival_time
                         else:
-                            serviceend = packets_tracker[str(node_no)][len(packets_tracker[str(node_no)]) - 1].service_end_time
+                            serviceend = serviceend_time[node_no]
                             nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, serviceend), voice_rate, node_service_rate, False)
                         # Appending to the serving Queue
-                        packets_tracker[str(node_no)].append(nodes_real[str(node_no)][0])
+                        serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
+                        # packets_tracker[str(node_no)].append(nodes_real[str(node_no)][0])
+                        if nodes_real[str(node_no)][0].flow_tag == 0:
+                            Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                        else:
+                            Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
                         # Appending to the next node receiving Queue
                         if nodes_real[str(node_no)][0].d_new == 99:
-                            final_packets_tracker.append(nodes_real[str(node_no)][0])
+                            # final_packets_tracker.append(nodes_real[str(node_no)][0])
+                            if nodes_real[str(node_no)][0].flow_tag == 0:
+                                if Voice_Mean == 0:
+                                    Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time
+                                else:
+                                    Voice_Mean = (Voice_Mean + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                            else:
+                                if Video_Mean == 0:
+                                    Video_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time
+                                else:
+                                    Video_Mean = (Video_Mean + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
                         else:
                             # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
                             # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
                             bisect.insort_left(nodes_real[str(nodes_real[str(node_no)][0].d_new)], Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
                         nodes_real[str(node_no)].pop(0)
+                        # serviceend = packets_tracker[str(node_no)][len(packets_tracker[str(node_no)]) - 1].service_end_time
             if len(nodes_nonreal[str(node_no)]) != 0 and len(nodes_real[str(node_no)]) == 0:
                 # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
-                for i in range(0, 100 - 1, 1):
+                initial_service_end = serviceend_time[0]
+                if serviceend_time[0] == 0:
+                    initial_service_end = 1
+                while (serviceend_time[node_no] - initial_service_end <= 0.1):
                     if len(nodes_nonreal[str(node_no)]) == 0:
                         break
-                    if len(packets_tracker[str(node_no)]) == 0:
+                    if serviceend_time[0] == 0:
                         nodes_nonreal[str(node_no)][0].service(nodes_nonreal[str(node_no)][0].arrival_time, voice_rate, node_service_rate, False)
+                        initial_service_end = nodes_nonreal[str(node_no)][0].arrival_time
                     else:
-                        serviceend = packets_tracker[str(node_no)][len(packets_tracker[str(node_no)]) - 1].service_end_time
+                        serviceend = serviceend_time[node_no]
                         nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, serviceend), voice_rate, node_service_rate, False)
                     # Appending to the serving Queue
-                    packets_tracker[str(node_no)].append(nodes_nonreal[str(node_no)][0])
+                    serviceend_time[node_no] = nodes_nonreal[str(node_no)][0].service_end_time
+                    # packets_tracker[str(node_no)].append(nodes_nonreal[str(node_no)][0])
                     # Appending to the next node receiving Queue
                     if nodes_nonreal[str(node_no)][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                        final_packets_tracker.append(nodes_nonreal[str(node_no)][0])
+                        # final_packets_tracker.append(nodes_nonreal[str(node_no)][0])
+                        if File_Mean == 0:
+                            File_Mean = nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time
+                        else:
+                            File_Mean = (File_Mean + nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time) / 2.0
                     else:
                         # nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)].append(nodes_nonreal[str(node_no)][0])
                         bisect.insort_left(nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)],
@@ -289,37 +353,8 @@ packets_tracking = {
     2: packets_tracker2,
     3: final_packets_tracker
 }
-Voice_Mean_Time0 = 0
-Voice_Mean_Time1 = 0
-Voice_Mean_Time2 = 0
-Voice_Mean_Time3 = 0
-Voice_Mean_Time = {
-    0: Voice_Mean_Time0,
-    1: Voice_Mean_Time1,
-    2: Voice_Mean_Time2,
-    3: Voice_Mean_Time3
-}
-Video_Mean_Time0 = 0
-Video_Mean_Time1 = 0
-Video_Mean_Time2 = 0
-Video_Mean_Time3 = 0
-Video_Mean_Time = {
-    0: Video_Mean_Time0,
-    1: Video_Mean_Time1,
-    2: Video_Mean_Time2,
-    3: Video_Mean_Time3
-}
-File_Mean_Time0 = 0
-File_Mean_Time1 = 0
-File_Mean_Time2 = 0
-File_Mean_Time3 = 0
-File_Mean_Time = {
-    0: File_Mean_Time0,
-    1: File_Mean_Time1,
-    2: File_Mean_Time2,
-    3: File_Mean_Time3
-}
 for i in range(0, 3, 1):
+    '''
     for packet in packets_tracking[i]:
         if packet.flow_tag == 0:
             # print packet.wait + packet.service_time
@@ -338,16 +373,16 @@ for i in range(0, 3, 1):
         Video_Mean_Time[i] = sum(Video_Total_Times[i])/len(Video_Total_Times[i])
     if len(File_Total_Times[i]) != 0:
         File_Mean_Time[i] = sum(File_Total_Times[i])/len(File_Total_Times[i])
+    '''
     print "Voice Mean Delay: ", Voice_Mean_Time[i]
     print "Video Mean Delay: ", Video_Mean_Time[i]
     print "File Mean Delay: ", File_Mean_Time[i]
     print ""
+
+'''
 Voice_Total_Time = []
 Video_Total_Time = []
 File_Total_Time = []
-Voice_Mean = 0
-Video_Mean = 0
-File_Mean = 0
 for packet in final_packets_tracker:
     if packet.flow_tag == 0:
         # print packet.wait + packet.service_time
@@ -366,6 +401,7 @@ if len(Video_Total_Time) != 0:
     Video_Mean = sum(Video_Total_Time) / len(Video_Total_Time)
 if len(File_Total_Time) != 0:
     File_Mean = sum(File_Total_Times) / len(File_Total_Times)
+'''
 print "Final Voice Mean Delay: ", Voice_Mean
 print "Final Video Mean Delay: ", Video_Mean
 print "Final File Mean Delay: ", File_Mean
