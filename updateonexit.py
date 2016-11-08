@@ -66,11 +66,11 @@ class updateonexit(object):
                     self.wt_matx = cd3.wt_matx
                     self.wt_matx_real = cd3.wt_matx_real
                     self.wt_matx_real1 = cd3.wt_matx_real1
-                    if loop == path_finalsize1:
-                        self.path_final[path_finalsize1, :] = np.zeros((1, p+5))
+                    if loop == path_finalsize1 - 1:
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((2, p+5))
                     else:
-                        self.path_final[loop:path_finalsize1-1, :] = self.path_final[loop+1:path_finalsize1, :]
-                        self.path_final[path_finalsize1, :] = np.zeros((1, p+5))
+                        self.path_final[loop:path_finalsize1-2, :] = self.path_final[loop+2:path_finalsize1, :]
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((1, p+5))
                     break
         elif flow_type_exit == 2:
             for loop in range(0, path_finalsize1, 1):

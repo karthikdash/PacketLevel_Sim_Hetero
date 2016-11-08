@@ -78,6 +78,9 @@ class updateonentry1(object):
                     self.wt_matx_real1 = cd1.wt_matx_real1
                 else:
                     self.blockstate_new = 1
+                    # Packets level Variables
+                    self.fwdpath = path1
+                    self.bkwdpath = path2
                     noofpaths = 1
                     for loop in range(0, s1-1, 1):
                         # Not sure about this loop[0] or loop[1]
@@ -92,7 +95,7 @@ class updateonentry1(object):
                                   self.userpriority_new, noofpaths,
                                   self.min_rate_new]
                             self.path_final[loop+1, :] = np.concatenate((v1, path2))
-                            np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
+                            # np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
                             break
         elif self.flow_type_new == 1:
             cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
@@ -102,18 +105,23 @@ class updateonentry1(object):
             self.wt_matx = cd.wt_matx
             self.wt_matx_real = cd.wt_matx_real
             self.wt_matx_real1 = cd.wt_matx_real1
-            if path1 == np.zeros((p)):
+            v = path1 == np.zeros((self.p))
+            if v.all():
                 self.blockstate_new = 0
             else:
                 self.blockstate_new = 1
+                # Packets level Variables
+                self.fwdpath = path1
+                self.bkwdpath = None
                 noofpaths = 1
                 for loop in range(0, s1, 1):
                     # Not sure about this loop[0] or loop[1]
                     if self.path_final[loop][0] == 0:
-                        self.path_final[loop, :] = np.append(self.flownumber_new, self.flow_type_new,
-                                                             self.userpriority_new, noofpaths,
-                                                             self.min_rate_new, path1)
-                        np.savetxt("pathfinal2.csv", self.path_final, delimiter=",")
+                        v = [self.flownumber_new, self.flow_type_new,
+                             self.userpriority_new, noofpaths,
+                             self.min_rate_new]
+                        self.path_final[loop, :] = np.concatenate((v, path1))
+                        # np.savetxt("pathfinal2.csv", self.path_final, delimiter=",")
                         break
         elif self.flow_type_new == 2:
             cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
@@ -130,6 +138,8 @@ class updateonentry1(object):
                 self.blockstate_new = 0
             else:
                 self.blockstate_new = 1
+                self.fwdpath = path1
+                self.bkwdpath = None  # None is python equivalent for nil
                 noofpaths = 1
                 for loop in range(0, s1, 1):
                     # print loop

@@ -29,7 +29,7 @@ flow_tag = 1  -> video
 flow_tag = 2  -> file / non-realtime data
 '''
 
-arrival_rate = 0.01
+arrival_rate = 0.001
 call_duration = 1.0 / 100
 file_duration = 1.0 / 100  # Same for file size as well
 
@@ -38,7 +38,7 @@ print np.random.exponential(np.divide(1, arrival_rate))
 print np.random.exponential(call_duration)
 
 # limit = input('Limit:')
-limit = 1000
+limit = 100
 t = 0
 
 path = [0, 1, 2, 4]
@@ -158,26 +158,6 @@ while t < limit:
                 packets0.append(Packets(arrival_time, arrival_time, flow_duration, 2, path[:], t))
                 # print "Appending"
         index = 0
-        '''
-        if len(packets0) != 0 or len(packets_realtime0) != 0:
-            # print index
-            if len(packets_realtime0) != 0:
-                packets_realtime0[0].service(packets_realtime0[0].arrival_time, voice_rate, node_service_rate, False)
-                # packets_tracker.append(packets_realtime0[0])
-                # Appending to the serving Queue
-                packets_tracker0.append(packets_realtime0[0])
-                # Appending to the next node receiving queue
-                nodes_real[str(packets_realtime0[0].d_new)].append(packets_realtime0[0])
-                packets_realtime0.pop(0)
-            elif len(packets0) != 0:
-                packets0[0].service(packets0[0].arrival_time, file_rate, node_service_rate, False)
-                # packets_tracker.append(packets0[0])
-                # Appending to the serving Queue
-                packets_tracker0.append(packets0[0])
-                # Appending to the next node receiving queue
-                nodes_nonreal[str(packets0[0].d_new)].append(packets0[0])
-                packets0.pop(0)
-        '''
         firstqueue = len(packets_tracker)
     else:
         arrival_time = arrival_time + np.random.exponential(np.divide(1, arrival_rate))
@@ -189,7 +169,7 @@ while t < limit:
         if flow_duration < 1:
             flow_duration = 1
         flow_tag = np.random.randint(0, 3, size=1)[0]
-        print flow_tag, t, len(packets_tracker)
+        print flow_tag, t, len(packets_realtime0)
         if flow_tag == 0:
             len_tracker = len(packets_realtime0)
             for i in range(1, int(flow_duration), 1):
