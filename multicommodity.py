@@ -3,6 +3,9 @@ from updateonentry1 import updateonentry1
 from updateonexit import updateonexit
 from Packets import Packets
 import bisect
+from allocaterealupdated1 import allocaterealupdated1
+from allocatenonrealupdated1 import allocatenonrealupdated1
+
 # from udpateonentry import updateonentry
 # Network Parameters
 
@@ -43,22 +46,22 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.004
+lamb = 0.009
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
 # 232 = frame size - overheads size
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
-flow_type1 = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.004, np.ones((12)))
+flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
+arrivalrate = np.multiply(0.009, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 500
+limit = 200
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -123,11 +126,11 @@ flownumber_new = 0
 s_multi = []
 d_multi = []
 flow_type_multi = []
-min_rate_block = []
+min_rate_multi = []
 flownumber_multi = []
 userpriority_multi = []
 blockstate_multi = []
-userpriority_multi = 1
+userpriority_new_multi = 1
 flownumber_new_multi = 0
 
 # Enhanced Dijkstra Variable Definations
@@ -525,6 +528,10 @@ while(countarrival < limit - 1):
         path_final = updateonentry2.path_final
         blockstate = updateonentry2.blockstate
 
+        if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
+            count_algo1 = count_algo1 + 1
+        blockstate1[countarrival] = blockstate_new
+
 
         if blockstate[-1] == 1:  # If last call not blocked
             flow_duration = np.random.exponential(np.divide(1, call_duration))
@@ -573,6 +580,72 @@ while(countarrival < limit - 1):
         # print blockstate, "blockstate"
         # print path_final, "pathfinalstate"
         print flow_type1[I]
+
+        # ############## Routing using multicommodity ##############
+        if I <= s6 - 1:
+            if I == 0:
+                chosenprob1 = probabilities[0:paths[I]]
+                chosenprob2 = probabilities[3 * total:3 * total + paths[I]]
+            else:
+                chosenprob1 = probabilities[paths[I - 1]:paths[I]]
+                chosenprob2 = probabilities[3 * total + paths[I - 1]:3 * total + paths[I]]
+        elif I <= 2 * s6 - 1:
+            if I == 4:
+                chosenprob1 = probabilities[total:total + paths[I - s6]]
+                chosenprob2 = probabilities[4 * total:4 * total + paths[I - s6]]
+            else:
+                chosenprob1 = probabilities[total + paths[I - s6 - 1]:total + paths[I - s6]]
+                chosenprob2 = probabilities[4 * total + paths[I - s6 - 1]:4 * total + paths[I - s6]]
+        else:
+            if I == 8:
+                chosenprob1 = probabilities[2 * total:2 * total + paths[I - 2 * s6]]
+            else:
+                chosenprob1 = probabilities[2 * total + paths[I - 2 * s6 - 1]:2 * total + paths[I - 2 * s6]]
+
+        if flow_type1[I] == 0:  # For realtime flow routing ( Voice and Video)
+            all1 = allocaterealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
+                                                        source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,
+                                                        userpriority_new_multi, path_final_multi, wt_matx_multi, wt_matx_real1_multi, wt_matx_real_multi,
+                                                        blockstate_multi, a11, b11, c11, d11, g11,h11, i11, j11, I, chosenprob1, chosenprob2)
+            all1.service()
+            s_multi = all1.s_multi
+            d_multi = all1.d_multi
+            flow_type_multi = all1.flow_type_multi
+            min_rate_multi = all1.min_rate_multi
+            flownumber_multi = all1.flownumber_multi
+            userpriority_multi = all1.userpriority_multi
+            wt_matx_multi = all1.wt_matx
+            wt_matx_real1_multi = all1.wt_matx_real1
+            wt_matx_real_multi = all1.wt_matx_real
+            blockstate_new_multi = all1.callblock
+            path_final_multi = all1.path_final
+            blockstate_multi = all1.blockstate_multi
+            if blockstate_multi[-1] == 1:
+                fwdpath = all1.fwdpath
+                bkwdpath = all1.bkwdpath
+        else:
+            aln = allocatenonrealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
+                                                        source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,
+                                                        userpriority_new_multi, path_final_multi, wt_matx_multi,
+                                                        blockstate_multi, a11, b11, c11, d11, I, chosenprob1)
+            aln.service()
+            s_multi = aln.s_multi
+            d_multi = aln.d_multi
+            flow_type_multi = aln.flow_type_multi
+            min_rate_multi = aln.min_rate_multi
+            flownumber_multi = aln.flownumber_multi
+            userpriority_multi = aln.userpriority_multi
+            wt_matx_multi = aln.wt_matx
+            blockstate_new_multi = aln.callblock
+            path_final_multi = aln.path_final
+            blockstate_multi = aln.blockstate_multi
+            if blockstate_multi[-1] == 1:
+                fwdpath = all1.fwdpath
+
+        if blockstate_new_multi == 0:
+            count_multi = count_multi + 1
+        blockstate1_multi[countarrival] = blockstate_new_multi
+
         # ################## Node Servicing ###########
         '''
         for node_no in range(1, noOfNodes + 1, 1):
@@ -708,14 +781,13 @@ while(countarrival < limit - 1):
                                                    nodes_nonreal[str(node_no)][0].node_service_rate))
                     nodes_nonreal[str(node_no)].pop(0)
         '''
-        np.savetxt("pathfinal123.csv", path_final, delimiter=",")
-        if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
-            count_algo1 = count_algo1 + 1
-        blockstate1[countarrival] = blockstate_new
-        countarrival = countarrival + 1
+        # np.savetxt("pathfinal123.csv", path_final, delimiter=",")
+
         ################################################
         # updateonentry1 does routing using Enhanced Dijkstra
         ################################################
+        count1departure[countarrival] = countdeparture
+        countarrival = countarrival + 1
 
         # updateonentry = updateonentry(p, s_block, d_block, flow_type_block, min_rate_block, flownumber_block, userpriority_block, source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_block, userpriority_new_block, path_final_block, wt_matx_block, wt_matx_real_block, wt_matx_real1_block, eff_capacity_matx, blockstate_block)
 
@@ -734,17 +806,11 @@ while(countarrival < limit - 1):
                         if blockstate1[loop1] == 1:  # For Calls which are not blocked in adapted Dijkstra
                             for loop2 in range(0, 3*limit - 1, 1):
                                 if path_final[loop2, 0] == loop1+1:
-                                    # print "insideleonmusk"
                                     path1 = path_final[loop2, 5:p+5]
                                     path2 = path_final[loop2+1, 5:p+5]
                                     break
                             endtoenddelay1 = 0.0
                             endtoenddelay2 = 0.0
-                            np.savetxt("pathfinal.csv", path_final, delimiter=",")
-                            # print path_final
-                            # print path1
-                            # print path2
-                            # print countarrival
                             for loop2 in range(0, p-1-1, 1):
                                 if path1[loop2+1] != 0:
                                     endtoenddelay1 = endtoenddelay1 + wt_matx_real[int(path1[loop2] -1), int(path1[loop2+1] -1)]  # Compute End to End delay of fwd path
@@ -756,6 +822,28 @@ while(countarrival < limit - 1):
                                 else:
                                     break
                             delayvolume[loop1] = delayvolume[loop1] + (endtoenddelay1 + endtoenddelay2)*(timecurrent-timepreviuos1)  # timepreviuos1 = either last arrival or departure
+                        if blockstate1_multi[loop1] == 1:  # For Calls which are not blocked in adapted Dijkstra
+                            for loop2 in range(0, 3 * limit - 1, 1):
+                                if path_final_multi[loop2, 0] == loop1 + 1:
+                                    path1 = path_final_multi[loop2, 5:p + 5]
+                                    path2 = path_final_multi[loop2 + 1, 5:p + 5]
+                                    break
+                            endtoenddelay1_multi = 0.0
+                            endtoenddelay2_multi = 0.0
+                            for loop2 in range(0, p - 1 - 1, 1):
+                                if path1[loop2 + 1] != 0:
+                                    endtoenddelay1_multi = endtoenddelay1_multi + wt_matx_real_multi[
+                                        int(path1[loop2] - 1), int(path1[loop2 + 1] - 1)]  # Compute End to End delay of fwd path
+                                else:
+                                    break
+                            for loop2 in range(0, p - 1, 1):
+                                if path1[loop2 + 1] != 0:
+                                    endtoenddelay2_multi = endtoenddelay2_multi + wt_matx_real_multi[
+                                        int(path1[loop2] - 1), int(path1[loop2 + 1] - 1)]  # Compute End to End delay of bkwd path
+                                else:
+                                    break
+                            delayvolume_multi[loop1] = delayvolume_multi[loop1] + (endtoenddelay1_multi + endtoenddelay2_multi) * (
+                            timecurrent - timepreviuos1)  # timepreviuos1 = either last arrival or departure
                 # print loop1, "loop1end"
             timeprevious1 = timecurrent  # Set as latest arrival data_require
             if countarrival == start + 1:  # Statistics are computed from here
@@ -775,6 +863,20 @@ while(countarrival < limit - 1):
                 avgcost = totalcost/(timecurrent-timeoffirstarrival)  # Compute avg cost = totalcost/ (time since first arrival when tracking statistics started)
                 avgcost1 = np.append(avgcost1, avgcost)
                 # End of calculations adapted Dijkstra
+
+                # Multicommodity avg network cost computation
+                wt_matx1_multi = wt_matx_multi
+                for loop in range(0, p, 1):
+                    for loop1 in range(0, p, 1):
+                        if wt_matx1_multi[loop, loop1] == float('inf'):
+                            wt_matx1_multi[loop, loop1] = 0
+                cost_multi = sum(sum(wt_matx1_multi))  # Sum up all link costs
+                totalcost_multi = totalcost_multi + cost_multi * (timecurrent - timeprevious)  # Update total cost by [cost * (time since last arrival or departure)]
+                avgcost_multi = totalcost_multi / (
+                timecurrent - timeoffirstarrival)  # Compute avg cost = totalcost/ (time since first arrival when tracking statistics started)
+                avgcost1_multi = np.append(avgcost1_multi, avgcost_multi)
+                # End of calculations adapted Dijkstra
+
                 timeprevious = timecurrent  # For next iteration we set the time
 
             # Initilisations for routing
@@ -788,8 +890,8 @@ while(countarrival < limit - 1):
             departuretime = np.append(departuretime, timeofdeparture)
             departuretime1 = np.append(departuretime1, timeofdeparture)
             # New Arrival time computation for the next flow
-            # flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
-            flowarrivaltime[I] = intialArrival + np.random.exponential(np.divide(1, arrivalrate[I]))
+            flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
+            #flowarrivaltime[I] = intialArrival + np.random.exponential(np.divide(1, arrivalrate[I]))
             intialArrival = flowarrivaltime[I]
             # flowarrivaltime[I] = flowarrivaltime[I] + 1000
             # Source node of the considered flow
@@ -1043,6 +1145,73 @@ while(countarrival < limit - 1):
 
             blockstate1[countarrival] = blockstate_new  # blockstate1 counter is updated
 
+            # ########################################## End of Adapted Dijkstra ##########################
+            # ########################################## Routing using multicommodity #####################
+            if I <= s6 - 1:
+                if I == 0:
+                    chosenprob1 = probabilities[0:paths[I]]
+                    chosenprob2 = probabilities[3 * total:3 * total + paths[I]]
+                else:
+                    chosenprob1 = probabilities[paths[I - 1]:paths[I]]
+                    chosenprob2 = probabilities[3 * total + paths[I - 1]:3 * total + paths[I]]
+            elif I <= 2 * s6 - 1:
+                if I == 4:
+                    chosenprob1 = probabilities[total:total + paths[I - s6]]
+                    chosenprob2 = probabilities[4 * total:4 * total + paths[I - s6]]
+                else:
+                    chosenprob1 = probabilities[total + paths[I - s6 - 1]:total + paths[I - s6]]
+                    chosenprob2 = probabilities[4 * total + paths[I - s6 - 1]:4 * total + paths[I - s6]]
+            else:
+                if I == 8:
+                    chosenprob1 = probabilities[2 * total:2 * total + paths[I - 2 * s6]]
+                else:
+                    chosenprob1 = probabilities[2 * total + paths[I - 2 * s6 - 1]:2 * total + paths[I - 2 * s6]]
+            # ######################################## Routing begins here #################################
+            if flow_type1[I] == 0:  # For realtime flow routing ( Voice and Video)
+                allo = allocaterealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi,userpriority_multi, source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,userpriority_new_multi, path_final_multi, wt_matx_multi, wt_matx_real1_multi, wt_matx_real_multi, blockstate_multi, a11, b11, c11, d11, g11, h11, i11, j11, I, chosenprob1, chosenprob2)
+                allo.service()
+                s_multi = allo.s_multi
+                d_multi = allo.d_multi
+                flow_type_multi = allo.flow_type_multi
+                min_rate_multi = allo.min_rate_multi
+                flownumber_multi = allo.flownumber_multi
+                userpriority_multi = allo.userpriority_multi
+                wt_matx_multi = allo.wt_matx
+                wt_matx_real1_multi = allo.wt_matx_real1
+                wt_matx_real_multi = allo.wt_matx_real
+                blockstate_new_multi = allo.callblock
+                path_final_multi = allo.path_final
+                blockstate_multi = allo.blockstate_multi
+
+            else:
+                aln = allocatenonrealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
+                                              source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,
+                                              userpriority_new_multi, path_final_multi, wt_matx_multi,
+                                              blockstate_multi, a11, b11, c11, d11, I, chosenprob1)
+                aln.service()
+                s_multi = aln.s_multi
+                d_multi = aln.d_multi
+                flow_type_multi = aln.flow_type_multi
+                min_rate_multi = aln.min_rate_multi
+                flownumber_multi = aln.flownumber_multi
+                userpriority_multi = aln.userpriority_multi
+                wt_matx_multi = aln.wt_matx
+                blockstate_new_multi = aln.callblock
+                path_final_multi = aln.path_final
+                blockstate_multi = aln.blockstate_multi
+
+            if blockstate_new_multi == 0:  # If call is blocked by apadted Dijkstra
+                count_multi = count_multi + 1  # Increase count_algo1 counter and below counters for voice/video/data if tracking statistics started
+                if countarrival > start:  # If tracking statistics started
+                    if I <= arrivalratesize / connectiontypes:
+                        blockedvoice_multi = blockedvoice_multi + 1
+                    elif I <= 2 * arrivalratesize / connectiontypes:
+                        blockedvideo_multi = blockedvideo_multi + 1
+                    else:
+                        blocekednonrealtime_multi = blocekednonrealtime_multi + 1
+
+            blockstate1_multi[countarrival] = blockstate_new_multi  # blockstate1 counter is updated
+
             ##############################################
             if countarrival > start:  # Tracking starts here
                 # Total counts of various call types arrived so flowarrivaltime
@@ -1086,6 +1255,28 @@ while(countarrival < limit - 1):
                             delayvolume[loop1] = delayvolume[loop1] + (endtoenddelay1 + endtoenddelay2)*(timecurrent - timeprevious1)
                             if departuretime1[loop1] == timecurrent:
                                 avgdelay[loop1] = delayvolume[loop1]/(2*(timecurrent - arrivaltime[loop1]))  # Compute avgdelay of that real time flow that is going to depart now
+                        if blockstate1_multi[loop1] == 1:  # For Calls which are not blocked in adapted Dijkstra
+                            for loop2 in range(0, 3 * limit - 1, 1):
+                                if path_final_multi[loop2, 0] == loop1 + 1:
+                                    path1 = path_final_multi[loop2, 5:p + 5]
+                                    path2 = path_final_multi[loop2 + 1, 5:p + 5]
+                                    break
+                            endtoenddelay1_multi = 0.0
+                            endtoenddelay2_multi = 0.0
+                            for loop2 in range(0, p - 1 - 1, 1):
+                                if path1[loop2 + 1] != 0:
+                                    endtoenddelay1_multi = endtoenddelay1_multi + wt_matx_real_multi[
+                                        int(path1[loop2] - 1), int(path1[loop2 + 1] - 1)]  # Compute End to End delay of fwd path
+                                else:
+                                    break
+                            for loop2 in range(0, p - 1, 1):
+                                if path1[loop2 + 1] != 0:
+                                    endtoenddelay2_multi = endtoenddelay2_multi + wt_matx_real_multi[
+                                        int(path1[loop2] - 1), int(path1[loop2 + 1] - 1)]  # Compute End to End delay of bkwd path
+                                else:
+                                    break
+                            delayvolume_multi[loop1] = delayvolume_multi[loop1] + (endtoenddelay1_multi + endtoenddelay2_multi) * (
+                            timecurrent - timepreviuos1)  # timepreviuos1 = either last arrival or departure
 
             timeprevious1 = timecurrent  # Timeprevious1 set as this latest departure time
             if timecurrent > timeprevious:  # Will be false until network avg cost calculation tracking starts
@@ -1101,6 +1292,21 @@ while(countarrival < limit - 1):
                 avgcost = totalcost/(timecurrent-timeoffirstarrival)  # Compute avg cost = totalcost/ (time since first arrival when tracking statistics started)
                 avgcost1 = np.append(avgcost1, avgcost)
                 # End of calculations adapted Dijkstra
+
+                # Multicommodity avg network cost computation
+                wt_matx1_multi = wt_matx_multi
+                for loop in range(0, p, 1):
+                    for loop1 in range(0, p, 1):
+                        if wt_matx1_multi[loop, loop1] == float('inf'):
+                            wt_matx1_multi[loop, loop1] = 0
+                cost_multi = sum(sum(wt_matx1_multi))  # Sum up all link costs
+                totalcost_multi = totalcost_multi + cost_multi * (
+                timecurrent - timeprevious)  # Update total cost by [cost * (time since last arrival or departure)]
+                avgcost_multi = totalcost_multi / (
+                    timecurrent - timeoffirstarrival)  # Compute avg cost = totalcost/ (time since first arrival when tracking statistics started)
+                avgcost1_multi = np.append(avgcost1_multi, avgcost_multi)
+                # End of calculations of multicommodity
+
                 timeprevious = timecurrent
 
             departuretime1[I1] = float('inf')  # To say that flow has departed
@@ -1122,6 +1328,23 @@ while(countarrival < limit - 1):
                 wt_matx_real1 = upde.wt_matx_real1
                 path_final = upde.path_final
                 blockstate = upde.blockstate
+            if blockstate1_multi[I1] == 1:
+                upde_multi = updateonexit(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
+                                    I1 + 1, path_final_multi, wt_matx_multi, wt_matx_real_multi,
+                                    wt_matx_real1_multi, blockstate_multi)
+                upde_multi.execute()
+                s_multi = upde_multi.s
+                d_multi = upde_multi.d
+                flow_type_multi = upde_multi.flow_type
+                min_rate_multi = upde_multi.min_rate
+                flownumber_multi = upde_multi.flownumber
+                userpriority_multi = upde_multi.userpriority
+                wt_matx_multi = upde_multi.wt_matx
+                wt_matx_real_multi = upde_multi.wt_matx_real
+                wt_matx_real1_multi = upde_multi.wt_matx_real1
+                path_final_multi = upde_multi.path_final
+                blockstate_multi = upde_multi.blockstate
+
 
 
 # print avgcost1
@@ -1129,12 +1352,22 @@ totalrealtime = totalvoice + totalvideo
 fracvoice_algo1 = float(blockedvoice_alog1*1.0/totalvoice)
 fracvideo_algo1 = float(blockedvideo_algo1*1.0/totalvideo)
 fracnonreal_algo1 = float(blocekednonrealtime_algo1*1.0/totalnonrealtime)
+
+fracvoice_multi = float(blockedvoice_multi*1.0/totalvoice)
+fracvideo_multi= float(blockedvideo_multi*1.0/totalvideo)
+fracnonreal_multi = float(blocekednonrealtime_multi*1.0/totalnonrealtime)
 print totalrealtime, "totalrealtime"
+print totalnonrealtime, "totalnonrealtime"
 # print blockedvoice_alog1
 # print blockedrealtime_algo1
 print fracvoice_algo1
 print fracvideo_algo1
 print fracnonreal_algo1
+print "MUlti"
+print fracvoice_multi
+print fracvideo_multi
+print fracnonreal_multi
+
 print sum(avgcost1)/len(avgcost1)
 print Voice_Mean_Time
 print Video_Mean_Time

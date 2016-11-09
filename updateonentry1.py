@@ -155,7 +155,7 @@ class updateonentry1(object):
             path1 = dij.execute()
             [path1size1, path1size] = np.shape(path1)
             if path1size < self.p:
-                for loop in range(path1size, p, 1):
+                for loop in range(path1size, self.p, 1):
                     path1[loop] = 0
             self.blockstate_new = 1
             noofpaths = 1
