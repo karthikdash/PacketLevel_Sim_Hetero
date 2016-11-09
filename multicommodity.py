@@ -46,7 +46,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+lamb = 0.001
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -54,14 +54,14 @@ data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.009, np.ones((12)))
+arrivalrate = np.multiply(0.001, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 200
+limit = 500
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -535,7 +535,7 @@ while(countarrival < limit - 1):
 
         if blockstate[-1] == 1:  # If last call not blocked
             flow_duration = np.random.exponential(np.divide(1, call_duration))
-            if flow_type[-1] == 0:
+            if I <= arrivalratesize/connectiontypes:
                 fwdpath = updateonentry2.fwdpath
                 bkwdpath = updateonentry2.bkwdpath
                 # Forward Path Packetisation
@@ -544,7 +544,7 @@ while(countarrival < limit - 1):
                         bisect.insort_left(nodes_real[str(fwdpath[0])],
                                            Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
                                                    flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flow_duration, flow_type[-1], fwdpath[:].tolist(), flownumber[-1], int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
+                                                   flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
                 path_final[flownumber[-1]-1, 2] = int(flow_duration)*int(voice_packet_rate)
                 # Backward Path Packetisation
                 for i in range(0, int(flow_duration), 1):
@@ -552,9 +552,9 @@ while(countarrival < limit - 1):
                         bisect.insort_left(nodes_real[str(bkwdpath[0])],
                                            Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
                                                    flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flow_duration, flow_type[-1], bkwdpath[:].tolist(), flownumber[-1], int(flow_duration) * int(voice_packet_rate), False, min_rate[-1]))
+                                                   flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration) * int(voice_packet_rate), False, min_rate[-1]))
                 path_final[flownumber[-1], 2] = int(flow_duration) * int(voice_packet_rate)
-            elif flow_type[-1] == 1:
+            elif I <= 2*arrivalratesize/connectiontypes:
                 fwdpath = updateonentry2.fwdpath
                 bkwdpath = updateonentry2.bkwdpath
                 for i in range(0, int(flow_duration), 1):
@@ -562,9 +562,18 @@ while(countarrival < limit - 1):
                         bisect.insort_left(nodes_real[str(fwdpath[0])],
                                            Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
                                                    flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                   flow_duration, flow_type[-1], fwdpath[:].tolist(), flownumber[-1], int(flow_duration) * int(video_packet_rate), True, min_rate[-1]))
+                                                   flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate), True, min_rate[-1]))
                 path_final[flownumber[-1] - 1, 2] = int(flow_duration) * int(video_packet_rate)
-            elif flow_type[-1] == 2:
+                # Back Path Packetisation
+                for i in range(1, int(flow_duration), 1):
+                    for j in range(0, int(video_packet_rate), 1):
+                        bisect.insort_left(nodes_real[str(bkwdpath[0])],
+                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
+                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
+                                                   flow_duration, 1, bkwdpath[:].tolist(), 1,
+                                                   int(flow_duration) * int(video_packet_rate), False, min_rate[-1]))
+                path_final[flownumber[-1]][2] = int(flow_duration) * int(video_packet_rate)
+            else:
                 fwdpath = updateonentry2.fwdpath
                 flow_duration = np.random.exponential(np.divide(1, file_duration)) * file_packet_size
                 # print "insidetag2", flow_duration/file_packet_size
@@ -575,7 +584,7 @@ while(countarrival < limit - 1):
                 for i in range(0, file_limit, 1):
                     bisect.insort_left(nodes_nonreal[str(fwdpath[0])],
                                        Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, flow_type[-1],
-                                               fwdpath[:].tolist(), flownumber[-1], file_limit, True, min_rate[-1]))
+                                               fwdpath[:].tolist(), 2, file_limit, True, min_rate[-1]))
                 path_final[flownumber[-1] - 1, 2] = file_limit
         # print blockstate, "blockstate"
         # print path_final, "pathfinalstate"
@@ -639,8 +648,6 @@ while(countarrival < limit - 1):
             blockstate_new_multi = aln.callblock
             path_final_multi = aln.path_final
             blockstate_multi = aln.blockstate_multi
-            if blockstate_multi[-1] == 1:
-                fwdpath = all1.fwdpath
 
         if blockstate_new_multi == 0:
             count_multi = count_multi + 1
@@ -933,7 +940,7 @@ while(countarrival < limit - 1):
             blockstate = upde.blockstate
             if blockstate_new == 1:  # If last call not blocked
                 flow_duration = np.random.exponential(np.divide(1, call_duration))
-                if flow_type[-1] == 0:
+                if I <= arrivalratesize/connectiontypes:
                     fwdpath = upde.fwdpath
                     bkwdpath = upde.bkwdpath
                     # Forward Path Packetisation
@@ -942,22 +949,23 @@ while(countarrival < limit - 1):
                             bisect.insort_left(nodes_real[str(fwdpath[0])],
                                                Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
                                                        flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flow_duration, flow_type[-1], fwdpath[:].tolist(), flownumber[-1], int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
+                                                       flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
                         if path_final[k][0] == flownumber[-1]:
                             path_final[k][2] = int(flow_duration) * int(voice_packet_rate)
                             break
                         k += 1
-                    # Forward Path Packetisation
+
+                    # Back Path Packetisation
                     for i in range(1, int(flow_duration), 1):
                         for j in range(0, int(voice_packet_rate), 1):
                             bisect.insort_left(nodes_real[str(bkwdpath[0])],
                                                Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
                                                        flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flow_duration, flow_type[-1], bkwdpath[:].tolist(), flownumber[-1], int(flow_duration)*int(voice_packet_rate), False, min_rate[-1]))
+                                                       flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), False, min_rate[-1]))
                     path_final[k+1][2] = int(flow_duration) * int(voice_packet_rate)
-                elif flow_type[-1] == 1:
+                elif I < 2*arrivalratesize/connectiontypes:
                     fwdpath = upde.fwdpath
                     bkwdpath = upde.bkwdpath
                     for i in range(1, int(flow_duration), 1):
@@ -965,14 +973,25 @@ while(countarrival < limit - 1):
                             bisect.insort_left(nodes_real[str(fwdpath[0])],
                                                Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
                                                        flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                       flow_duration, flow_type[-1], fwdpath[:].tolist(), flownumber[-1], int(flow_duration)*int(video_packet_rate), True, min_rate[-1]))
+                                                       flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration)*int(video_packet_rate), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
                         if path_final[k][0] == flownumber[-1]:
                             path_final[k][2] = int(flow_duration) * int(video_packet_rate)
                             break
                         k += 1
-                elif flow_type[-1] == 2:
+
+                    # Back Path Packetisation
+                    for i in range(1, int(flow_duration), 1):
+                        for j in range(0, int(video_packet_rate), 1):
+                            bisect.insort_left(nodes_real[str(bkwdpath[0])],
+                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
+                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
+                                                       flow_duration, 1, bkwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate), True,
+                                                       min_rate[-1]))
+                    path_final[k + 1][2] = int(flow_duration) * int(video_packet_rate)
+
+                else:
                     fwdpath = upde.fwdpath
                     flow_duration = np.random.exponential(np.divide(1, file_duration)) * file_packet_size
                     # print "insidetag2", flow_duration/file_packet_size
@@ -982,7 +1001,7 @@ while(countarrival < limit - 1):
                         file_limit = int(flow_duration / file_packet_size)
                     for i in range(0, file_limit, 1):
                         bisect.insort_left(nodes_nonreal[str(fwdpath[0])],
-                                           Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, flow_type[-1], fwdpath[:].tolist(), flownumber[-1], file_limit, True, min_rate[-1]))
+                                           Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, 2, fwdpath[:].tolist(), flownumber[-1], file_limit, True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
                         if path_final[k][0] == flownumber[-1]:
