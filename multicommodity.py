@@ -61,7 +61,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 500
+limit = 200
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -272,13 +272,13 @@ path2 = []
 # ######################### Packet Level Initialisations ##########################################
 # Network Parameters
 node_service_rate = 1000  # Bytes/second
-voice_rate = 400  # Bps
+voice_rate = 22  # Bps
 video_rate = 400  # Bps
 file_rate = 300  # Bps
 
-voice_packet_size = 40.00  # Bytes
-video_packet_size = 40.00
-file_packet_size = 40.00
+voice_packet_size = 256.00  # Bytes
+video_packet_size = 256.00
+file_packet_size = 256.00
 
 voice_packet_rate = (voice_rate/voice_packet_size)
 video_packet_rate = (video_rate/video_packet_size)

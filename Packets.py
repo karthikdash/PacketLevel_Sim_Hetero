@@ -4,9 +4,9 @@ import numpy as np
 
 
 class Packets:
-    voice_packet_size = 40.00  # Bytes
-    video_packet_size = 40.00
-    file_packet_size = 40.00
+    voice_packet_size = 0.25600  # Bytes
+    video_packet_size = 0.25600
+    file_packet_size = 0.25600
 
     def __init__(self, initial_arrival_time, arrival_time, flow_duration, flow_tag, path, flownumber, noofpackets, direction, node_service_rate):
         self.initial_arrival_time = initial_arrival_time
@@ -38,11 +38,11 @@ class Packets:
             self.d_new = self.path[0]
         self.service_start_time = service_start_time
         if self.flow_tag == 0:
-            self.service_time = self.voice_packet_size/(self.node_service_rate * 100)
+            self.service_time = self.voice_packet_size/(self.node_service_rate)
         elif self.flow_tag == 1:
-            self.service_time = self.video_packet_size/(self.node_service_rate * 100)
+            self.service_time = self.video_packet_size/(self.node_service_rate)
         elif self.flow_tag == 2:
-            self.service_time = self.file_packet_size/(self.node_service_rate * 100)
+            self.service_time = self.file_packet_size/(self.node_service_rate)
         self.service_end_time = service_start_time + self.service_time
         self.wait = self.service_start_time - self.arrival_time
         # self.arrival_time = self.service_end_time
