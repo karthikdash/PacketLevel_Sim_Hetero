@@ -46,7 +46,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.001
+lamb = 0.009
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -54,7 +54,7 @@ data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.001, np.ones((12)))
+arrivalrate = np.multiply(0.009, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
@@ -272,9 +272,9 @@ path2 = []
 # ######################### Packet Level Initialisations ##########################################
 # Network Parameters
 node_service_rate = 1000  # Bytes/second
-voice_rate = 22  # Bps
-video_rate = 400  # Bps
-file_rate = 300  # Bps
+voice_rate = 2400  # Bps
+video_rate = 4000  # Bps
+file_rate = 3000  # Bps
 
 voice_packet_size = 256.00  # Bytes
 video_packet_size = 256.00
@@ -610,7 +610,7 @@ while(countarrival < limit - 1):
                 chosenprob1 = probabilities[2 * total:2 * total + paths[I - 2 * s6]]
             else:
                 chosenprob1 = probabilities[2 * total + paths[I - 2 * s6 - 1]:2 * total + paths[I - 2 * s6]]
-
+        '''
         if flow_type1[I] == 0:  # For realtime flow routing ( Voice and Video)
             all1 = allocaterealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
                                                         source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,
@@ -652,7 +652,7 @@ while(countarrival < limit - 1):
         if blockstate_new_multi == 0:
             count_multi = count_multi + 1
         blockstate1_multi[countarrival] = blockstate_new_multi
-
+        '''
         # ################## Node Servicing ###########
         '''
         for node_no in range(1, noOfNodes + 1, 1):
@@ -1165,6 +1165,7 @@ while(countarrival < limit - 1):
             blockstate1[countarrival] = blockstate_new  # blockstate1 counter is updated
 
             # ########################################## End of Adapted Dijkstra ##########################
+            '''
             # ########################################## Routing using multicommodity #####################
             if I <= s6 - 1:
                 if I == 0:
@@ -1230,7 +1231,7 @@ while(countarrival < limit - 1):
                         blocekednonrealtime_multi = blocekednonrealtime_multi + 1
 
             blockstate1_multi[countarrival] = blockstate_new_multi  # blockstate1 counter is updated
-
+            '''
             ##############################################
             if countarrival > start:  # Tracking starts here
                 # Total counts of various call types arrived so flowarrivaltime
@@ -1347,6 +1348,7 @@ while(countarrival < limit - 1):
                 wt_matx_real1 = upde.wt_matx_real1
                 path_final = upde.path_final
                 blockstate = upde.blockstate
+            '''
             if blockstate1_multi[I1] == 1:
                 upde_multi = updateonexit(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
                                     I1 + 1, path_final_multi, wt_matx_multi, wt_matx_real_multi,
@@ -1363,6 +1365,7 @@ while(countarrival < limit - 1):
                 wt_matx_real1_multi = upde_multi.wt_matx_real1
                 path_final_multi = upde_multi.path_final
                 blockstate_multi = upde_multi.blockstate
+            '''
 
 
 
