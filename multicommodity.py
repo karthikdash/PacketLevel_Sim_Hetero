@@ -14,7 +14,7 @@ n = 10
 p = n
 node1packetcounter = 0
 nodeoutsidecounter = 0
-
+videofinish = 0
 # Link is (link_src[i],link_dest[i])
 link_src = [1, 1, 2, 2, 3, 4, 4, 5, 5, 5, 6, 7, 8, 9]
 link_dest = [2, 8, 3, 9, 4, 5, 10, 6, 7, 10, 7, 8, 10, 10]
@@ -36,6 +36,7 @@ link_errorprob3 = [0.01, 0.02, 0.01, 0.02, 0.02, 0.03, 0.03, 0.01, 0.02, 0.02, 0
 
 # (Half Bandwidth/frameSize * [Linke Rates corresponding to link_src[i],link_dest[j]]
 link_rate = np.multiply((1000000.0/256), [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2])
+pure_link_rate = [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2]
 
 # <M> Defined in source-destination pairs with rate requirements
 source1 = [2, 4, 3, 1]
@@ -61,7 +62,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 200
+limit = 500
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -86,6 +87,15 @@ eff_capacity_matx = A
 a = np.delete(eff_capacity_matx, 0, 0)
 a = np.delete(a, 0, 1)
 np.savetxt("foo3.csv", a, delimiter=',')
+
+B = np.zeros((n, n))
+for i in range(0, m1):
+    q = link_src[i] - 1
+    r = link_dest[i] - 1
+    B[q][r] = pure_link_rate[i]
+    B[r][q] = pure_link_rate[i]
+b = np.delete(B, 0, 0)
+b = np.delete(B, 0, 1)
 
 # To ignore Division by O warnings. /0 taken as Inf
 with np.errstate(divide='ignore', invalid='ignore'):
@@ -272,9 +282,9 @@ path2 = []
 # ######################### Packet Level Initialisations ##########################################
 # Network Parameters
 node_service_rate = 1000  # Bytes/second
-voice_rate = 2400  # Bps
-video_rate = 4000  # Bps
-file_rate = 3000  # Bps
+voice_rate = 24000  # Bps
+video_rate = 400000  # Bps
+file_rate = 300000  # Bps
 
 voice_packet_size = 256.00  # Bytes
 video_packet_size = 256.00
@@ -540,39 +550,39 @@ while(countarrival < limit - 1):
                 bkwdpath = updateonentry2.bkwdpath
                 # Forward Path Packetisation
                 for i in range(0, int(flow_duration), 1):
-                    for j in range(0, int(voice_packet_rate), 1):
+                    for j in range(0, int(voice_packet_rate/10), 1):
                         bisect.insort_left(nodes_real[str(fwdpath[0])],
-                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
-                path_final[flownumber[-1]-1, 2] = int(flow_duration)*int(voice_packet_rate)
+                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                   flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate/10), True, min_rate[-1]))
+                path_final[flownumber[-1]-1, 2] = int(flow_duration)*int(voice_packet_rate/10)
                 # Backward Path Packetisation
                 for i in range(0, int(flow_duration), 1):
-                    for j in range(0, int(voice_packet_rate), 1):
+                    for j in range(0, int(voice_packet_rate/10), 1):
                         bisect.insort_left(nodes_real[str(bkwdpath[0])],
-                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                   flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration) * int(voice_packet_rate), False, min_rate[-1]))
-                path_final[flownumber[-1], 2] = int(flow_duration) * int(voice_packet_rate)
+                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                   flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration) * int(voice_packet_rate/10), False, min_rate[-1]))
+                path_final[flownumber[-1], 2] = int(flow_duration) * int(voice_packet_rate/10)
             elif I <= 2*arrivalratesize/connectiontypes:
                 fwdpath = updateonentry2.fwdpath
                 bkwdpath = updateonentry2.bkwdpath
                 for i in range(0, int(flow_duration), 1):
-                    for j in range(0, int(video_packet_rate), 1):
+                    for j in range(0, int(video_packet_rate/100), 1):
                         bisect.insort_left(nodes_real[str(fwdpath[0])],
-                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                   flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate), True, min_rate[-1]))
-                path_final[flownumber[-1] - 1, 2] = int(flow_duration) * int(video_packet_rate)
+                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                   flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate/100), True, min_rate[-1]))
+                path_final[flownumber[-1] - 1, 2] = int(flow_duration) * int(video_packet_rate/100)
                 # Back Path Packetisation
                 for i in range(1, int(flow_duration), 1):
-                    for j in range(0, int(video_packet_rate), 1):
+                    for j in range(0, int(video_packet_rate/100), 1):
                         bisect.insort_left(nodes_real[str(bkwdpath[0])],
-                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
+                                           Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                   flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
                                                    flow_duration, 1, bkwdpath[:].tolist(), 1,
-                                                   int(flow_duration) * int(video_packet_rate), False, min_rate[-1]))
-                path_final[flownumber[-1]][2] = int(flow_duration) * int(video_packet_rate)
+                                                   int(flow_duration) * int(video_packet_rate/100), False, min_rate[-1]))
+                path_final[flownumber[-1]][2] = int(flow_duration) * int(video_packet_rate/100)
             else:
                 fwdpath = updateonentry2.fwdpath
                 flow_duration = np.random.exponential(np.divide(1, file_duration)) * file_packet_size
@@ -945,51 +955,51 @@ while(countarrival < limit - 1):
                     bkwdpath = upde.bkwdpath
                     # Forward Path Packetisation
                     for i in range(1, int(flow_duration), 1):
-                        for j in range(0, int(voice_packet_rate), 1):
+                        for j in range(0, int(voice_packet_rate/10), 1):
                             bisect.insort_left(nodes_real[str(fwdpath[0])],
-                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), True, min_rate[-1]))
+                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                       flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate/10), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
                         if path_final[k][0] == flownumber[-1]:
-                            path_final[k][2] = int(flow_duration) * int(voice_packet_rate)
+                            path_final[k][2] = int(flow_duration) * int(voice_packet_rate/10)
                             break
                         k += 1
 
                     # Back Path Packetisation
                     for i in range(1, int(flow_duration), 1):
-                        for j in range(0, int(voice_packet_rate), 1):
+                        for j in range(0, int(voice_packet_rate/10), 1):
                             bisect.insort_left(nodes_real[str(bkwdpath[0])],
-                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / voice_packet_rate),
-                                                       flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate), False, min_rate[-1]))
-                    path_final[k+1][2] = int(flow_duration) * int(voice_packet_rate)
+                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
+                                                       flow_duration, 0, bkwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate/10), False, min_rate[-1]))
+                    path_final[k+1][2] = int(flow_duration) * int(voice_packet_rate/10)
                 elif I < 2*arrivalratesize/connectiontypes:
                     fwdpath = upde.fwdpath
                     bkwdpath = upde.bkwdpath
                     for i in range(1, int(flow_duration), 1):
-                        for j in range(0, int(video_packet_rate), 1):
+                        for j in range(0, int(video_packet_rate/100), 1):
                             bisect.insort_left(nodes_real[str(fwdpath[0])],
-                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                       flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration)*int(video_packet_rate), True, min_rate[-1]))
+                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                       flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration)*int(video_packet_rate/100), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
                         if path_final[k][0] == flownumber[-1]:
-                            path_final[k][2] = int(flow_duration) * int(video_packet_rate)
+                            path_final[k][2] = int(flow_duration) * int(video_packet_rate/100)
                             break
                         k += 1
 
                     # Back Path Packetisation
                     for i in range(1, int(flow_duration), 1):
-                        for j in range(0, int(video_packet_rate), 1):
+                        for j in range(0, int(video_packet_rate/100), 1):
                             bisect.insort_left(nodes_real[str(bkwdpath[0])],
-                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / video_packet_rate),
-                                                       flow_duration, 1, bkwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate), True,
+                                               Packets(flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                       flowarrivaltime[I] + float(i + (j) * 1.0 / (video_packet_rate/100)),
+                                                       flow_duration, 1, bkwdpath[:].tolist(), 1, int(flow_duration) * int(video_packet_rate/100), True,
                                                        min_rate[-1]))
-                    path_final[k + 1][2] = int(flow_duration) * int(video_packet_rate)
+                    path_final[k + 1][2] = int(flow_duration) * int(video_packet_rate/100)
 
                 else:
                     fwdpath = upde.fwdpath
@@ -1010,36 +1020,41 @@ while(countarrival < limit - 1):
                         k += 1
                 # Node Servicing starts here
                 print "k2"
-                for node_no in range(1, noOfNodes + 1, 1):
-                    if len(nodes_real[str(node_no)]) > 0:
-                        nodeoutsidecounter += 1
-                        # if nodes_real[str(node_no)][0].arrival_time >= max(serviceend_time):
-                        if True:
-                            node1packetcounter += 1
-                            if nodes_real[str(node_no)][0].flow_tag == 0 or nodes_real[str(node_no)][0].flow_tag == 1:
-                                initial_service_end = serviceend_time[node_no]
-                                if serviceend_time[node_no] == 0:
-                                    initial_service_end = 1
-                                while (serviceend_time[node_no] - initial_service_end <= 50):
-                                    # if node_no == 1:
-                                        # node1packetcounter += 1
-                                    if len(nodes_real[str(node_no)]) == 0:
-                                        break
+                for i in range(0, 1000, 1):
+                    for node_no in range(1, noOfNodes + 1, 1):
+                        if len(nodes_real[str(node_no)]) > 0:
+                            nodeoutsidecounter += 1
+                            # if nodes_real[str(node_no)][0].arrival_time >= max(serviceend_time):
+                            arrivaltimes = []
+                            for nd_no in range(1, noOfNodes + 1, 1):
+                                if len(nodes_real[str(nd_no)]) == 0:
+                                    arrivaltimes.append(0)
+                                else:
+                                    arrivaltimes.append(nodes_real[str(nd_no)][0].arrival_time)
+                            if nodes_real[str(node_no)][0].arrival_time <= min(filter(None, arrivaltimes)):
+                                    initial_service_end = serviceend_time[node_no]
                                     if serviceend_time[node_no] == 0:
-                                        nodes_real[str(node_no)][0].service(nodes_real[str(node_no)][0].arrival_time, voice_rate, False)
+                                        initial_service_end = 1
+                                    #  Each node gets serviced here
+                                    if len(nodes_real[str(node_no)]) == 0:
+                                        continue  # Continue checking other nodes for servicable packets
+                                    if serviceend_time[node_no] == 0:
+                                        s_link = nodes_real[str(node_no)][0].path[0]
+                                        d_link = nodes_real[str(node_no)][0].path[1]
+                                        nodes_real[str(node_no)][0].service(nodes_real[str(node_no)][0].arrival_time, B[s_link-1][d_link-1], False)
                                         initial_service_end = nodes_real[str(node_no)][0].arrival_time
                                     else:
+                                        s_link = nodes_real[str(node_no)][0].path[0]
+                                        d_link = nodes_real[str(node_no)][0].path[1]
                                         serviceend = serviceend_time[node_no]
-                                        nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, serviceend), voice_rate, False)
+                                        nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, serviceend), B[s_link-1][d_link-1], False)
                                     # Appending to the serving Queue
                                     serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
                                     # packets_tracker[str(node_no)].append(nodes_real[str(node_no)][0])
                                     if nodes_real[str(node_no)][0].flow_tag == 0:
-                                        Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][
-                                            0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                        Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
                                     else:
-                                        Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][
-                                            0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                        Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
                                     # Appending to the next node receiving Queue
                                     if nodes_real[str(node_no)][0].d_new == 99:
                                         if nodes_real[str(node_no)][0].flow_tag == 0:
@@ -1062,11 +1077,12 @@ while(countarrival < limit - 1):
                                                 path_final[k + 1][2] -= 1
                                             ################################ Voice Mean Delay Calculations #############
                                             if Voice_Mean == 0:
-                                                Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time
+                                                Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][
+                                                    0].initial_arrival_time
                                             else:
                                                 Voice_Mean = (
-                                                             Voice_Mean + nodes_real[str(node_no)][0].service_end_time -
-                                                             nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                                                 Voice_Mean + nodes_real[str(node_no)][0].service_end_time -
+                                                                 nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
                                         else:
                                             ################### Decrementing the packet count from path_final ############
                                             k = 0
@@ -1083,8 +1099,8 @@ while(countarrival < limit - 1):
                                                              nodes_real[str(node_no)][0].initial_arrival_time
                                             else:
                                                 Video_Mean = (
-                                                             Video_Mean + nodes_real[str(node_no)][0].service_end_time -
-                                                             nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                                                 Video_Mean + nodes_real[str(node_no)][0].service_end_time -
+                                                                 nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
                                     else:
                                         # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
                                         # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
@@ -1097,60 +1113,66 @@ while(countarrival < limit - 1):
                                                                    nodes_real[str(node_no)][0].flownumber,
                                                                    nodes_real[str(node_no)][0].noofpackets,
                                                                    nodes_real[str(node_no)][0].direction,
-                                                                   nodes_real[str(node_no)][0].node_service_rate,))
+                                                                   nodes_real[str(node_no)][0].node_service_rate, ))
                                     nodes_real[str(node_no)].pop(0)
                                     # serviceend = packets_tracker[str(node_no)][len(packets_tracker[str(node_no)]) - 1].service_end_time
-                    if len(nodes_nonreal[str(node_no)]) > 0:
-                        # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
-                        if nodes_nonreal[str(node_no)][0].arrival_time >= max(serviceend_time):
-                            initial_service_end = serviceend_time[node_no]
-                            if serviceend_time[node_no] == 0:
-                                initial_service_end = 1
-                            while (serviceend_time[node_no] - initial_service_end <= 100):
-                                if len(nodes_nonreal[str(node_no)]) == 0:
-                                    break
-                                if serviceend_time[node_no] == 0:
-                                    nodes_nonreal[str(node_no)][0].service(nodes_nonreal[str(node_no)][0].arrival_time, voice_rate, False)
-                                    initial_service_end = nodes_nonreal[str(node_no)][0].arrival_time
-                                else:
-                                    serviceend = serviceend_time[node_no]
-                                    nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, serviceend), voice_rate, False)
-                                # Appending to the serving Queue
-                                serviceend_time[node_no] = nodes_nonreal[str(node_no)][0].service_end_time
-                                # packets_tracker[str(node_no)].append(nodes_nonreal[str(node_no)][0])
-                                # Appending to the next node receiving Queue
-                                File_Mean_Time[node_no] = (File_Mean_Time[node_no] + nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].arrival_time) / 2.0
-                                if nodes_nonreal[str(node_no)][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                                    ################### Decrementing the packet count from path_final ############
-                                    k = 0
-                                    if nodes_nonreal[str(node_no)][0].direction == True:
-                                        # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
-                                        while path_final[k][0] != 0:
-                                            if path_final[k][0] == nodes_nonreal[str(node_no)][0].flownumber:
-                                                path_final[k][2] -= 1
-                                                break
-                                            k += 1
-                                    ################################ File Mean Delay Calculations #############
-                                    if File_Mean == 0:
-                                        File_Mean = nodes_nonreal[str(node_no)][0].service_end_time - \
-                                                    nodes_nonreal[str(node_no)][0].initial_arrival_time
-                                    else:
-                                        File_Mean = (File_Mean + nodes_nonreal[str(node_no)][0].service_end_time -
-                                                     nodes_nonreal[str(node_no)][0].initial_arrival_time) / 2.0
-                                else:
-                                    # nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)].append(nodes_nonreal[str(node_no)][0])
-                                    bisect.insort_left(nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)],
-                                                       Packets(nodes_nonreal[str(node_no)][0].initial_arrival_time,
-                                                               nodes_nonreal[str(node_no)][0].service_end_time,
-                                                               nodes_nonreal[str(node_no)][0].flow_duration,
-                                                               nodes_nonreal[str(node_no)][0].flow_tag,
-                                                               nodes_nonreal[str(node_no)][0].path,
-                                                               nodes_nonreal[str(node_no)][0].flownumber,
-                                                               nodes_nonreal[str(node_no)][0].noofpackets,
-                                                               nodes_nonreal[str(node_no)][0].direction,
-                                                               nodes_nonreal[str(node_no)][0].node_service_rate))
-                                nodes_nonreal[str(node_no)].pop(0)
-
+                        if len(nodes_nonreal[str(node_no)]) > 0 and len(nodes_real[str(node_no)]) < 1:
+                                # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
+                                if max(serviceend_time) >= nodes_nonreal[str(node_no)][0].arrival_time:
+                                    if nodes_nonreal[str(node_no)][0].flow_tag == 2:
+                                        initial_service_end = serviceend_time[node_no]
+                                        if serviceend_time[node_no] == 0:
+                                            initial_service_end = 1
+                                        # Servicing for each individual node
+                                        if len(nodes_nonreal[str(node_no)]) == 0:
+                                            continue  # Continue for other servicable nodes
+                                        if serviceend_time[node_no] == 0:
+                                            nodes_nonreal[str(node_no)][0].service(nodes_nonreal[str(node_no)][0].arrival_time, voice_rate, False)
+                                            initial_service_end = nodes_nonreal[str(node_no)][0].arrival_time
+                                        else:
+                                            serviceend = serviceend_time[node_no]
+                                            nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, serviceend), voice_rate,
+                                                                                   False)
+                                        # Appending to the serving Queue
+                                        serviceend_time[node_no] = nodes_nonreal[str(node_no)][0].service_end_time
+                                        # packets_tracker[str(node_no)].append(nodes_nonreal[str(node_no)][0])
+                                        # Appending to the next node receiving Queue
+                                        File_Mean_Time[node_no] = (File_Mean_Time[node_no] + nodes_nonreal[str(node_no)][0].service_end_time -
+                                                                   nodes_nonreal[str(node_no)][0].arrival_time) / 2.0
+                                        if nodes_nonreal[str(node_no)][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
+                                            ################### Decrementing the packet count from path_final ############
+                                            k = 0
+                                            if nodes_nonreal[str(node_no)][0].direction == True:
+                                                # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
+                                                while path_final[k][0] != 0:
+                                                    if path_final[k][0] == nodes_nonreal[str(node_no)][0].flownumber:
+                                                        path_final[k][2] -= 1
+                                                        break
+                                                    k += 1
+                                            ################################ File Mean Delay Calculations #############
+                                            if File_Mean == 0:
+                                                File_Mean = nodes_nonreal[str(node_no)][0].service_end_time - \
+                                                            nodes_nonreal[str(node_no)][0].initial_arrival_time
+                                                File_Mean_Speed = nodes_nonreal[str(node_no)][0].flow_duration/(nodes_nonreal[str(node_no)][0].service_end_time - \
+                                                            nodes_nonreal[str(node_no)][0].initial_arrival_time)
+                                            else:
+                                                File_Mean = (File_Mean + nodes_nonreal[str(node_no)][0].service_end_time -
+                                                             nodes_nonreal[str(node_no)][0].initial_arrival_time) / 2.0
+                                                File_Mean_Speed = ( File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration/(nodes_nonreal[str(node_no)][0].service_end_time - \
+                                                            nodes_nonreal[str(node_no)][0].initial_arrival_time) )/ 2.0
+                                        else:
+                                            # nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)].append(nodes_nonreal[str(node_no)][0])
+                                            bisect.insort_left(nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)],
+                                                               Packets(nodes_nonreal[str(node_no)][0].initial_arrival_time,
+                                                                       nodes_nonreal[str(node_no)][0].service_end_time,
+                                                                       nodes_nonreal[str(node_no)][0].flow_duration,
+                                                                       nodes_nonreal[str(node_no)][0].flow_tag,
+                                                                       nodes_nonreal[str(node_no)][0].path,
+                                                                       nodes_nonreal[str(node_no)][0].flownumber,
+                                                                       nodes_nonreal[str(node_no)][0].noofpackets,
+                                                                       nodes_nonreal[str(node_no)][0].direction,
+                                                                       nodes_nonreal[str(node_no)][0].node_service_rate))
+                                        nodes_nonreal[str(node_no)].pop(0)
             # print blockstate, "blockstate"
             if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
                 count_algo1 = count_algo1 + 1  # Increase count_algo1 counter and below counters for voice/video/data if tracking statistics started
