@@ -62,7 +62,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 500
+limit = 1000
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -96,6 +96,15 @@ for i in range(0, m1):
     B[r][q] = pure_link_rate[i]
 b = np.delete(B, 0, 0)
 b = np.delete(B, 0, 1)
+
+C = np.zeros((n, n))
+for i in range(0, m1):
+    q = link_src[i] - 1
+    r = link_dest[i] - 1
+    C[q][r] = weight_x[i]
+    C[r][q] = weight_x[i]
+c = np.delete(C, 0, 0)
+c = np.delete(c, 0, 1)
 
 # To ignore Division by O warnings. /0 taken as Inf
 with np.errstate(divide='ignore', invalid='ignore'):
@@ -482,7 +491,7 @@ intialArrival = 0
 # Flow starts
 # while(countarrival < limit):
 while(countarrival < limit - 1):
-    print countarrival, "countarrival", len(packets_realtime1)
+    print countarrival, "countarrival", len(packets_realtime1), serviceend_time
     # We find the minimum get the first arriving flow and hence source node for that corresponding time
     c = flowarrivaltime.min()  # Minimum Value
     I = flowarrivaltime.argmin()  # Index of the Minimum Value
@@ -1038,87 +1047,96 @@ while(countarrival < limit - 1):
                                     #  Each node gets serviced here
                                     if len(nodes_real[str(node_no)]) == 0:
                                         continue  # Continue checking other nodes for servicable packets
+                                    s_link = nodes_real[str(node_no)][0].path[0]
+                                    d_link = nodes_real[str(node_no)][0].path[1]
+                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1-C[s_link-1][d_link-1], C[s_link-1][d_link-1]])
                                     if serviceend_time[node_no] == 0:
-                                        s_link = nodes_real[str(node_no)][0].path[0]
-                                        d_link = nodes_real[str(node_no)][0].path[1]
-                                        nodes_real[str(node_no)][0].service(nodes_real[str(node_no)][0].arrival_time, B[s_link-1][d_link-1], False)
+                                        if B[s_link-1][d_link-1] == 0:
+                                            print "Inf"
+                                        nodes_real[str(node_no)][0].service(nodes_real[str(node_no)][0].arrival_time, B[s_link-1][d_link-1], False, link_retransmit_prob)
                                         initial_service_end = nodes_real[str(node_no)][0].arrival_time
                                     else:
-                                        s_link = nodes_real[str(node_no)][0].path[0]
-                                        d_link = nodes_real[str(node_no)][0].path[1]
+                                        if B[s_link-1][d_link-1] == 0:
+                                            print "Inf"
                                         serviceend = serviceend_time[node_no]
-                                        nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, serviceend), B[s_link-1][d_link-1], False)
+                                        nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, serviceend), B[s_link-1][d_link-1], False, link_retransmit_prob)
                                     # Appending to the serving Queue
                                     serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
                                     # packets_tracker[str(node_no)].append(nodes_real[str(node_no)][0])
-                                    if nodes_real[str(node_no)][0].flow_tag == 0:
-                                        Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                    else:
-                                        Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                    # Appending to the next node receiving Queue
-                                    if nodes_real[str(node_no)][0].d_new == 99:
+                                    if link_retransmit_prob == 1:
                                         if nodes_real[str(node_no)][0].flow_tag == 0:
-                                            ################### Decrementing the packet count from path_final ############
-                                            k = 0
-                                            if nodes_real[str(node_no)][0].direction == True:
-                                                # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
-                                                while path_final[k][0] != 0:
-                                                    if path_final[k][0] == nodes_real[str(node_no)][0].flownumber:
-                                                        path_final[k][2] -= 1
-                                                        if path_final[k][2] < 1:
-                                                            print "finished"
-                                                            # timeofdeparture = nodes_real[str(node_no)][0].service_end_time
-                                                            # DepartureTime vector is updated by appending the current flow departure time which just arrived
-                                                            # departuretime = np.append(departuretime, timeofdeparture)
-                                                            # departuretime1 = np.append(departuretime1, timeofdeparture)
-                                                        break
-                                                    k += 1
-                                            else:
-                                                path_final[k + 1][2] -= 1
-                                            ################################ Voice Mean Delay Calculations #############
-                                            if Voice_Mean == 0:
-                                                Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][
-                                                    0].initial_arrival_time
-                                            else:
-                                                Voice_Mean = (
-                                                                 Voice_Mean + nodes_real[str(node_no)][0].service_end_time -
-                                                                 nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                            Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
                                         else:
-                                            ################### Decrementing the packet count from path_final ############
-                                            k = 0
-                                            if nodes_real[str(node_no)][0].direction == True:
-                                                # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
-                                                while path_final[k][0] != 0:
-                                                    if path_final[k][0] == nodes_real[str(node_no)][0].flownumber:
-                                                        path_final[k][2] -= 1
-                                                        break
-                                                    k += 1
-                                            ################################ Video Mean Delay Calculations #############
-                                            if Video_Mean == 0:
-                                                Video_Mean = nodes_real[str(node_no)][0].service_end_time - \
-                                                             nodes_real[str(node_no)][0].initial_arrival_time
+                                            Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                        # Appending to the next node receiving Queue
+                                        if nodes_real[str(node_no)][0].d_new == 99:
+                                            if nodes_real[str(node_no)][0].flow_tag == 0:
+                                                ################### Decrementing the packet count from path_final ############
+                                                k = 0
+                                                if nodes_real[str(node_no)][0].direction == True:
+                                                    # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
+                                                    while path_final[k][0] != 0:
+                                                        if path_final[k][0] == nodes_real[str(node_no)][0].flownumber:
+                                                            path_final[k][2] -= 1
+                                                            if path_final[k][2] < 1:
+                                                                print "finished"
+                                                                # timeofdeparture = nodes_real[str(node_no)][0].service_end_time
+                                                                # DepartureTime vector is updated by appending the current flow departure time which just arrived
+                                                                # departuretime = np.append(departuretime, timeofdeparture)
+                                                                # departuretime1 = np.append(departuretime1, timeofdeparture)
+                                                            break
+                                                        k += 1
+                                                else:
+                                                    path_final[k + 1][2] -= 1
+                                                ################################ Voice Mean Delay Calculations #############
+                                                if Voice_Mean == 0:
+                                                    Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][
+                                                        0].initial_arrival_time
+                                                else:
+                                                    Voice_Mean = (
+                                                                     Voice_Mean + nodes_real[str(node_no)][0].service_end_time -
+                                                                     nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
                                             else:
-                                                Video_Mean = (
-                                                                 Video_Mean + nodes_real[str(node_no)][0].service_end_time -
-                                                                 nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
-                                    else:
-                                        # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
-                                        # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
-                                        bisect.insort_left(nodes_real[str(nodes_real[str(node_no)][0].d_new)],
-                                                           Packets(nodes_real[str(node_no)][0].initial_arrival_time,
-                                                                   nodes_real[str(node_no)][0].service_end_time,
-                                                                   nodes_real[str(node_no)][0].flow_duration,
-                                                                   nodes_real[str(node_no)][0].flow_tag,
-                                                                   nodes_real[str(node_no)][0].path,
-                                                                   nodes_real[str(node_no)][0].flownumber,
-                                                                   nodes_real[str(node_no)][0].noofpackets,
-                                                                   nodes_real[str(node_no)][0].direction,
-                                                                   nodes_real[str(node_no)][0].node_service_rate, ))
-                                    nodes_real[str(node_no)].pop(0)
-                                    # serviceend = packets_tracker[str(node_no)][len(packets_tracker[str(node_no)]) - 1].service_end_time
-                        if len(nodes_nonreal[str(node_no)]) > 0 and len(nodes_real[str(node_no)]) < 1:
+                                                ################### Decrementing the packet count from path_final ############
+                                                k = 0
+                                                if nodes_real[str(node_no)][0].direction == True:
+                                                    # path_final[nodes_real[str(node_no)][0].flownumber ][2] -= 1
+                                                    while path_final[k][0] != 0:
+                                                        if path_final[k][0] == nodes_real[str(node_no)][0].flownumber:
+                                                            path_final[k][2] -= 1
+                                                            break
+                                                        k += 1
+                                                ################################ Video Mean Delay Calculations #############
+                                                if Video_Mean == 0:
+                                                    Video_Mean = nodes_real[str(node_no)][0].service_end_time - \
+                                                                 nodes_real[str(node_no)][0].initial_arrival_time
+                                                else:
+                                                    Video_Mean = (
+                                                                     Video_Mean + nodes_real[str(node_no)][0].service_end_time -
+                                                                     nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                        else:
+                                            # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
+                                            # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
+                                            bisect.insort_left(nodes_real[str(nodes_real[str(node_no)][0].d_new)],
+                                                               Packets(nodes_real[str(node_no)][0].initial_arrival_time,
+                                                                       nodes_real[str(node_no)][0].service_end_time,
+                                                                       nodes_real[str(node_no)][0].flow_duration,
+                                                                       nodes_real[str(node_no)][0].flow_tag,
+                                                                       nodes_real[str(node_no)][0].path,
+                                                                       nodes_real[str(node_no)][0].flownumber,
+                                                                       nodes_real[str(node_no)][0].noofpackets,
+                                                                       nodes_real[str(node_no)][0].direction,
+                                                                       nodes_real[str(node_no)][0].node_service_rate, ))
+                                        nodes_real[str(node_no)].pop(0)
+                        if False :
                                 # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
-                                if max(serviceend_time) >= nodes_nonreal[str(node_no)][0].arrival_time:
+                                arrivaltimes = []
+                                for nd_no in range(1, noOfNodes + 1, 1):
+                                    if len(nodes_nonreal[str(nd_no)]) == 0:
+                                        arrivaltimes.append(0)
+                                    else:
+                                        arrivaltimes.append(nodes_nonreal[str(nd_no)][0].arrival_time)
+                                if nodes_nonreal[str(node_no)][0].arrival_time <= min(filter(None, arrivaltimes)):
                                     if nodes_nonreal[str(node_no)][0].flow_tag == 2:
                                         initial_service_end = serviceend_time[node_no]
                                         if serviceend_time[node_no] == 0:
@@ -1127,12 +1145,20 @@ while(countarrival < limit - 1):
                                         if len(nodes_nonreal[str(node_no)]) == 0:
                                             continue  # Continue for other servicable nodes
                                         if serviceend_time[node_no] == 0:
-                                            nodes_nonreal[str(node_no)][0].service(nodes_nonreal[str(node_no)][0].arrival_time, voice_rate, False)
+                                            s_link = nodes_nonreal[str(node_no)][0].path[0]
+                                            d_link = nodes_nonreal[str(node_no)][0].path[1]
+                                            if B[s_link - 1][d_link - 1] == 0:
+                                                print "Inf"
+                                            nodes_nonreal[str(node_no)][0].service(nodes_nonreal[str(node_no)][0].arrival_time, B[s_link-1][d_link-1], False, 1)
                                             initial_service_end = nodes_nonreal[str(node_no)][0].arrival_time
                                         else:
+                                            s_link = nodes_nonreal[str(node_no)][0].path[0]
+                                            d_link = nodes_nonreal[str(node_no)][0].path[1]
+                                            if B[s_link - 1][d_link - 1] == 0:
+                                                print "Inf"
                                             serviceend = serviceend_time[node_no]
-                                            nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, serviceend), voice_rate,
-                                                                                   False)
+                                            nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, serviceend), B[s_link-1][d_link-1],
+                                                                                   False, 1)
                                         # Appending to the serving Queue
                                         serviceend_time[node_no] = nodes_nonreal[str(node_no)][0].service_end_time
                                         # packets_tracker[str(node_no)].append(nodes_nonreal[str(node_no)][0])
@@ -1419,6 +1445,7 @@ print File_Mean_Time
 print Voice_Mean
 print Video_Mean
 print File_Mean
+# print File_Mean_Speed, "FileMeanSpeed"
 print node1packetcounter
 print nodeoutsidecounter
 # print fracrealtime_algo1

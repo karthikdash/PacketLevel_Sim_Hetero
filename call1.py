@@ -33,7 +33,7 @@ class call1(object):
             for i in range(0, self.p, 1):
                 for j in range(0, self.p, 1):
                     # Could be an erroneous declaration of negative Inf
-                    if dummy4[i][j] == -float('inf'):
+                    if np.isneginf(dummy4[i][j]):
                         dummy4[i][j] = float('inf')
             dij = dijkstra(self.s, self.d, dummy4)
             self.path = dij.execute()
