@@ -62,7 +62,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 1000
+limit = 500
 # Observation from 'start' iteration ?
 start = 5
 # Probability with which blocked call will be retried
@@ -1029,7 +1029,7 @@ while(countarrival < limit - 1):
                         k += 1
                 # Node Servicing starts here
                 print "k2"
-                for i in range(0, 1000, 1):
+                for i in range(0, 5000, 1):
                     for node_no in range(1, noOfNodes + 1, 1):
                         if len(nodes_real[str(node_no)]) > 0:
                             nodeoutsidecounter += 1
