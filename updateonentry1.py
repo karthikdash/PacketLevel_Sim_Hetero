@@ -1,5 +1,5 @@
 import numpy as np
-from call12 import call12
+from call1 import call1
 from call2 import call2
 from dijkstra import dijkstra
 
@@ -45,7 +45,7 @@ class updateonentry1(object):
         if self.flow_type_new == 0:
             # Calls call1.py
             # Source to destination calculation
-            cd = call12(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
@@ -58,7 +58,7 @@ class updateonentry1(object):
                 self.blockstate_new = 0  # Represents blockstate
             else:
                 # Destination to source calculation
-                cd = call12(self.p, self.d_new, self.s_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
+                cd = call1(self.p, self.d_new, self.s_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                            self.wt_matx_real, self.wt_matx_real1)
                 cd.execute()
                 path2 = cd.path
@@ -98,7 +98,7 @@ class updateonentry1(object):
                             # np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
                             break
         elif self.flow_type_new == 1:
-            cd = call12(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
@@ -124,7 +124,7 @@ class updateonentry1(object):
                         # np.savetxt("pathfinal2.csv", self.path_final, delimiter=",")
                         break
         elif self.flow_type_new == 2:
-            cd = call12(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
+            cd = call1(self.p, self.s_new, self.d_new, self.flow_type_new, self.min_rate_new, self.wt_matx,
                        self.wt_matx_real, self.wt_matx_real1)
             cd.execute()
             path1 = cd.path
