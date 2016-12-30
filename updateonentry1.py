@@ -20,7 +20,7 @@ class updateonentry1(object):
 
     def __init__(self, p, s, d, flow_type, min_rate, flownumber, userpriority, s_new, d_new,
                  flow_type_new, min_rate_new, flownumber_new, userpriority_new, path_final, wt_matx,
-                 wt_matx_real, wt_matx_real1, blockstate):
+                 wt_matx_real, wt_matx_real1, blockstate, flow_duration, flowarrival_time, connection_type, voice_packet_size, packet_datarate):
         self.p = p
         self.s = s
         self.d = d
@@ -39,6 +39,11 @@ class updateonentry1(object):
         self.wt_matx_real = wt_matx_real
         self.wt_matx_real1 = wt_matx_real1
         self.blockstate = blockstate
+        self.flow_duration = flow_duration
+        self.flowarrival_time = flowarrival_time
+        self.connection_type = connection_type
+        self.packet_size = voice_packet_size
+        self.packet_datarate = packet_datarate
 
     def execute(self):
         [s1, s2] = np.shape(self.path_final)
@@ -87,13 +92,18 @@ class updateonentry1(object):
                         if self.path_final[loop][0] == 0:
                             # print self.path_final
                             # print path1
+                            if int(self.packet_datarate / 100 / self.packet_size) < 1:
+                                no_of_packets = int(self.flow_duration) * 1
+                            else:
+                                no_of_packets = int(self.flow_duration) * int(self.packet_datarate / 100 / self.packet_size)
+
                             v = [self.flownumber_new, self.flow_type_new,
-                                 self.userpriority_new, noofpaths,
-                                 self.min_rate_new]
+                                 no_of_packets, self.connection_type,
+                                 self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
                             self.path_final[loop, :] = np.concatenate((v, path1))
                             v1 = [self.flownumber_new, self.flow_type_new,
-                                  self.userpriority_new, noofpaths,
-                                  self.min_rate_new]
+                                  no_of_packets, self.connection_type,
+                                  self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
                             self.path_final[loop+1, :] = np.concatenate((v1, path2))
                             # np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
                             break
@@ -119,7 +129,7 @@ class updateonentry1(object):
                     if self.path_final[loop][0] == 0:
                         v = [self.flownumber_new, self.flow_type_new,
                              self.userpriority_new, noofpaths,
-                             self.min_rate_new]
+                             self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, 1]
                         self.path_final[loop, :] = np.concatenate((v, path1))
                         # np.savetxt("pathfinal2.csv", self.path_final, delimiter=",")
                         break
@@ -145,9 +155,13 @@ class updateonentry1(object):
                     # print loop
                     # Not sure about this loop[0] or loop[1]
                     if self.path_final[loop][0] == 0:
+                        if int(self.flow_duration * 1000 / self.packet_size) < 1:
+                            file_limit = 1
+                        else:
+                            file_limit = int(self.flow_duration * 1000 / self.packet_size)
                         v = [self.flownumber_new, self.flow_type_new,
-                             self.userpriority_new, noofpaths,
-                             self.min_rate_new]
+                             file_limit, self.connection_type,
+                             self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
                         self.path_final[loop, :] = np.concatenate((v, path1))
                         break
         else:

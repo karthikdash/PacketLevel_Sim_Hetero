@@ -35,7 +35,7 @@ class updateonexit(object):
         if flow_type_exit == 0:
             for loop in range(0, path_finalsize1, 1):
                 if self.path_final[loop, 0] == self.flownumber_exit:
-                    path = self.path_final[loop, 5:p+5]
+                    path = self.path_final[loop, 9:p+9]
                     cd1 = call2(self.p, path, flow_type_exit, min_rate_exit, self.wt_matx,
                                 self.wt_matx_real, self.wt_matx_real1)
                     cd1.execute()
@@ -43,7 +43,7 @@ class updateonexit(object):
                     self.wt_matx_real = cd1.wt_matx_real
                     self.wt_matx_real1 = cd1.wt_matx_real1
 
-                    path = self.path_final[loop + 1, 5:p+5]
+                    path = self.path_final[loop + 1, 9:p+9]
                     cd2 = call2(self.p, path, flow_type_exit, min_rate_exit, self.wt_matx,
                                 self.wt_matx_real, self.wt_matx_real1)
                     cd2.execute()
@@ -51,15 +51,15 @@ class updateonexit(object):
                     self.wt_matx_real = cd2.wt_matx_real
                     self.wt_matx_real1 = cd2.wt_matx_real1
                     if loop == path_finalsize1 - 1:
-                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((2, p+5))
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((2, p+9))
                     else:
                         self.path_final[loop:path_finalsize1-2, :] = self.path_final[loop+2:path_finalsize1, :]
-                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((1, p+5))
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((1, p+9))
                     break
         elif flow_type_exit == 1:
             for loop in range(0, path_finalsize1, 1):
                 if self.path_final[loop, 0] == self.flownumber_exit:
-                    path = self.path_final[loop, 5:p+5]
+                    path = self.path_final[loop, 9:p+9]
                     cd3 = call2(self.p, path, flow_type_exit, min_rate_exit, self.wt_matx,
                                 self.wt_matx_real, self.wt_matx_real1)
                     cd3.execute()
@@ -67,10 +67,10 @@ class updateonexit(object):
                     self.wt_matx_real = cd3.wt_matx_real
                     self.wt_matx_real1 = cd3.wt_matx_real1
                     if loop == path_finalsize1 - 1:
-                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((2, p+5))
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((2, p+9))
                     else:
                         self.path_final[loop:path_finalsize1-2, :] = self.path_final[loop+2:path_finalsize1, :]
-                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((1, p+5))
+                        self.path_final[path_finalsize1-1:path_finalsize1, :] = np.zeros((1, p+9))
                     break
         elif flow_type_exit == 2:
             for loop in range(0, path_finalsize1, 1):
@@ -78,7 +78,7 @@ class updateonexit(object):
                     noofpaths = int(self.path_final[loop, 3])
                     for loop1 in range(0, noofpaths, 1):
                         min_rate_exit = self.path_final[loop + loop1, 4]
-                        path = self.path_final[loop + loop1 , 5:p+5]
+                        path = self.path_final[loop + loop1 , 9:p+9]
                         cd4 = call2(self.p, path, flow_type_exit, min_rate_exit, self.wt_matx,
                                     self.wt_matx_real, self.wt_matx_real1)
                         cd4.execute()
@@ -86,7 +86,7 @@ class updateonexit(object):
                         self.wt_matx_real = cd4.wt_matx_real
                         self.wt_matx_real1 = cd4.wt_matx_real1
                     self.path_final[loop:path_finalsize1-noofpaths, :] = self.path_final[loop+noofpaths:path_finalsize1, :]
-                    self.path_final[path_finalsize1-noofpaths:path_finalsize1, :] = np.zeros((noofpaths, p+5))
+                    self.path_final[path_finalsize1-noofpaths:path_finalsize1, :] = np.zeros((noofpaths, p+9))
                     break
         if index == flownumbersize and index == 0:
             self.s = []

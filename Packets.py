@@ -28,7 +28,7 @@ class Packets:
         self.service_end_date = self.service_start_date + self.service_time
         self.wait = self.service_start_date - self.arrival_date
         '''
-    def service(self, service_start_time, service_rate, prioritised, link_retransmit_prob ):
+    def service(self, service_start_time, service_rate, prioritised, link_retransmit_prob, slot_time):
         # self.service_time = (self.service_rate * self.flow_duration)/node_service_rate
         if link_retransmit_prob == 1:
             self.pre_arrival = self.arrival_time
@@ -39,11 +39,11 @@ class Packets:
                 self.d_new = self.path[0]
         self.service_start_time = service_start_time
         if self.flow_tag == 0:
-            self.service_time = self.voice_packet_size/(service_rate*100000)
+            self.service_time = slot_time
         elif self.flow_tag == 1:
-            self.service_time = self.video_packet_size/(service_rate*10000)
+            self.service_time = slot_time
         elif self.flow_tag == 2:
-            self.service_time = self.file_packet_size/(service_rate*1000000)
+            self.service_time = slot_time
         self.service_end_time = service_start_time + self.service_time
         self.wait = self.service_start_time - self.arrival_time
         # self.arrival_time = self.service_end_time
