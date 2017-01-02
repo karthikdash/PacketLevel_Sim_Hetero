@@ -765,8 +765,10 @@ while(countarrival < limit - 1):
                     if countarrival == 1:
                         time_service = min_arrivaltime
                     packet_check = True
-                    if min_arrivaltime <= time_service + file_packet_size / 20000:
-                        if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
+                    # if min_arrivaltime <= time_service + file_packet_size / 20000:
+                    if True:
+                        #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
+                        if path_final[k][3] == 0 and path_final[k][6] <= time_service:
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                        path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
@@ -786,7 +788,8 @@ while(countarrival < limit - 1):
 
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
-                        elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
+                        #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
+                        elif path_final[k][3] == 1 and path_final[k][6] <= time_service:
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
@@ -819,7 +822,7 @@ while(countarrival < limit - 1):
                             if countarrival == 1:
                                 time_service = path_final[0][6]
                         else:
-                            break
+                            k += 2
                     elif nodesHavePackets() == False:
                         time_service = time_service + file_packet_size / 20000
                     else:
@@ -838,6 +841,7 @@ while(countarrival < limit - 1):
                 while min_arrivaltime <= c:
                     packet_check = False
                     if nodesHavePackets() == False:
+                        time_service = time_service + file_packet_size / 80000
                         break
                     for i in range(0, 3, 1):
                         for node_no in range(1, noOfNodes + 1, 1):
