@@ -769,52 +769,89 @@ while(countarrival < limit - 1):
                     if True:
                         #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
                         if path_final[k][3] == 0 and path_final[k][6] <= time_service:
+                            '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                        path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                        path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                        path_final[k][2], True, path_final[k][4]))
+                            '''
+                            nodes_real[str(int(path_final[k][9]))].append(Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                                                          path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                                                          path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                                                          path_final[k][2], True, path_final[k][4]))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
 
                             k += 1
+                            '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                    path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], False, path_final[k][4]))
+                            '''
+                            nodes_real[str(int(path_final[k][9]))].append(Packets(
+                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                path_final[k][2], False, path_final[k][4]))
 
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
                         elif path_final[k][3] == 1 and path_final[k][6] <= time_service:
+                            '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], True, path_final[k][4]))
+                            '''
+                            nodes_real[str(int(path_final[k][9]))].append(Packets(
+                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                path_final[k][2], True, path_final[k][4]))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
+                            '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], False, path_final[k][4]))
+                            '''
+                            nodes_real[str(int(path_final[k][9]))].append(Packets(
+                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                 path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                 path_final[k][2], False, path_final[k][4]))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                         elif path_final[k][3] == 2:  # Data calls
+                            '''
                             bisect.insort_left(nodes_nonreal[str(int(path_final[k][9]))],
                                                Packets(
                                                    path_final[k][6],
                                                    path_final[k][6],
                                                    path_final[k][7], 2, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], True, path_final[k][4]))
+                            path_final[k][6] = path_final[k][6] + float(
+                                1.0 / ((path_final[k][8]) / video_packet_size)) + float(
+                                1.0 / ((path_final[k][8]) / video_packet_size))
+                            '''
+                            nodes_nonreal[str(int(path_final[k][9]))].append(Packets(
+                                path_final[k][6],
+                                path_final[k][6],
+                                path_final[k][7], 2, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                path_final[k][2], True, path_final[k][4]))
                             path_final[k][6] = path_final[k][6] + float(
                                 1.0 / ((path_final[k][8]) / video_packet_size)) + float(
                                 1.0 / ((path_final[k][8]) / video_packet_size))

@@ -4,7 +4,6 @@
     <list default="true" id="2957740d-62cf-4df3-9d86-404251eb1ae1" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/multicommodity.py" afterPath="$PROJECT_DIR$/multicommodity.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pathfinal_flowtype0.csv" afterPath="$PROJECT_DIR$/pathfinal_flowtype0.csv" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -25,8 +24,8 @@
       <file leaf-file-name="multicommodity.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/multicommodity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="774" column="97" lean-forward="false" selection-start-line="774" selection-start-column="97" selection-end-line="774" selection-end-column="97" />
+            <state relative-caret-position="-6155">
+              <caret line="885" column="24" lean-forward="false" selection-start-line="885" selection-start-column="24" selection-end-line="885" selection-end-column="24" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -127,8 +126,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -143,6 +140,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -362,8 +361,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1445</line>
-          <option name="timeStamp" value="224" />
+          <line>877</line>
+          <option name="timeStamp" value="240" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -376,7 +375,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="240" />
+      <option name="time" value="241" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -853,8 +852,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multicommodity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="774" column="97" lean-forward="false" selection-start-line="774" selection-start-column="97" selection-end-line="774" selection-end-column="97" />
+        <state relative-caret-position="-6155">
+          <caret line="885" column="24" lean-forward="false" selection-start-line="885" selection-start-column="24" selection-end-line="885" selection-end-column="24" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
