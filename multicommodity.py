@@ -635,14 +635,14 @@ while(countarrival < limit - 1):
                                                    flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
                                                    flow_duration, 0, fwdpath[:].tolist(), flownumber_new, int(flow_duration)*int(voice_packet_rate/10), True, min_rate[-1]))
                 '''
-                path_final[flownumber[-1] - 1, 3] = 0
+                path_final[int(flownumber[-1]) - 1, 3] = 0
                 if int(packet_datarate[I] / 100 / voice_packet_size) < 1:
-                    path_final[flownumber[-1]-1, 2] = int(flow_duration) * 1
-                    path_final[flownumber[-1], 2] = int(flow_duration) * 1
+                    path_final[int(flownumber[-1])-1, 2] = int(flow_duration) * 1
+                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * 1
                 else:
-                    path_final[flownumber[-1] - 1, 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
-                    path_final[flownumber[-1], 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
-                path_final[flownumber[-1] - 1, 8] = packet_datarate[I]/100
+                    path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
+                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I]/100
                 # Backward Path Packetisation
                 '''
                 for i in range(0, int(flow_duration), 1):
@@ -652,9 +652,9 @@ while(countarrival < limit - 1):
                                                    flowarrivaltime[I] + float(i + (j) * 1.0 / (voice_packet_rate/10)),
                                                    flow_duration, 0, bkwdpath[:].tolist(), flownumber_new, int(flow_duration) * int(voice_packet_rate/10), False, min_rate[-1]))
                 '''
-                path_final[flownumber[-1], 3] = 0
+                path_final[int(flownumber[-1]), 3] = 0
 
-                path_final[flownumber[-1], 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
             elif I < 2*arrivalratesize/connectiontypes:
                 '''
                 fwdpath = updateonentry2.fwdpath
@@ -677,12 +677,12 @@ while(countarrival < limit - 1):
                                                    flow_duration, 1, bkwdpath[:].tolist(), flownumber_new,
                                                    int(flow_duration) * int(video_packet_rate/100), False, min_rate[-1]))
                 '''
-                path_final[flownumber[-1] - 1, 3] = 1
-                path_final[flownumber[-1] - 1, 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
-                path_final[flownumber[-1] - 1, 8] = packet_datarate[I] / 100
-                path_final[flownumber[-1], 3] = 1
-                path_final[flownumber[-1], 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
-                path_final[flownumber[-1], 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]) - 1, 3] = 1
+                path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]), 3] = 1
+                path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
+                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
             else:
                 if int(flow_duration*150*1000 / file_packet_size) < 1:
                     file_limit = 1
@@ -697,9 +697,9 @@ while(countarrival < limit - 1):
                                        Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, flow_type[-1],
                                                fwdpath[:].tolist(), flownumber_new, file_limit, True, min_rate[-1]))
                 '''
-                path_final[flownumber[-1] - 1, 2] = file_limit
-                path_final[flownumber[-1] - 1, 8] = packet_datarate[I] / 100
-                path_final[flownumber[-1] - 1, 3] = 2
+                path_final[int(flownumber[-1]) - 1, 2] = file_limit
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]) - 1, 3] = 2
         # print blockstate, "blockstate"
         # print path_final, "pathfinalstate"
         print flow_type1[I]
@@ -2290,7 +2290,7 @@ while(countarrival < limit - 1):
                                                        flow_duration, 0, fwdpath[:].tolist(), 0, int(flow_duration)*int(voice_packet_rate/10), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
-                        if path_final[k][0] == flownumber[-1]:
+                        if path_final[k][0] == int(flownumber[-1]):
                             path_final[k][2] = int(flow_duration) * int(voice_packet_rate/10)
                             break
                         k += 1
@@ -2314,7 +2314,7 @@ while(countarrival < limit - 1):
                                                        flow_duration, 1, fwdpath[:].tolist(), 1, int(flow_duration)*int(video_packet_rate/100), True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
-                        if path_final[k][0] == flownumber[-1]:
+                        if path_final[k][0] == int(flownumber[-1]):
                             path_final[k][2] = int(flow_duration) * int(video_packet_rate/100)
                             break
                         k += 1
@@ -2339,10 +2339,10 @@ while(countarrival < limit - 1):
                         file_limit = int(flow_duration / file_packet_size)
                     for i in range(0, file_limit, 1):
                         bisect.insort_left(nodes_nonreal[str(fwdpath[0])],
-                                           Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, 2, fwdpath[:].tolist(), flownumber[-1], file_limit, True, min_rate[-1]))
+                                           Packets(flowarrivaltime[I], flowarrivaltime[I], flow_duration, 2, fwdpath[:].tolist(), int(flownumber[-1]), file_limit, True, min_rate[-1]))
                     k = 0
                     while path_final[k][0] != 0:
-                        if path_final[k][0] == flownumber[-1]:
+                        if path_final[k][0] == int(flownumber[-1]):
                             path_final[k][2] = file_limit
                             break
                         k += 1
