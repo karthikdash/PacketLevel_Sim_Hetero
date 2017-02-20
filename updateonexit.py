@@ -75,7 +75,8 @@ class updateonexit(object):
         elif flow_type_exit == 2:
             for loop in range(0, path_finalsize1, 1):
                 if self.path_final[loop, 0] == self.flownumber_exit:
-                    noofpaths = int(self.path_final[loop, 3])
+                    # noofpaths = int(self.path_final[loop, 3])
+                    noofpaths = 1
                     for loop1 in range(0, noofpaths, 1):
                         min_rate_exit = self.path_final[loop + loop1, 4]
                         path = self.path_final[loop + loop1 , 9:p+9]

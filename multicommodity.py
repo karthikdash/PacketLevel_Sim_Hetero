@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+lamb = 0.002
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,16 +61,16 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.009, np.ones((12)))
+arrivalrate = np.multiply(0.002, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 1000
+limit = 10000
 # Observation from 'start' iteration ?
-start = 5
+start = 2
 # Probability with which blocked call will be retried
 retry_prob = 0.7
 # Sigma
@@ -117,17 +117,26 @@ with np.errstate(divide='ignore', invalid='ignore'):
     # Adapted Dijkstra Weights
     wt_matx = np.divide(1, eff_capacity_matx)
     wt_matx_real = np.divide(1, eff_capacity_matx)
-    wt_matx_real1 = np.divide(2, eff_capacity_matx)
+    wt_matx_real1 = np.divide(1.33, eff_capacity_matx)
     # Multicommodity Weights
     wt_matx_multi = np.divide(1, eff_capacity_matx)
     wt_matx_real_multi = np.divide(1, eff_capacity_matx)
-    wt_matx_real1_multi = np.divide(2, eff_capacity_matx)
+    wt_matx_real1_multi = np.divide(1.33, eff_capacity_matx)
     # Enhanced Dijkstra Wights
     wt_matx_block = np.divide(1, eff_capacity_matx)
     wt_matx_real_block = np.divide(1, eff_capacity_matx)
-    wt_matx_real1_block = np.divide(2, eff_capacity_matx)
+    wt_matx_real1_block = np.divide(1.33, eff_capacity_matx)
 source = []
 destination = []
+
+# Debugging
+np.savetxt("orweightmatx.csv", 1/wt_matx, delimiter=",")
+np.savetxt("orweightmatxreal.csv", 1/wt_matx_real, delimiter=",")
+np.savetxt("orweightmatxreal1.csv", 1/wt_matx_real1, delimiter=",")
+
+orig_total_matx = np.sum(1/wt_matx)
+orig_total_real = np.sum(1/wt_matx_real)
+orig_total_real1 = np.sum(1/wt_matx_real1)
 
 # To get Source-Destination Pairs defined by problem statement. Since we have same S-D for different flows, we append source1 and destination1
 for i in range(0, connectiontypes):
@@ -580,6 +589,33 @@ while(countarrival < limit - 1):
         path_final = updateonentry2.path_final
         blockstate = updateonentry2.blockstate
 
+
+        # Debugging
+        np.savetxt("updweightmatx.csv", 1/ wt_matx, delimiter=",")
+        np.savetxt("updorweightmatxreal.csv", 1/ wt_matx_real, delimiter=",")
+        np.savetxt("updorweightmatxreal1.csv", 1/ wt_matx_real1, delimiter=",")
+
+        total_matx = np.sum(1/wt_matx)
+        total_real = np.sum(1 / wt_matx_real)
+        total_real1 = np.sum(1 / wt_matx_real1)
+        k = 0
+        weight_diff = 0
+        realweight_diff = 0
+        while path_final[k][0] != 0:
+            j = 9
+            while path_final[k][j] != 0:
+                weight_diff = weight_diff + path_final[k][4]
+                if path_final[k][1] == 0:
+                    realweight_diff = realweight_diff + path_final[k][4]
+                j += 1
+            weight_diff = weight_diff - path_final[k][4]
+            if path_final[k][1] == 0:
+                realweight_diff = realweight_diff - path_final[k][4]
+            k += 1
+        if (orig_total_matx - total_matx - weight_diff) > 2:
+            print "Oops"
+        if (orig_total_real1 - total_real1 - realweight_diff) > 2:
+            print "Oops"
         if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
             count_algo1 = count_algo1 + 1
         blockstate1[countarrival] = blockstate_new
@@ -587,7 +623,7 @@ while(countarrival < limit - 1):
 
         if blockstate[-1] == 1:  # If last call not blocked
 
-            if I <= arrivalratesize/connectiontypes:
+            if I < arrivalratesize/connectiontypes:
                 '''
                 fwdpath = updateonentry2.fwdpath
                 bkwdpath = updateonentry2.bkwdpath
@@ -648,10 +684,10 @@ while(countarrival < limit - 1):
                 path_final[flownumber[-1], 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
                 path_final[flownumber[-1], 8] = packet_datarate[I] / 100
             else:
-                if int(flow_duration*1000 / file_packet_size) < 1:
+                if int(flow_duration*150*1000 / file_packet_size) < 1:
                     file_limit = 1
                 else:
-                    file_limit = int(flow_duration*1000 / file_packet_size)
+                    file_limit = int(flow_duration*150*1000 / file_packet_size)
                 '''
                 fwdpath = updateonentry2.fwdpath
                 flow_duration = np.random.exponential(np.divide(1, file_duration)) * file_packet_size
@@ -667,7 +703,7 @@ while(countarrival < limit - 1):
         # print blockstate, "blockstate"
         # print path_final, "pathfinalstate"
         print flow_type1[I]
-
+        '''
         # ############## Routing using multicommodity ##############
         if I <= s6 - 1:
             if I == 0:
@@ -732,10 +768,8 @@ while(countarrival < limit - 1):
         blockstate1_multi[countarrival] = blockstate_new_multi
 
         # np.savetxt("pathfinal123.csv", path_final, delimiter=",")
+        '''
 
-        ################################################
-        # updateonentry1 does routing using Enhanced Dijkstra
-        ################################################
         flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
         count1departure[countarrival] = countdeparture
         countarrival = countarrival + 1
@@ -758,17 +792,21 @@ while(countarrival < limit - 1):
                         print "asd"
                     if path_final[0][0] != 0:
                         min_arrivaltime = float('inf')
+                    po = 0
                     while path_final[j][0] != 0:
                         if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
+                        po = po +1
+                        if po > 100:
+                            print po
                     if countarrival == 1:
                         time_service = min_arrivaltime
                     packet_check = True
                     # if min_arrivaltime <= time_service + file_packet_size / 20000:
                     if True:
                         #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
-                        if path_final[k][3] == 0 and path_final[k][6] <= time_service:
+                        if path_final[k][3] == 0 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
@@ -793,16 +831,16 @@ while(countarrival < limit - 1):
                                                    path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], False, path_final[k][4]))
                             '''
-                            nodes_real[str(int(path_final[k][9]))].append(Packets(
-                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
-                                path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
-                                path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                path_final[k][2], False, path_final[k][4]))
-
-                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
+                            if (int(path_final[k][9])) != 0:
+                                nodes_real[str(int(path_final[k][9]))].append(Packets(
+                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
+                                    path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                    path_final[k][2], False, path_final[k][4]))
+                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
-                        elif path_final[k][3] == 1 and path_final[k][6] <= time_service:
+                        elif path_final[k][3] == 1 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
@@ -828,12 +866,13 @@ while(countarrival < limit - 1):
                                                    path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], False, path_final[k][4]))
                             '''
-                            nodes_real[str(int(path_final[k][9]))].append(Packets(
-                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
-                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
-                                 path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                 path_final[k][2], False, path_final[k][4]))
-                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
+                            if (int(path_final[k][9])) != 0:
+                                nodes_real[str(int(path_final[k][9]))].append(Packets(
+                                     path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                     path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
+                                     path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                     path_final[k][2], False, path_final[k][4]))
+                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                         elif path_final[k][3] == 2:  # Data calls
                             '''
@@ -872,8 +911,8 @@ while(countarrival < limit - 1):
                         if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
-                if time_service > min_arrivaltime:
-                    time_service = min_arrivaltime
+                # if time_service > min_arrivaltime:
+                    # time_service = min_arrivaltime
                 #while (time_service) <= min_arrivaltime and (time_service) <= c:  # Can be set true here.
                 while min_arrivaltime <= c:
                     packet_check = False
@@ -936,7 +975,7 @@ while(countarrival < limit - 1):
                                                             packetcounter += 1
                                                             if path_final[k][2] < 1:
                                                                 print "finished"
-                                                                if path_final[k + 1][2] < 1:
+                                                                if True:
                                                                     upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                         flownumber, userpriority,
                                                                                         path_final[k][0], path_final,
@@ -956,6 +995,40 @@ while(countarrival < limit - 1):
                                                                     path_final = upde.path_final
                                                                     blockstate = upde.blockstate
 
+                                                                    # Debugging
+                                                                    np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                               delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal.csv",
+                                                                               1 / wt_matx_real, delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal1.csv",
+                                                                               1 / wt_matx_real1, delimiter=",")
+                                                                    print("WFIN")
+
+                                                                    total_matx = np.sum(1 / wt_matx)
+                                                                    total_real = np.sum(1 / wt_matx_real)
+                                                                    total_real1 = np.sum(1 / wt_matx_real1)
+                                                                    k = 0
+                                                                    weight_diff = 0
+                                                                    realweight_diff = 0
+                                                                    while path_final[k][0] != 0:
+                                                                        j = 9
+                                                                        while path_final[k][j] != 0:
+                                                                            weight_diff = weight_diff + path_final[k][4]
+                                                                            if path_final[k][1] == 0:
+                                                                                realweight_diff = realweight_diff + \
+                                                                                                  path_final[k][4]
+                                                                            j += 1
+                                                                        weight_diff = weight_diff - path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff - \
+                                                                                              path_final[k][4]
+                                                                        k += 1
+                                                                    if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                        print "Oops"
+                                                                    if (
+                                                                            orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                        print "Oops"
+
                                                             break
                                                         k += 1
                                                 else:
@@ -965,7 +1038,7 @@ while(countarrival < limit - 1):
                                                             packetcounter += 1
                                                             if path_final[k + 1][2] < 1:
                                                                 print "finished reverse"
-                                                                if path_final[k][2] < 1:
+                                                                if True:
                                                                     upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                         flownumber, userpriority,
                                                                                         path_final[k][0], path_final,
@@ -984,6 +1057,40 @@ while(countarrival < limit - 1):
                                                                     wt_matx_real1 = upde.wt_matx_real1
                                                                     path_final = upde.path_final
                                                                     blockstate = upde.blockstate
+
+                                                                    # Debugging
+                                                                    np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                               delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal.csv",
+                                                                               1 / wt_matx_real, delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal1.csv",
+                                                                               1 / wt_matx_real1, delimiter=",")
+                                                                    print("WFIN")
+
+                                                                    total_matx = np.sum(1 / wt_matx)
+                                                                    total_real = np.sum(1 / wt_matx_real)
+                                                                    total_real1 = np.sum(1 / wt_matx_real1)
+                                                                    k = 0
+                                                                    weight_diff = 0
+                                                                    realweight_diff = 0
+                                                                    while path_final[k][0] != 0:
+                                                                        j = 9
+                                                                        while path_final[k][j] != 0:
+                                                                            weight_diff = weight_diff + path_final[k][4]
+                                                                            if path_final[k][1] == 0:
+                                                                                realweight_diff = realweight_diff + \
+                                                                                                  path_final[k][4]
+                                                                            j += 1
+                                                                        weight_diff = weight_diff - path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff - \
+                                                                                              path_final[k][4]
+                                                                        k += 1
+                                                                    if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                        print "Oops"
+                                                                    if (
+                                                                            orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                        print "Oops"
 
                                                             break
                                                         k += 1
@@ -1009,7 +1116,7 @@ while(countarrival < limit - 1):
                                                             packetcounter += 1
                                                             if path_final[k][2] < 1:
                                                                 print "finished"
-                                                                if path_final[k + 1][2] < 1:
+                                                                if True:
                                                                     upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                         flownumber, userpriority,
                                                                                         path_final[k][0], path_final,
@@ -1029,6 +1136,40 @@ while(countarrival < limit - 1):
                                                                     path_final = upde.path_final
                                                                     blockstate = upde.blockstate
 
+                                                                    # Debugging
+                                                                    np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                               delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal.csv",
+                                                                               1 / wt_matx_real, delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal1.csv",
+                                                                               1 / wt_matx_real1, delimiter=",")
+                                                                    print("WFIN")
+
+                                                                    total_matx = np.sum(1 / wt_matx)
+                                                                    total_real = np.sum(1 / wt_matx_real)
+                                                                    total_real1 = np.sum(1 / wt_matx_real1)
+                                                                    k = 0
+                                                                    weight_diff = 0
+                                                                    realweight_diff = 0
+                                                                    while path_final[k][0] != 0:
+                                                                        j = 9
+                                                                        while path_final[k][j] != 0:
+                                                                            weight_diff = weight_diff + path_final[k][4]
+                                                                            if path_final[k][1] == 0:
+                                                                                realweight_diff = realweight_diff + \
+                                                                                                  path_final[k][4]
+                                                                            j += 1
+                                                                        weight_diff = weight_diff - path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff - \
+                                                                                              path_final[k][4]
+                                                                        k += 1
+                                                                    if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                        print "Oops"
+                                                                    if (
+                                                                            orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                        print "Oops"
+
                                                             break
                                                         k += 1
                                                 else:
@@ -1038,7 +1179,7 @@ while(countarrival < limit - 1):
                                                             packetcounter += 1
                                                             if path_final[k + 1][2] < 1:
                                                                 print "finished reverse"
-                                                                if path_final[k][2] < 1:
+                                                                if True:
                                                                     upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                         flownumber, userpriority,
                                                                                         path_final[k][0], path_final,
@@ -1057,6 +1198,40 @@ while(countarrival < limit - 1):
                                                                     wt_matx_real1 = upde.wt_matx_real1
                                                                     path_final = upde.path_final
                                                                     blockstate = upde.blockstate
+
+                                                                    # Debugging
+                                                                    np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                               delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal.csv",
+                                                                               1 / wt_matx_real, delimiter=",")
+                                                                    np.savetxt("updorweightmatxreal1.csv",
+                                                                               1 / wt_matx_real1, delimiter=",")
+                                                                    print("WFIN")
+
+                                                                    total_matx = np.sum(1 / wt_matx)
+                                                                    total_real = np.sum(1 / wt_matx_real)
+                                                                    total_real1 = np.sum(1 / wt_matx_real1)
+                                                                    k = 0
+                                                                    weight_diff = 0
+                                                                    realweight_diff = 0
+                                                                    while path_final[k][0] != 0:
+                                                                        j = 9
+                                                                        while path_final[k][j] != 0:
+                                                                            weight_diff = weight_diff + path_final[k][4]
+                                                                            if path_final[k][1] == 0:
+                                                                                realweight_diff = realweight_diff + \
+                                                                                                  path_final[k][4]
+                                                                            j += 1
+                                                                        weight_diff = weight_diff - path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff - \
+                                                                                              path_final[k][4]
+                                                                        k += 1
+                                                                    if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                        print "Oops"
+                                                                    if (
+                                                                            orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                        print "Oops"
 
                                                             break
                                                         k += 1
@@ -1157,6 +1332,40 @@ while(countarrival < limit - 1):
                                                                 path_final = upde.path_final
                                                                 blockstate = upde.blockstate
 
+                                                                # Debugging
+                                                                np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                           delimiter=",")
+                                                                np.savetxt("updorweightmatxreal.csv",
+                                                                           1 / wt_matx_real, delimiter=",")
+                                                                np.savetxt("updorweightmatxreal1.csv",
+                                                                           1 / wt_matx_real1, delimiter=",")
+                                                                print("WFIN")
+
+                                                                total_matx = np.sum(1 / wt_matx)
+                                                                total_real = np.sum(1 / wt_matx_real)
+                                                                total_real1 = np.sum(1 / wt_matx_real1)
+                                                                k = 0
+                                                                weight_diff = 0
+                                                                realweight_diff = 0
+                                                                while path_final[k][0] != 0:
+                                                                    j = 9
+                                                                    while path_final[k][j] != 0:
+                                                                        weight_diff = weight_diff + path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff + \
+                                                                                              path_final[k][4]
+                                                                        j += 1
+                                                                    weight_diff = weight_diff - path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff - \
+                                                                                          path_final[k][4]
+                                                                    k += 1
+                                                                if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                    print "Oops"
+                                                                if (
+                                                                        orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                    print "Oops"
+
                                                             break
                                                         k += 1
                                                 ################################ File Mean Delay Calculations #############
@@ -1229,7 +1438,7 @@ while(countarrival < limit - 1):
                                                         packetcounter += 1
                                                         if path_final[k][2] < 1:
                                                             print "finished"
-                                                            if path_final[k + 1][2] < 1:
+                                                            if True:
                                                                 upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                     flownumber, userpriority,
                                                                                     path_final[k][0], path_final, wt_matx,
@@ -1248,6 +1457,40 @@ while(countarrival < limit - 1):
                                                                 path_final = upde.path_final
                                                                 blockstate = upde.blockstate
 
+                                                                # Debugging
+                                                                np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                           delimiter=",")
+                                                                np.savetxt("updorweightmatxreal.csv",
+                                                                           1 / wt_matx_real, delimiter=",")
+                                                                np.savetxt("updorweightmatxreal1.csv",
+                                                                           1 / wt_matx_real1, delimiter=",")
+                                                                print("WFIN")
+
+                                                                total_matx = np.sum(1 / wt_matx)
+                                                                total_real = np.sum(1 / wt_matx_real)
+                                                                total_real1 = np.sum(1 / wt_matx_real1)
+                                                                k = 0
+                                                                weight_diff = 0
+                                                                realweight_diff = 0
+                                                                while path_final[k][0] != 0:
+                                                                    j = 9
+                                                                    while path_final[k][j] != 0:
+                                                                        weight_diff = weight_diff + path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff + \
+                                                                                              path_final[k][4]
+                                                                        j += 1
+                                                                    weight_diff = weight_diff - path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff - \
+                                                                                          path_final[k][4]
+                                                                    k += 1
+                                                                if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                    print "Oops"
+                                                                if (
+                                                                        orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                    print "Oops"
+
                                                         break
                                                     k += 1
                                             else:
@@ -1257,7 +1500,7 @@ while(countarrival < limit - 1):
                                                         packetcounter += 1
                                                         if path_final[k+1][2] < 1:
                                                             print "finished reverse"
-                                                            if path_final[k][2] < 1:
+                                                            if True:
                                                                 upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                     flownumber, userpriority,
                                                                                     path_final[k][0], path_final, wt_matx,
@@ -1275,6 +1518,40 @@ while(countarrival < limit - 1):
                                                                 wt_matx_real1 = upde.wt_matx_real1
                                                                 path_final = upde.path_final
                                                                 blockstate = upde.blockstate
+
+                                                                # Debugging
+                                                                np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                           delimiter=",")
+                                                                np.savetxt("updorweightmatxreal.csv",
+                                                                           1 / wt_matx_real, delimiter=",")
+                                                                np.savetxt("updorweightmatxreal1.csv",
+                                                                           1 / wt_matx_real1, delimiter=",")
+                                                                print("WFIN")
+
+                                                                total_matx = np.sum(1 / wt_matx)
+                                                                total_real = np.sum(1 / wt_matx_real)
+                                                                total_real1 = np.sum(1 / wt_matx_real1)
+                                                                k = 0
+                                                                weight_diff = 0
+                                                                realweight_diff = 0
+                                                                while path_final[k][0] != 0:
+                                                                    j = 9
+                                                                    while path_final[k][j] != 0:
+                                                                        weight_diff = weight_diff + path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff + \
+                                                                                              path_final[k][4]
+                                                                        j += 1
+                                                                    weight_diff = weight_diff - path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff - \
+                                                                                          path_final[k][4]
+                                                                    k += 1
+                                                                if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                    print "Oops"
+                                                                if (
+                                                                        orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                    print "Oops"
 
                                                         break
                                                     k += 1
@@ -1298,7 +1575,7 @@ while(countarrival < limit - 1):
                                                         packetcounter += 1
                                                         if path_final[k][2] < 1:
                                                             print "finished"
-                                                            if path_final[k + 1][2] < 1:
+                                                            if True:
                                                                 upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                     flownumber, userpriority,
                                                                                     path_final[k][0], path_final, wt_matx,
@@ -1317,6 +1594,40 @@ while(countarrival < limit - 1):
                                                                 path_final = upde.path_final
                                                                 blockstate = upde.blockstate
 
+                                                                # Debugging
+                                                                np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                           delimiter=",")
+                                                                np.savetxt("updorweightmatxreal.csv",
+                                                                           1 / wt_matx_real, delimiter=",")
+                                                                np.savetxt("updorweightmatxreal1.csv",
+                                                                           1 / wt_matx_real1, delimiter=",")
+                                                                print("WFIN")
+
+                                                                total_matx = np.sum(1 / wt_matx)
+                                                                total_real = np.sum(1 / wt_matx_real)
+                                                                total_real1 = np.sum(1 / wt_matx_real1)
+                                                                k = 0
+                                                                weight_diff = 0
+                                                                realweight_diff = 0
+                                                                while path_final[k][0] != 0:
+                                                                    j = 9
+                                                                    while path_final[k][j] != 0:
+                                                                        weight_diff = weight_diff + path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff + \
+                                                                                              path_final[k][4]
+                                                                        j += 1
+                                                                    weight_diff = weight_diff - path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff - \
+                                                                                          path_final[k][4]
+                                                                    k += 1
+                                                                if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                    print "Oops"
+                                                                if (
+                                                                        orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                    print "Oops"
+
                                                         break
                                                     k += 1
                                             else:
@@ -1326,7 +1637,7 @@ while(countarrival < limit - 1):
                                                         packetcounter += 1
                                                         if path_final[k + 1][2] < 1:
                                                             print "finished reverse"
-                                                            if path_final[k][2] < 1:
+                                                            if True:
                                                                 upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                     flownumber, userpriority,
                                                                                     path_final[k][0], path_final, wt_matx,
@@ -1344,6 +1655,40 @@ while(countarrival < limit - 1):
                                                                 wt_matx_real1 = upde.wt_matx_real1
                                                                 path_final = upde.path_final
                                                                 blockstate = upde.blockstate
+
+                                                                # Debugging
+                                                                np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                           delimiter=",")
+                                                                np.savetxt("updorweightmatxreal.csv",
+                                                                           1 / wt_matx_real, delimiter=",")
+                                                                np.savetxt("updorweightmatxreal1.csv",
+                                                                           1 / wt_matx_real1, delimiter=",")
+                                                                print("WFIN")
+
+                                                                total_matx = np.sum(1 / wt_matx)
+                                                                total_real = np.sum(1 / wt_matx_real)
+                                                                total_real1 = np.sum(1 / wt_matx_real1)
+                                                                k = 0
+                                                                weight_diff = 0
+                                                                realweight_diff = 0
+                                                                while path_final[k][0] != 0:
+                                                                    j = 9
+                                                                    while path_final[k][j] != 0:
+                                                                        weight_diff = weight_diff + path_final[k][4]
+                                                                        if path_final[k][1] == 0:
+                                                                            realweight_diff = realweight_diff + \
+                                                                                              path_final[k][4]
+                                                                        j += 1
+                                                                    weight_diff = weight_diff - path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff - \
+                                                                                          path_final[k][4]
+                                                                    k += 1
+                                                                if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                    print "Oops"
+                                                                if (
+                                                                        orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                    print "Oops"
 
                                                         break
                                                     k += 1
@@ -1455,6 +1800,38 @@ while(countarrival < limit - 1):
                                                             wt_matx_real1 = upde.wt_matx_real1
                                                             path_final = upde.path_final
                                                             blockstate = upde.blockstate
+
+                                                            # Debugging
+                                                            np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                       delimiter=",")
+                                                            np.savetxt("updorweightmatxreal.csv",
+                                                                       1 / wt_matx_real, delimiter=",")
+                                                            np.savetxt("updorweightmatxreal1.csv",
+                                                                       1 / wt_matx_real1, delimiter=",")
+                                                            print("WFIN")
+
+                                                            total_matx = np.sum(1 / wt_matx)
+                                                            total_real = np.sum(1 / wt_matx_real)
+                                                            total_real1 = np.sum(1 / wt_matx_real1)
+                                                            k = 0
+                                                            weight_diff = 0
+                                                            realweight_diff = 0
+                                                            while path_final[k][0] != 0:
+                                                                j = 9
+                                                                while path_final[k][j] != 0:
+                                                                    weight_diff = weight_diff + path_final[k][4]
+                                                                    if path_final[k][1] == 0:
+                                                                        realweight_diff = realweight_diff + \
+                                                                                          path_final[k][4]
+                                                                    j += 1
+                                                                weight_diff = weight_diff - path_final[k][4]
+                                                                if path_final[k][1] == 0:
+                                                                    realweight_diff = realweight_diff - path_final[k][4]
+                                                                k += 1
+                                                            if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                print "Oops"
+                                                            if (orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                print "Oops"
 
                                                         break
                                                     k += 1
@@ -1607,7 +1984,7 @@ while(countarrival < limit - 1):
             flownumber_new_block = flownumber_new_block + 1
 
             flow_duration = np.random.exponential(np.divide(1, call_duration))
-            if I <= arrivalratesize / connectiontypes:
+            if I < arrivalratesize / connectiontypes:
                 connection_type = 0
             elif I < 2 * arrivalratesize / connectiontypes:
                 connection_type = 1
@@ -1637,12 +2014,40 @@ while(countarrival < limit - 1):
             path_final = upde.path_final
             blockstate = upde.blockstate
 
+            # Debugging
+            np.savetxt("updweightmatx.csv", 1/wt_matx, delimiter=",")
+            np.savetxt("updorweightmatxreal.csv", 1/wt_matx_real, delimiter=",")
+            np.savetxt("updorweightmatxreal1.csv", 1/wt_matx_real1, delimiter=",")
+            print("INSERT")
+
+            total_matx = np.sum(1 / wt_matx)
+            total_real = np.sum(1 / wt_matx_real)
+            total_real1 = np.sum(1 / wt_matx_real1)
+            k = 0
+            weight_diff = 0
+            realweight_diff = 0
+            while path_final[k][0] != 0:
+                j = 9
+                while path_final[k][j] != 0:
+                    weight_diff = weight_diff + path_final[k][4]
+                    if path_final[k][1] == 0:
+                        realweight_diff = realweight_diff + path_final[k][4]
+                    j += 1
+                weight_diff = weight_diff - path_final[k][4]
+                if path_final[k][1] == 0:
+                    realweight_diff = realweight_diff - path_final[k][4]
+                k += 1
+            if (orig_total_matx - total_matx - weight_diff) > 2:
+                print "Oops"
+            if (orig_total_real1 - total_real1 - realweight_diff) > 2:
+                print "Oops"
+
             if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
                 count_algo1 = count_algo1 + 1  # Increase count_algo1 counter and below counters for voice/video/data if tracking statistics started
                 if countarrival > start:  # If tracking statistics started
-                    if I <= arrivalratesize / connectiontypes:
+                    if I < arrivalratesize / connectiontypes:
                         blockedvoice_alog1 = blockedvoice_alog1 + 1
-                    elif I <= 2 * arrivalratesize / connectiontypes:
+                    elif I < 2 * arrivalratesize / connectiontypes:
                         blockedvideo_algo1 = blockedvideo_algo1 + 1
                     else:
                         blocekednonrealtime_algo1 = blocekednonrealtime_algo1 + 1
