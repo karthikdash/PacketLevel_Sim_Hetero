@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.001
+lamb = 0.007
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,14 +61,14 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.001, np.ones((12)))
+arrivalrate = np.multiply(0.007, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 50000
+limit = 100
 # Observation from 'start' iteration ?
 start = 2
 # Probability with which blocked call will be retried
