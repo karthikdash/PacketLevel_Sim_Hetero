@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.007
+lamb = 0.001
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,14 +61,14 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.007, np.ones((12)))
+arrivalrate = np.multiply(0.001, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 100
+limit = 10
 # Observation from 'start' iteration ?
 start = 2
 # Probability with which blocked call will be retried
@@ -486,6 +486,7 @@ Voice_Mean = 0
 Video_Mean = 0
 File_Mean = 0
 File_Mean_Speed = 0
+File_Mean_Speed_e2e = 0
 serviceend_time = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 final_packets_tracker = []
 timetracker = []
@@ -911,8 +912,8 @@ while(countarrival < limit - 1):
                         if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
-                # if time_service > min_arrivaltime:
-                    # time_service = min_arrivaltime
+                if time_service < min_arrivaltime:
+                    time_service = min_arrivaltime
                 #while (time_service) <= min_arrivaltime and (time_service) <= c:  # Can be set true here.
                 while min_arrivaltime <= c:
                     packet_check = False
@@ -1310,9 +1311,22 @@ while(countarrival < limit - 1):
                                                             if path_final[k][2] < 1:
                                                                 print "finished"
                                                                 if File_Mean_Speed == 0:
-                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.001)) / 1.0
+                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 1.0
+                                                                    File_Mean_Speed_e2e = 256.0 / (0.01 * (
+                                                                    nodes_nonreal[str(node_no)][0].service_end_time -
+                                                                    nodes_nonreal[str(node_no)][
+                                                                        0].initial_arrival_time))
                                                                 else:
-                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.001)) / 2.0
+                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 2.0
+                                                                    File_Mean_Speed_e2e = (
+                                                                                          File_Mean_Speed_e2e + 256.0 / (
+                                                                                          0.01 * (
+                                                                                              nodes_nonreal[
+                                                                                                  str(node_no)][
+                                                                                                  0].service_end_time -
+                                                                                              nodes_nonreal[
+                                                                                                  str(node_no)][
+                                                                                                  0].initial_arrival_time))) / 2.0
                                                                 upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                     flownumber, userpriority,
                                                                                     path_final[k][0], path_final,
@@ -1768,7 +1782,11 @@ while(countarrival < limit - 1):
                                                                                                            nodes_nonreal[
                                                                                                                str(
                                                                                                                    node_no)][
-                                                                                                               0].initial_arrival_time) * 0.001)) / 1.0
+                                                                                                               0].initial_arrival_time) * 0.01)) / 1.0
+                                                                File_Mean_Speed_e2e = 256.0 / (0.01 * (
+                                                                    nodes_nonreal[str(node_no)][0].service_end_time -
+                                                                    nodes_nonreal[str(node_no)][
+                                                                        0].initial_arrival_time))
                                                             else:
                                                                 File_Mean_Speed = (File_Mean_Speed +
                                                                                    nodes_nonreal[str(node_no)][
@@ -1780,7 +1798,12 @@ while(countarrival < limit - 1):
                                                                                                            nodes_nonreal[
                                                                                                                str(
                                                                                                                    node_no)][
-                                                                                                               0].initial_arrival_time) * 0.001)) / 2.0
+                                                                                                               0].initial_arrival_time) * 0.01)) / 2.0
+                                                                File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
+                                                                0.01 * (
+                                                                    nodes_nonreal[str(node_no)][0].service_end_time -
+                                                                    nodes_nonreal[str(node_no)][
+                                                                        0].initial_arrival_time))) / 2.0
 
 
                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -2591,6 +2614,8 @@ print Voice_Mean
 print Video_Mean
 print File_Mean
 print File_Mean_Speed, "FileMeanSpeed"
+print File_Mean_Speed_e2e, "File Mean Speed E2E"
 print node1packetcounter
 print nodeoutsidecounter
 # print fracrealtime_algo1
+np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e], delimiter=",")
