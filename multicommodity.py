@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.001
+lamb = 0.009
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,7 +61,7 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.001, np.ones((12)))
+arrivalrate = np.multiply(0.009, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
@@ -833,7 +833,7 @@ while(countarrival < limit - 1):
                                                                           path_final[k][2], True, path_final[k][4]))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
-                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
+                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)) + float(1.0 / ((path_final[k][8]) / voice_packet_size))
 
                             k += 1
                             '''
@@ -850,7 +850,7 @@ while(countarrival < limit - 1):
                                     path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                     path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                     path_final[k][2], False, path_final[k][4]))
-                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
+                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)) + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
                         elif path_final[k][3] == 1 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
@@ -869,7 +869,7 @@ while(countarrival < limit - 1):
                                 path_final[k][2], True, path_final[k][4]))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
-                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
+                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)) + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
@@ -885,7 +885,7 @@ while(countarrival < limit - 1):
                                      path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                      path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                      path_final[k][2], False, path_final[k][4]))
-                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
+                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)) + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                         elif path_final[k][3] == 2:  # Data calls
                             '''
@@ -955,8 +955,8 @@ while(countarrival < limit - 1):
                                         continue  # Continue checking other nodes for servicable packets
                                     s_link = int(nodes_real[str(node_no)][0].path[0])
                                     d_link = int(nodes_real[str(node_no)][0].path[1])
-                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                    # link_retransmit_prob = 1
+                                    #link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                    link_retransmit_prob = 1
                                     nodes_real[str(node_no)][0].service(
                                         max(nodes_real[str(node_no)][0].arrival_time, time_service),
                                         B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -970,11 +970,15 @@ while(countarrival < limit - 1):
                                                                         nodes_real[str(node_no)][
                                                                             0].service_end_time -
                                                                         nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                            if Voice_Mean_Time[node_no] > 1:
+                                                print "no"
                                         else:
                                             Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] +
                                                                         nodes_real[str(node_no)][
                                                                             0].service_end_time -
                                                                         nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                            if Video_Mean_Time[node_no] > 1:
+                                                print "no"
                                         # Appending to the next node receiving Queue
                                         if nodes_real[str(node_no)][0].d_new == 99:
                                             if nodes_real[str(node_no)][0].flow_tag == 0:
@@ -1438,8 +1442,8 @@ while(countarrival < limit - 1):
                                     continue  # Continue checking other nodes for servicable packets
                                 s_link = int(nodes_real[str(node_no)][0].path[0])
                                 d_link = int(nodes_real[str(node_no)][0].path[1])
-                                link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                # link_retransmit_prob = 1
+                                # link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                link_retransmit_prob = 1
                                 nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                 # Appending to the serving Queue
                                 # serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
@@ -1448,9 +1452,14 @@ while(countarrival < limit - 1):
                                     if nodes_real[str(node_no)][0].flow_tag == 0:
                                         Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][
                                             0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                        if Voice_Mean_Time[node_no] > 1:
+                                            print "no"
+
                                     else:
                                         Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][
                                             0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
+                                        if Voice_Mean_Time[node_no] > 1:
+                                            print "no"
                                     # Appending to the next node receiving Queue
                                     if nodes_real[str(node_no)][0].d_new == 99:
                                         if nodes_real[str(node_no)][0].flow_tag == 0:
