@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.005
+lamb = 0.001
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,14 +61,14 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.005, np.ones((12)))
+arrivalrate = np.multiply(0.001, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 1000
+limit = 10000
 # Observation from 'start' iteration ?
 start = 2
 # Probability with which blocked call will be retried
@@ -126,8 +126,12 @@ with np.errstate(divide='ignore', invalid='ignore'):
     wt_matx_block = np.divide(1, eff_capacity_matx)
     wt_matx_real_block = np.divide(1, eff_capacity_matx)
     wt_matx_real1_block = np.divide(1.33, eff_capacity_matx)
+
 source = []
 destination = []
+
+orig_matx = wt_matx
+orig_real1 = wt_matx_real1
 
 # Debugging
 np.savetxt("orweightmatx.csv", 1/wt_matx, delimiter=",")
@@ -137,6 +141,12 @@ np.savetxt("orweightmatxreal1.csv", 1/wt_matx_real1, delimiter=",")
 orig_total_matx = np.sum(1/wt_matx)
 orig_total_real = np.sum(1/wt_matx_real)
 orig_total_real1 = np.sum(1/wt_matx_real1)
+
+rho_matx_sum = np.zeros((10,10))
+
+old_c = 0
+new_c = 0
+sum_c = 0
 
 # To get Source-Destination Pairs defined by problem statement. Since we have same S-D for different flows, we append source1 and destination1
 for i in range(0, connectiontypes):
@@ -526,7 +536,7 @@ def nonrealnodesHavePackets():
         if len(nodes_nonreal[str(no)]) != 0:
             return True
     return False
-
+c = 0
 while(countarrival < limit - 1):
     print countarrival, "countarrival", packetcounter , time_service
     # We find the minimum get the first arriving flow and hence source node for that corresponding time
@@ -590,7 +600,9 @@ while(countarrival < limit - 1):
         path_final = updateonentry2.path_final
         blockstate = updateonentry2.blockstate
 
-
+        old_c = 0
+        c = flowarrivaltime.min()
+        new_c = c
         # Debugging
         np.savetxt("updweightmatx.csv", 1/ wt_matx, delimiter=",")
         np.savetxt("updorweightmatxreal.csv", 1/ wt_matx_real, delimiter=",")
@@ -943,8 +955,8 @@ while(countarrival < limit - 1):
                                         continue  # Continue checking other nodes for servicable packets
                                     s_link = int(nodes_real[str(node_no)][0].path[0])
                                     d_link = int(nodes_real[str(node_no)][0].path[1])
-                                    # link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                    link_retransmit_prob = 1
+                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                    # link_retransmit_prob = 1
                                     nodes_real[str(node_no)][0].service(
                                         max(nodes_real[str(node_no)][0].arrival_time, time_service),
                                         B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -1426,8 +1438,8 @@ while(countarrival < limit - 1):
                                     continue  # Continue checking other nodes for servicable packets
                                 s_link = int(nodes_real[str(node_no)][0].path[0])
                                 d_link = int(nodes_real[str(node_no)][0].path[1])
-                                # link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                link_retransmit_prob = 1
+                                link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                # link_retransmit_prob = 1
                                 nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                 # Appending to the serving Queue
                                 # serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
@@ -2037,6 +2049,13 @@ while(countarrival < limit - 1):
             path_final = upde.path_final
             blockstate = upde.blockstate
 
+            usage_matx = np.subtract(np.divide(1,orig_matx), np.divide(1,wt_matx))
+            rho_matx = np.divide(usage_matx,np.divide(1,orig_matx))
+
+            rho_matx_sum = rho_matx_sum + np.multiply(new_c - old_c, np.nan_to_num(rho_matx))
+            sum_c = sum_c + (new_c - old_c)
+            print (np.nanmin(rho_matx))
+            print (np.nanmax(rho_matx))
             # Debugging
             np.savetxt("updweightmatx.csv", 1/wt_matx, delimiter=",")
             np.savetxt("updorweightmatxreal.csv", 1/wt_matx_real, delimiter=",")
@@ -2161,7 +2180,10 @@ while(countarrival < limit - 1):
 
             count1departure[countarrival] = countdeparture  # Entries to the number of departures happened so far
             countarrival = countarrival + 1  # Increase Call Counter
+            old_c = c
             flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
+            new_c = flowarrivaltime.min()
+            print new_c
         '''
         if c < c1:  # If the next arrival time < departure time
             timecurrent = c  # Current Time = Arrival Time
@@ -2617,5 +2639,10 @@ print File_Mean_Speed, "FileMeanSpeed"
 print File_Mean_Speed_e2e, "File Mean Speed E2E"
 print node1packetcounter
 print nodeoutsidecounter
+
+rho_matx_sum_new = np.divide(rho_matx_sum, sum_c)
+print (np.nanmin(rho_matx_sum_new))
+print (np.nanmax(rho_matx_sum_new))
+
 # print fracrealtime_algo1
-np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e], delimiter=",")
+np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e,np.nanmax(rho_matx_sum_new)], delimiter=",")
