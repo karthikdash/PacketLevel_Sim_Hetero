@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+lamb = 0.001
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,7 +61,7 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.009, np.ones((12)))
+arrivalrate = np.multiply(0.001, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
@@ -955,8 +955,8 @@ while(countarrival < limit - 1):
                                         continue  # Continue checking other nodes for servicable packets
                                     s_link = int(nodes_real[str(node_no)][0].path[0])
                                     d_link = int(nodes_real[str(node_no)][0].path[1])
-                                    #link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                    link_retransmit_prob = 1
+                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                    # link_retransmit_prob = 1
                                     nodes_real[str(node_no)][0].service(
                                         max(nodes_real[str(node_no)][0].arrival_time, time_service),
                                         B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -1442,8 +1442,8 @@ while(countarrival < limit - 1):
                                     continue  # Continue checking other nodes for servicable packets
                                 s_link = int(nodes_real[str(node_no)][0].path[0])
                                 d_link = int(nodes_real[str(node_no)][0].path[1])
-                                # link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                link_retransmit_prob = 1
+                                link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                # link_retransmit_prob = 1
                                 nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                 # Appending to the serving Queue
                                 # serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
