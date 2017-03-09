@@ -8,7 +8,7 @@ class Packets:
     video_packet_size = 256.00
     file_packet_size = 256.00
 
-    def __init__(self, initial_arrival_time, arrival_time, flow_duration, flow_tag, path, flownumber, noofpackets, direction, node_service_rate):
+    def __init__(self, initial_arrival_time, arrival_time, flow_duration, flow_tag, path, flownumber, noofpackets, direction, node_service_rate, total_slot_time, total_slots):
         self.initial_arrival_time = initial_arrival_time
         self.arrival_time = arrival_time
         self.pre_arrival = arrival_time
@@ -22,6 +22,8 @@ class Packets:
         self.node_service_rate = node_service_rate
         # True is fwd. False is bkwd
         self.direction = direction
+        self.total_slot_time = total_slot_time
+        self.total_slots = total_slots
         '''
         self.service_start_date = service_start_date
         self.service_time = service_time
@@ -51,3 +53,7 @@ class Packets:
     # For Sorting. Will be used for bisect module
     def __lt__(self, other):
         return self.arrival_time < other.arrival_time
+
+    def addSlotDelay(self, slot_time):
+        self.total_slot_time = self.total_slot_time + slot_time
+        self.total_slots = self.total_slots + 1

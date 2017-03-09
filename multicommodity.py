@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+lamb = 0.001
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,14 +61,14 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.009, np.ones((12)))
+arrivalrate = np.multiply(0.001, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 50000
+limit = 5000
 # Observation from 'start' iteration ?
 start = 2
 # Probability with which blocked call will be retried
@@ -819,7 +819,7 @@ while(countarrival < limit - 1):
                     # if min_arrivaltime <= time_service + file_packet_size / 20000:
                     if True:
                         #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
-                        if path_final[k][3] == 0 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
+                        if path_final[k][3] == 0 and (path_final[k][6] <= time_service):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
@@ -830,7 +830,7 @@ while(countarrival < limit - 1):
                             nodes_real[str(int(path_final[k][9]))].append(Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                                           path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                                           path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                                                          path_final[k][2], True, path_final[k][4]))
+                                                                          path_final[k][2], True, path_final[k][4], 0, 0))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)) + float(1.0 / ((path_final[k][8]) / voice_packet_size))
@@ -849,11 +849,11 @@ while(countarrival < limit - 1):
                                     path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                     path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                     path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                    path_final[k][2], False, path_final[k][4]))
+                                    path_final[k][2], False, path_final[k][4], 0, 0))
                                 path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)) + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
-                        elif path_final[k][3] == 1 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
+                        elif path_final[k][3] == 1 and (path_final[k][6] <= time_service):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
@@ -866,7 +866,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                 path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                 path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                path_final[k][2], True, path_final[k][4]))
+                                path_final[k][2], True, path_final[k][4], 0, 0))
                             if countarrival == 1:
                                 time_service = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)) + float(1.0 / ((path_final[k][8]) / video_packet_size))
@@ -884,7 +884,7 @@ while(countarrival < limit - 1):
                                      path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                      path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                      path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                     path_final[k][2], False, path_final[k][4]))
+                                     path_final[k][2], False, path_final[k][4], 0, 0))
                                 path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)) + float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                         elif path_final[k][3] == 2:  # Data calls
@@ -903,7 +903,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6],
                                 path_final[k][6],
                                 path_final[k][7], 2, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                path_final[k][2], True, path_final[k][4]))
+                                path_final[k][2], True, path_final[k][4], 0, 0))
                             path_final[k][6] = path_final[k][6] + float(
                                 1.0 / ((path_final[k][8]) / video_packet_size)) + float(
                                 1.0 / ((path_final[k][8]) / video_packet_size))
@@ -924,10 +924,10 @@ while(countarrival < limit - 1):
                         if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
-                if time_service < min_arrivaltime:
-                    time_service = min_arrivaltime
+                # if time_service < min_arrivaltime:
+                    # time_service = min_arrivaltime
                 #while (time_service) <= min_arrivaltime and (time_service) <= c:  # Can be set true here.
-                while min_arrivaltime <= c:
+                while min_arrivaltime <= c and time_service <= min_arrivaltime:
                     packet_check = False
                     if nodesHavePackets() == False:
                         time_service = time_service + file_packet_size / 80000
@@ -957,6 +957,8 @@ while(countarrival < limit - 1):
                                     d_link = int(nodes_real[str(node_no)][0].path[1])
                                     link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
                                     # link_retransmit_prob = 1
+                                    for packetno in range(0, len(nodes_real[str(node_no)]), 1):
+                                        nodes_real[str(node_no)][packetno].addSlotDelay(file_packet_size / 80000)
                                     nodes_real[str(node_no)][0].service(
                                         max(nodes_real[str(node_no)][0].arrival_time, time_service),
                                         B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -970,15 +972,15 @@ while(countarrival < limit - 1):
                                                                         nodes_real[str(node_no)][
                                                                             0].service_end_time -
                                                                         nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                            if Voice_Mean_Time[node_no] > 1:
-                                                print "no"
+                                            # if Voice_Mean_Time[node_no] > 1:
+                                                # print "no"
                                         else:
                                             Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] +
                                                                         nodes_real[str(node_no)][
                                                                             0].service_end_time -
                                                                         nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                            if Video_Mean_Time[node_no] > 1:
-                                                print "no"
+                                            #if Video_Mean_Time[node_no] > 1:
+                                                # print "no"
                                         # Appending to the next node receiving Queue
                                         if nodes_real[str(node_no)][0].d_new == 99:
                                             if nodes_real[str(node_no)][0].flow_tag == 0:
@@ -1113,15 +1115,22 @@ while(countarrival < limit - 1):
                                                         k += 1
                                                 ################################ Voice Mean Delay Calculations #############
                                                 if Voice_Mean == 0:
+                                                    '''
                                                     Voice_Mean = nodes_real[str(node_no)][0].service_end_time - \
                                                                  nodes_real[str(node_no)][
                                                                      0].initial_arrival_time
+                                                    '''
+                                                    Voice_Mean = (nodes_real[str(node_no)][0].total_slot_time)
                                                 else:
+                                                    '''
                                                     Voice_Mean = (
                                                                      Voice_Mean + nodes_real[str(node_no)][
                                                                          0].service_end_time -
                                                                      nodes_real[str(node_no)][
                                                                          0].initial_arrival_time) / 2.0
+                                                    '''
+                                                    Voice_Mean = (Voice_Mean + nodes_real[str(node_no)][
+                                                        0].total_slot_time) / 2.0
                                             else:
                                                 ################### Decrementing the packet count from path_final ############
                                                 k = 0
@@ -1254,14 +1263,21 @@ while(countarrival < limit - 1):
                                                         k += 1
                                                 ################################ Video Mean Delay Calculations #############
                                                 if Video_Mean == 0:
+                                                    '''
                                                     Video_Mean = nodes_real[str(node_no)][0].service_end_time - \
                                                                  nodes_real[str(node_no)][0].initial_arrival_time
+                                                    '''
+                                                    Video_Mean = nodes_real[str(node_no)][0].total_slot_time
                                                 else:
+                                                    '''
                                                     Video_Mean = (
                                                                      Video_Mean + nodes_real[str(node_no)][
                                                                          0].service_end_time -
                                                                      nodes_real[str(node_no)][
                                                                          0].initial_arrival_time) / 2.0
+                                                    '''
+                                                    Video_Mean = (Video_Mean + nodes_real[str(node_no)][
+                                                        0].total_slot_time) / 2.0
                                         else:
                                             # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
                                             # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
@@ -1274,7 +1290,9 @@ while(countarrival < limit - 1):
                                                                        nodes_real[str(node_no)][0].flownumber,
                                                                        nodes_real[str(node_no)][0].noofpackets,
                                                                        nodes_real[str(node_no)][0].direction,
-                                                                       nodes_real[str(node_no)][0].node_service_rate, ))
+                                                                       nodes_real[str(node_no)][0].node_service_rate,
+                                                                       nodes_real[str(node_no)][0].total_slot_time,
+                                                                       nodes_real[str(node_no)][0].total_slots))
                                         nodes_real[str(node_no)].pop(0)
                             else:
                                 # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
@@ -1302,6 +1320,9 @@ while(countarrival < limit - 1):
                                             d_link = int(nodes_nonreal[str(node_no)][0].path[1])
                                             if B[s_link - 1][d_link - 1] == 0:
                                                 print "Inf"
+                                            for packetno in range(0, len(nodes_nonreal[str(node_no)]), 1):
+                                                nodes_nonreal[str(node_no)][packetno].addSlotDelay(
+                                                    file_packet_size / 80000)
                                             nodes_nonreal[str(node_no)][0].service(
                                                 max(nodes_nonreal[str(node_no)][0].arrival_time, time_service),
                                                 B[s_link - 1][d_link - 1], False, 1, file_packet_size / 80000)
@@ -1327,13 +1348,13 @@ while(countarrival < limit - 1):
                                                             if path_final[k][2] < 1:
                                                                 print "finished"
                                                                 if File_Mean_Speed == 0:
-                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 1.0
+                                                                    File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[str(node_no)][0].noofpackets*256.0) / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 1.0
                                                                     File_Mean_Speed_e2e = 256.0 / (0.01 * (
                                                                     nodes_nonreal[str(node_no)][0].service_end_time -
                                                                     nodes_nonreal[str(node_no)][
                                                                         0].initial_arrival_time))
                                                                 else:
-                                                                    File_Mean_Speed = (File_Mean_Speed + nodes_nonreal[str(node_no)][0].flow_duration / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 2.0
+                                                                    File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[str(node_no)][0].noofpackets*256.0) / ((nodes_nonreal[str(node_no)][0].service_end_time - nodes_nonreal[str(node_no)][0].initial_arrival_time)*0.01)) / 2.0
                                                                     File_Mean_Speed_e2e = (
                                                                                           File_Mean_Speed_e2e + 256.0 / (
                                                                                           0.01 * (
@@ -1400,13 +1421,10 @@ while(countarrival < limit - 1):
                                                         k += 1
                                                 ################################ File Mean Delay Calculations #############
                                                 if File_Mean == 0:
-                                                    File_Mean = nodes_nonreal[str(node_no)][0].service_end_time - \
-                                                                nodes_nonreal[str(node_no)][0].initial_arrival_time
+                                                    File_Mean = nodes_nonreal[str(node_no)][0].total_slot_time
                                                 else:
                                                     File_Mean = (File_Mean + nodes_nonreal[str(node_no)][
-                                                        0].service_end_time -
-                                                                 nodes_nonreal[str(node_no)][
-                                                                     0].initial_arrival_time) / 2.0
+                                                        0].total_slot_time) / 2.0
                                             else:
                                                 # nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)].append(nodes_nonreal[str(node_no)][0])
                                                 bisect.insort_left(
@@ -1419,7 +1437,9 @@ while(countarrival < limit - 1):
                                                             nodes_nonreal[str(node_no)][0].flownumber,
                                                             nodes_nonreal[str(node_no)][0].noofpackets,
                                                             nodes_nonreal[str(node_no)][0].direction,
-                                                            nodes_nonreal[str(node_no)][0].node_service_rate))
+                                                            nodes_nonreal[str(node_no)][0].node_service_rate,
+                                                            nodes_nonreal[str(node_no)][0].total_slot_time,
+                                                            nodes_nonreal[str(node_no)][0].total_slots))
                                             nodes_nonreal[str(node_no)].pop(0)
                         time_service = time_service + file_packet_size / 80000
                     for node_no in range(1, noOfNodes + 1, 1):
@@ -1444,6 +1464,8 @@ while(countarrival < limit - 1):
                                 d_link = int(nodes_real[str(node_no)][0].path[1])
                                 link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
                                 # link_retransmit_prob = 1
+                                for packetno in range(0, len(nodes_real[str(node_no)]), 1):
+                                    nodes_real[str(node_no)][packetno].addSlotDelay(file_packet_size / 20000)
                                 nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                 # Appending to the serving Queue
                                 # serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
@@ -1452,14 +1474,14 @@ while(countarrival < limit - 1):
                                     if nodes_real[str(node_no)][0].flow_tag == 0:
                                         Voice_Mean_Time[node_no] = (Voice_Mean_Time[node_no] + nodes_real[str(node_no)][
                                             0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                        if Voice_Mean_Time[node_no] > 1:
-                                            print "no"
+                                        # if Voice_Mean_Time[node_no] > 1:
+                                            # print "no"
 
                                     else:
                                         Video_Mean_Time[node_no] = (Video_Mean_Time[node_no] + nodes_real[str(node_no)][
                                             0].service_end_time - nodes_real[str(node_no)][0].arrival_time) / 2.0
-                                        if Voice_Mean_Time[node_no] > 1:
-                                            print "no"
+                                        # if Voice_Mean_Time[node_no] > 1:
+                                            # print "no"
                                     # Appending to the next node receiving Queue
                                     if nodes_real[str(node_no)][0].d_new == 99:
                                         if nodes_real[str(node_no)][0].flow_tag == 0:
@@ -1592,13 +1614,11 @@ while(countarrival < limit - 1):
                                                     k += 1
                                             ################################ Voice Mean Delay Calculations #############
                                             if Voice_Mean == 0:
-                                                Voice_Mean = nodes_real[str(node_no)][0].service_end_time - \
-                                                             nodes_real[str(node_no)][
-                                                                 0].initial_arrival_time
+                                                # Voice_Mean = nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time
+                                                Voice_Mean = nodes_real[str(node_no)][0].total_slot_time
                                             else:
-                                                Voice_Mean = (
-                                                                 Voice_Mean + nodes_real[str(node_no)][0].service_end_time -
-                                                                 nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                                # Voice_Mean = (Voice_Mean + nodes_real[str(node_no)][0].service_end_time - nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                                Voice_Mean = (Voice_Mean + nodes_real[str(node_no)][0].total_slot_time) / 2.0
                                         else:
                                             ################### Decrementing the packet count from path_final ############
                                             k = 0
@@ -1729,12 +1749,19 @@ while(countarrival < limit - 1):
                                                     k += 1
                                             ################################ Video Mean Delay Calculations #############
                                             if Video_Mean == 0:
+                                                '''
                                                 Video_Mean = nodes_real[str(node_no)][0].service_end_time - \
                                                              nodes_real[str(node_no)][0].initial_arrival_time
+                                                '''
+                                                Video_Mean = nodes_real[str(node_no)][0].total_slot_time
                                             else:
+                                                '''
                                                 Video_Mean = (
                                                                  Video_Mean + nodes_real[str(node_no)][0].service_end_time -
                                                                  nodes_real[str(node_no)][0].initial_arrival_time) / 2.0
+                                                '''
+                                                Video_Mean = (Video_Mean + nodes_real[str(node_no)][
+                                                    0].total_slot_time) / 2.0
                                     else:
                                         # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(nodes_real[str(node_no)][0])
                                         # nodes_real[str(nodes_real[str(node_no)][0].d_new)].append(Packets(nodes_real[str(node_no)][0].initial_arrival_time, nodes_real[str(node_no)][0].service_end_time, nodes_real[str(node_no)][0].flow_duration, nodes_real[str(node_no)][0].flow_tag, nodes_real[str(node_no)][0].path, nodes_real[str(node_no)][0].flownumber))
@@ -1747,7 +1774,9 @@ while(countarrival < limit - 1):
                                                                    nodes_real[str(node_no)][0].flownumber,
                                                                    nodes_real[str(node_no)][0].noofpackets,
                                                                    nodes_real[str(node_no)][0].direction,
-                                                                   nodes_real[str(node_no)][0].node_service_rate, ))
+                                                                   nodes_real[str(node_no)][0].node_service_rate,
+                                                                   nodes_real[str(node_no)][0].total_slot_time,
+                                                                   nodes_real[str(node_no)][0].total_slots))
                                     nodes_real[str(node_no)].pop(0)
                         else:
                             # for i in range(0, int(node_service_rate/file_packet_size) - 1, 1):
@@ -1773,6 +1802,8 @@ while(countarrival < limit - 1):
                                         d_link = int(nodes_nonreal[str(node_no)][0].path[1])
                                         if B[s_link - 1][d_link - 1] == 0:
                                             print "Inf"
+                                        for packetno in range(0, len(nodes_nonreal[str(node_no)]), 1):
+                                            nodes_nonreal[str(node_no)][packetno].addSlotDelay(file_packet_size / 20000)
                                         nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, 1, file_packet_size/20000)
 
                                         # Appending to the serving Queue
@@ -1793,33 +1824,33 @@ while(countarrival < limit - 1):
                                                         if path_final[k][2] < 1:
                                                             print "finished"
                                                             if File_Mean_Speed == 0:
-                                                                File_Mean_Speed = (File_Mean_Speed +
-                                                                                   nodes_nonreal[str(node_no)][
-                                                                                       0].flow_duration / ((
-                                                                                                           nodes_nonreal[
-                                                                                                               str(
-                                                                                                                   node_no)][
-                                                                                                               0].service_end_time -
-                                                                                                           nodes_nonreal[
-                                                                                                               str(
-                                                                                                                   node_no)][
-                                                                                                               0].initial_arrival_time) * 0.01)) / 1.0
+                                                                File_Mean_Speed = (File_Mean_Speed + (
+                                                                nodes_nonreal[str(node_no)][0].noofpackets * 256.0) / ((
+                                                                                                                       nodes_nonreal[
+                                                                                                                           str(
+                                                                                                                               node_no)][
+                                                                                                                           0].service_end_time -
+                                                                                                                       nodes_nonreal[
+                                                                                                                           str(
+                                                                                                                               node_no)][
+                                                                                                                           0].initial_arrival_time) * 0.01)) / 1.0
+
                                                                 File_Mean_Speed_e2e = 256.0 / (0.01 * (
                                                                     nodes_nonreal[str(node_no)][0].service_end_time -
                                                                     nodes_nonreal[str(node_no)][
                                                                         0].initial_arrival_time))
                                                             else:
-                                                                File_Mean_Speed = (File_Mean_Speed +
-                                                                                   nodes_nonreal[str(node_no)][
-                                                                                       0].flow_duration / ((
-                                                                                                           nodes_nonreal[
-                                                                                                               str(
-                                                                                                                   node_no)][
-                                                                                                               0].service_end_time -
-                                                                                                           nodes_nonreal[
-                                                                                                               str(
-                                                                                                                   node_no)][
-                                                                                                               0].initial_arrival_time) * 0.01)) / 2.0
+                                                                File_Mean_Speed = (File_Mean_Speed + (
+                                                                nodes_nonreal[str(node_no)][0].noofpackets * 256.0) / ((
+                                                                                                                       nodes_nonreal[
+                                                                                                                           str(
+                                                                                                                               node_no)][
+                                                                                                                           0].service_end_time -
+                                                                                                                       nodes_nonreal[
+                                                                                                                           str(
+                                                                                                                               node_no)][
+                                                                                                                           0].initial_arrival_time) * 0.01)) / 2.0
+
                                                                 File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
                                                                 0.01 * (
                                                                     nodes_nonreal[str(node_no)][0].service_end_time -
@@ -1881,11 +1912,9 @@ while(countarrival < limit - 1):
                                                     k += 1
                                             ################################ File Mean Delay Calculations #############
                                             if File_Mean == 0:
-                                                File_Mean = nodes_nonreal[str(node_no)][0].service_end_time - \
-                                                            nodes_nonreal[str(node_no)][0].initial_arrival_time
+                                                File_Mean = nodes_nonreal[str(node_no)][0].total_slot_time
                                             else:
-                                                File_Mean = (File_Mean + nodes_nonreal[str(node_no)][0].service_end_time -
-                                                             nodes_nonreal[str(node_no)][0].initial_arrival_time) / 2.0
+                                                File_Mean = (File_Mean + nodes_nonreal[str(node_no)][0].total_slot_time) / 2.0
                                         else:
                                             # nodes_nonreal[str(nodes_nonreal[str(node_no)][0].d_new)].append(nodes_nonreal[str(node_no)][0])
                                             bisect.insort_left(nodes_nonreal[str(int(nodes_nonreal[str(node_no)][0].d_new))],
@@ -1897,7 +1926,9 @@ while(countarrival < limit - 1):
                                                                        nodes_nonreal[str(node_no)][0].flownumber,
                                                                        nodes_nonreal[str(node_no)][0].noofpackets,
                                                                        nodes_nonreal[str(node_no)][0].direction,
-                                                                       nodes_nonreal[str(node_no)][0].node_service_rate))
+                                                                       nodes_nonreal[str(node_no)][0].node_service_rate,
+                                                                       nodes_nonreal[str(node_no)][0].total_slot_time,
+                                                                       nodes_nonreal[str(node_no)][0].total_slots))
                                         nodes_nonreal[str(node_no)].pop(0)
                     time_service = time_service + file_packet_size / 80000
         else:  # Either new flow has arrived or all packets have been served.
@@ -2192,7 +2223,7 @@ while(countarrival < limit - 1):
             old_c = c
             flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
             new_c = flowarrivaltime.min()
-            print new_c
+            #  new_c
         '''
         if c < c1:  # If the next arrival time < departure time
             timecurrent = c  # Current Time = Arrival Time
@@ -2652,6 +2683,6 @@ print nodeoutsidecounter
 rho_matx_sum_new = np.divide(rho_matx_sum, sum_c)
 print (np.nanmin(rho_matx_sum_new))
 print (np.nanmax(rho_matx_sum_new))
-
+print time_service, min_arrivaltime
 # print fracrealtime_algo1
 np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e,np.nanmax(rho_matx_sum_new)], delimiter=",")
