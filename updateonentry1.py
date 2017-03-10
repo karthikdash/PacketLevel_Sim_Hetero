@@ -155,10 +155,10 @@ class updateonentry1(object):
                     # print loop
                     # Not sure about this loop[0] or loop[1]
                     if self.path_final[loop][0] == 0:
-                        if int(self.flow_duration * 1000 / self.packet_size) < 1:
+                        if int(self.flow_duration * (self.packet_datarate/100) / self.packet_size) < 1:
                             file_limit = 1
                         else:
-                            file_limit = int(self.flow_duration * 1000 / self.packet_size)
+                            file_limit = int(self.flow_duration * (self.packet_datarate/100) / self.packet_size)
                         v = [self.flownumber_new, self.flow_type_new,
                              file_limit, self.connection_type,
                              self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
