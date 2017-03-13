@@ -52,7 +52,7 @@ s6 = len(source1)
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+lamb = 0.008
 
 # <M> Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
@@ -61,14 +61,14 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.009, np.ones((12)))
+arrivalrate = np.multiply(0.008, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 # Video,Voice and Realtime?
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 10000
+limit = 100
 # Observation from 'start' iteration ?
 start = 2
 # Probability with which blocked call will be retried
@@ -420,6 +420,32 @@ node7_slot_total = 0
 node8_slot_total = 0
 node9_slot_total = 0
 node10_slot_total = 0
+
+
+node1_slot_queue_len = 0
+node2_slot_queue_len = 0
+node3_slot_queue_len = 0
+node4_slot_queue_len = 0
+node5_slot_queue_len = 0
+node6_slot_queue_len = 0
+node7_slot_queue_len = 0
+node8_slot_queue_len = 0
+node9_slot_queue_len = 0
+node10_slot_queue_len = 0
+
+
+nodes_slot_queue_len = {
+    '1': node1_slot_queue_len,
+    '2': node2_slot_queue_len,
+    '3': node3_slot_queue_len,
+    '4': node4_slot_queue_len,
+    '5': node5_slot_queue_len,
+    '6': node6_slot_queue_len,
+    '7': node7_slot_queue_len,
+    '8': node8_slot_queue_len,
+    '9': node9_slot_queue_len,
+    '10': node10_slot_queue_len,
+}
 
 nodes_slot_used = {
     '1': node1_slot_used,
@@ -894,7 +920,7 @@ while(countarrival < limit - 1):
                     # if min_arrivaltime <= time_service + file_packet_size / 20000:
                     if True:
                         #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
-                        if path_final[k][3] == 0 and (path_final[k][6] <= time_service):
+                        if path_final[k][3] == 0 and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
@@ -928,7 +954,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)) + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
-                        elif path_final[k][3] == 1 and (path_final[k][6] <= time_service):
+                        elif path_final[k][3] == 1  and (path_final[k][6] <= time_service or (path_final[k][6] == min_arrivaltime or path_final[k+1][6] == min_arrivaltime)):
                             '''
                             bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
                                                Packets(
@@ -1045,6 +1071,8 @@ while(countarrival < limit - 1):
                                     # link_retransmit_prob = 1
                                     for packetno in range(0, len(nodes_real[str(node_no)]), 1):
                                         nodes_real[str(node_no)][packetno].addSlotDelay(file_packet_size / 80000)
+
+                                    nodes_slot_queue_len[str(node_no)] = nodes_slot_queue_len[str(node_no)] + len(nodes_real[str(node_no)])
                                     nodes_real[str(node_no)][0].service(
                                         max(nodes_real[str(node_no)][0].arrival_time, time_service),
                                         B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -1411,6 +1439,8 @@ while(countarrival < limit - 1):
                                             for packetno in range(0, len(nodes_nonreal[str(node_no)]), 1):
                                                 nodes_nonreal[str(node_no)][packetno].addSlotDelay(
                                                     file_packet_size / 80000)
+
+                                            nodes_slot_queue_len[str(node_no)] = nodes_slot_queue_len[str(node_no)] + len(nodes_nonreal[str(node_no)])
                                             nodes_nonreal[str(node_no)][0].service(
                                                 max(nodes_nonreal[str(node_no)][0].arrival_time, time_service),
                                                 B[s_link - 1][d_link - 1], False, 1, file_packet_size / 80000)
@@ -1556,6 +1586,9 @@ while(countarrival < limit - 1):
                                 # link_retransmit_prob = 1
                                 for packetno in range(0, len(nodes_real[str(node_no)]), 1):
                                     nodes_real[str(node_no)][packetno].addSlotDelay(file_packet_size / 20000)
+
+                                nodes_slot_queue_len[str(node_no)] = nodes_slot_queue_len[str(node_no)] + len(nodes_real[str(node_no)])
+
                                 nodes_real[str(node_no)][0].service(max(nodes_real[str(node_no)][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                 # Appending to the serving Queue
                                 # serviceend_time[node_no] = nodes_real[str(node_no)][0].service_end_time
@@ -1896,6 +1929,9 @@ while(countarrival < limit - 1):
                                             print "Inf"
                                         for packetno in range(0, len(nodes_nonreal[str(node_no)]), 1):
                                             nodes_nonreal[str(node_no)][packetno].addSlotDelay(file_packet_size / 20000)
+                                        nodes_slot_queue_len[str(node_no)] = nodes_slot_queue_len[str(node_no)] + len(
+                                            nodes_nonreal[str(node_no)])
+
                                         nodes_nonreal[str(node_no)][0].service(max(nodes_nonreal[str(node_no)][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, 1, file_packet_size/20000)
 
                                         # Appending to the serving Queue
@@ -2782,6 +2818,7 @@ print (np.nanmax(rho_matx_sum_new))
 print time_service, min_arrivaltime
 
 for nodeno in range(1, noOfNodes + 1, 1):
-    print nodes_slot_used[str(nodeno)]/(nodes_slot_total[str(nodeno)]*1.0)
+    print nodes_slot_used[str(nodeno)]/(nodes_slot_total[str(nodeno)]*1.0) , nodes_slot_queue_len[str(node_no)] / (nodes_slot_total[str(nodeno)]*1.0)
+
 # print fracrealtime_algo1
 np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e,np.nanmax(rho_matx_sum_new)], delimiter=",")
