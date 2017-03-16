@@ -2,12 +2,14 @@
 <project version="4">
   <component name="BookmarkManager">
     <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="362" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="788" mnemonic="1" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="988" mnemonic="2" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1127" mnemonic="3" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1510" mnemonic="4" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1669" mnemonic="5" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="984" mnemonic="1" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1184" mnemonic="2" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1323" mnemonic="3" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1707" mnemonic="4" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1865" mnemonic="5" />
     <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="54" mnemonic="0" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="498" mnemonic="8" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="3113" mnemonic="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2957740d-62cf-4df3-9d86-404251eb1ae1" name="Default" comment="">
@@ -20,8 +22,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results0.004.csv" afterPath="$PROJECT_DIR$/results0.004.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results0.005.csv" afterPath="$PROJECT_DIR$/results0.005.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results0.006.csv" afterPath="$PROJECT_DIR$/results0.006.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results0.007.csv" afterPath="$PROJECT_DIR$/results0.007.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results0.009.csv" afterPath="$PROJECT_DIR$/results0.009.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/updorweightmatxreal.csv" afterPath="$PROJECT_DIR$/updorweightmatxreal.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/updorweightmatxreal1.csv" afterPath="$PROJECT_DIR$/updorweightmatxreal1.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/updweightmatx.csv" afterPath="$PROJECT_DIR$/updweightmatx.csv" />
@@ -45,8 +45,8 @@
       <file leaf-file-name="multicommodity.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/multicommodity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="461" column="0" lean-forward="true" selection-start-line="461" selection-start-column="0" selection-end-line="461" selection-end-column="0" />
+            <state relative-caret-position="123">
+              <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -92,21 +92,11 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Video_Mean</find>
-      <find>File_Mean</find>
-      <find>nodes_nonreal[str(node_no)][0].service</find>
-      <find>nodesHavePackets</find>
-      <find>nodesHavepackets</find>
-      <find>updateonentry</find>
       <find>updateonentry1</find>
       <find>file_mean_speed</find>
       <find>Packets</find>
       <find>File_Mean_speed</find>
       <find>retras</find>
-      <find>nodes_slot_unused</find>
-      <find>nodes_slot_queue_len</find>
-      <find>nodes_total_real_packets</find>
-      <find>nodes_slot_queue_nonreal_len</find>
       <find>if (orig_total_matx - total_matx - weight_diff) &gt; 2:</find>
       <find>call</find>
       <find>nodes_real[str(node_no)]</find>
@@ -122,6 +112,16 @@
       <find>packet_datarate</find>
       <find>finished</find>
       <find>File_Mean_Speed</find>
+      <find>nodes_slot_used</find>
+      <find>nodes_slot_used</find>
+      <find>nodes_slot_unused</find>
+      <find>nodes_slot_total</find>
+      <find>nodes_total_real_packets</find>
+      <find>nodes_slot_queue_nonreal_len</find>
+      <find>nodes_slot_queue_len</find>
+      <find>nodes_slot_queue_real_len</find>
+      <find>nodes_total_nonreal_packets</find>
+      <find>File_Mean_Speed_e2e</find>
     </findStrings>
     <replaceStrings>
       <replace>call1</replace>
@@ -422,55 +422,60 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1208</line>
+          <line>1405</line>
           <option name="timeStamp" value="329" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1271</line>
+          <line>1468</line>
           <option name="timeStamp" value="330" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1356</line>
+          <line>1553</line>
           <option name="timeStamp" value="331" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1419</line>
+          <line>1616</line>
           <option name="timeStamp" value="332" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1568</line>
+          <line>1765</line>
           <option name="timeStamp" value="333" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1729</line>
+          <line>1925</line>
           <option name="timeStamp" value="334" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1791</line>
+          <line>1987</line>
           <option name="timeStamp" value="335" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1864</line>
+          <line>2060</line>
           <option name="timeStamp" value="336" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1926</line>
+          <line>2122</line>
           <option name="timeStamp" value="337" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/multicommodity.py</url>
+          <line>2261</line>
+          <option name="timeStamp" value="338" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2066</line>
-          <option name="timeStamp" value="338" />
+          <line>2338</line>
+          <option name="timeStamp" value="343" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -483,18 +488,9 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="340" />
+      <option name="time" value="344" />
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="nodes_nonreal" />
-        <watch expression="nodes_real" />
-        <watch expression="path_final" />
-        <watch expression="time_service" />
-        <watch expression="c" />
-        <watch expression="min_arrivaltime" />
-      </configuration>
-    </watches-manager>
+    <watches-manager />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Packets.py">
@@ -958,8 +954,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multicommodity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="461" column="0" lean-forward="true" selection-start-line="461" selection-start-column="0" selection-end-line="461" selection-end-column="0" />
+        <state relative-caret-position="123">
+          <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
