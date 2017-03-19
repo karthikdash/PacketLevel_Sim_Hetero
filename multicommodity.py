@@ -72,7 +72,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 30000
+limit = 100
 # Observation from 'start' iteration ?
 start = 2
 
@@ -1783,7 +1783,7 @@ while(countarrival < limit - 1):
                                                                         print "finished"
 
                                                                         if File_Mean_Speed == 0:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets*256) / (time_service - path_final[k][5])) / 1.0
+                                                                            File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 1.0
                                                                             '''
                                                                             File_Mean_Speed_e2e = 256.0 / (0.01 * (
                                                                                 nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time -
@@ -1791,7 +1791,7 @@ while(countarrival < limit - 1):
                                                                                     0].initial_arrival_time))
                                                                             '''
                                                                         else:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets*256) / (time_service - path_final[k][5])) / 2.0
+                                                                            File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 2.0
                                                                             '''
                                                                             File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
                                                                                 0.01 * (
@@ -2289,11 +2289,11 @@ while(countarrival < limit - 1):
                                                                 if path_final[k][2] < 1:
                                                                     print "finished"
                                                                     if File_Mean_Speed == 0:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets*256) / (time_service - path_final[k][5])) / 1.0
+                                                                        File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 1.0
 
                                                                         # File_Mean_Speed_e2e = 256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time))
                                                                     else:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets*256) / (time_service - path_final[k][5])) / 2.0
+                                                                        File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 2.0
 
                                                                         # File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
 
