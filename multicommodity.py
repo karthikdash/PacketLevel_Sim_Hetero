@@ -73,9 +73,9 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 5000
+limit = 1000
 # Observation from 'start' iteration ?
-start = 100
+start = 5
 
 # Effective weight after factoring in on-off states and frame error probability
 weight_x = ((np.multiply(np.array(link_onprob1), np.subtract(1, link_errorprob1))) +
@@ -509,6 +509,15 @@ nodes_slot_unused = np.zeros((n, n))
 
 # Total occurred slots
 nodes_slot_total = np.zeros((n, n))
+
+# Total number of slots used when transmission was successful
+nodes_slot_success_used = np.zeros((n, n))
+
+# Total number of unused slots when transmission was successful
+nodes_slot_success_unused = np.zeros((n, n))
+
+# Total number of slots when successful tranmission was successful
+nodes_slot_success_total = np.zeros((n, n))
 
 # ###### Trackers for total packets entering the particular queue on particular node #####
 # There are two places where packets enter the queue.
@@ -1000,22 +1009,22 @@ while(countarrival < limit - 1):
                         if time_service <= min_arrivaltime:
                             for node_no in range(1, noOfNodes + 1, 1):
                                 for next_nodeno in range(0, len(node_links[node_no]), 1):
+                                    # (0,1) :: (probability of failure, probablity of success)
+                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[node_no - 1][node_links[node_no][next_nodeno] - 1], C[node_no - 1][node_links[node_no][next_nodeno] - 1]])
+                                    # link_retransmit_prob = 1
                                     if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) < 1 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 1:
                                         nodes_slot_unused[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
+                                        if link_retransmit_prob == 1:
+                                            nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                            nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                     if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                         nodeoutsidecounter += 1
                                         nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        # if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time >= max(serviceend_time):
-                                        '''
-                                        arrivaltimes = []
-                                        for nd_no in range(1, noOfNodes + 1, 1):
-                                            if len(nodes_real[str(nd_no)]) == 0:
-                                                arrivaltimes.append(0)
-                                            else:
-                                                arrivaltimes.append(nodes_real[str(nd_no)][0].arrival_time)
-                                        '''
+                                        if link_retransmit_prob == 1:
+                                            nodes_slot_success_used[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                            nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                         s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                         d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
                                         #if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service and B[s_link - 1][d_link - 1] == 8:
@@ -1028,8 +1037,7 @@ while(countarrival < limit - 1):
                                                 continue  # Continue checking other nodes for servicable packets
                                             s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                             d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-                                            link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                            # link_retransmit_prob = 1
+
                                             for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
                                                 nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 80000)
 
@@ -1544,10 +1552,22 @@ while(countarrival < limit - 1):
                     if time_service <= min_arrivaltime:
                         for node_no in range(1, noOfNodes + 1, 1):
                             for next_nodeno in range(0, len(node_links[node_no]), 1):
+                                link_retransmit_prob = np.random.choice(np.arange(0, 2),
+                                                                        p=[1 - C[node_no - 1][node_links[node_no][next_nodeno] - 1], C[node_no - 1][node_links[node_no][next_nodeno] - 1]])
+
+                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) < 1 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 1:
+                                    nodes_slot_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                    nodes_slot_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                    if link_retransmit_prob == 1:
+                                        nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                        nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                 if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                     nodeoutsidecounter += 1
                                     nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                     nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
+                                    if link_retransmit_prob == 1:
+                                        nodes_slot_success_used[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                        nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                     # if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time >= max(serviceend_time):
                                     arrivaltimes = []
                                     '''
@@ -1567,7 +1587,6 @@ while(countarrival < limit - 1):
                                             continue  # Continue checking other nodes for servicable packets
                                         s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                         d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-                                        link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
                                         # link_retransmit_prob = 1
                                         for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
                                             nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
@@ -2802,7 +2821,9 @@ print sum_c
 for nodeno in range(1, noOfNodes + 1, 1):
     for next_nodeno in range(0, len(node_links[nodeno]), 1):
         print nodes_slot_used[nodeno-1][node_links[nodeno][next_nodeno]-1]/(nodes_slot_total[nodeno-1][node_links[nodeno][next_nodeno]-1]*1.0)
-        print "len", len(nodes_nonreal[(nodeno, node_links[nodeno][next_nodeno])])
+        print "success", nodes_slot_success_used[nodeno-1][node_links[nodeno][next_nodeno]-1]/(nodes_slot_success_total[nodeno-1][node_links[nodeno][next_nodeno]-1]*1.0)
+
+        # print "len", len(nodes_nonreal[(nodeno, node_links[nodeno][next_nodeno])])
         # nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0), nodes_slot_queue_nonreal_len[str(node_no)] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0)
         # print " "
         # print "Packets/Sec", nodes_total_real_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c), nodes_total_nonreal_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c)
