@@ -1018,7 +1018,7 @@ while(countarrival < limit - 1):
                                         if link_retransmit_prob == 1:
                                             nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                             nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
+                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 100:
                                         nodeoutsidecounter += 1
                                         nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
@@ -1372,7 +1372,7 @@ while(countarrival < limit - 1):
                                                 else:
                                                     # nodes_real[str(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_real[(node_no, node_links[node_no][next_nodeno])][0])
                                                     # nodes_real[str(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(Packets(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_duration, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber))
-                                                    nodes_total_real_packets[nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
+                                                    # nodes_total_real_packets[nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
                                                     bisect.insort_left(nodes_real[(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
                                                                        Packets(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
                                                                                nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
@@ -1561,7 +1561,7 @@ while(countarrival < limit - 1):
                                     if link_retransmit_prob == 1:
                                         nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                         nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
+                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 100:
                                     nodeoutsidecounter += 1
                                     nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                     nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
@@ -1942,8 +1942,8 @@ while(countarrival < limit - 1):
                                                 d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])
                                                 if B[s_link - 1][d_link - 1] == 0:
                                                     print "Inf"
-                                                # for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
-                                                    # nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
+                                                for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
+                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
 
                                                 # nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
 
@@ -2806,6 +2806,7 @@ print File_Mean
 print "New Calculations"
 print Voice_Mean_Total
 print Video_Mean_Total
+# print File_Mean_Total
 
 print File_Mean_Speed, "FileMeanSpeed"
 print File_Mean_Speed_e2e, "File Mean Speed E2E"
