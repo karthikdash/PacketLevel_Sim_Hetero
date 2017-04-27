@@ -6,7 +6,7 @@ import bisect
 from allocaterealupdated1 import allocaterealupdated1
 from allocatenonrealupdated1 import allocatenonrealupdated1
 
-# Adapted Disjktra Packet Simulator
+# Adapted Disjktra Packet Simulator 60:30:10
 
 # from udpateonentry import updateonentry
 # Network Parameters
@@ -60,20 +60,21 @@ print lamb
 # Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
 packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 400000.0, 400000.0, 300000.0, 400000.0, 300000.0, 300000.0]
-
-# 232 = frame size - overheads size
+# Below constants are calculated with 60:30:10 rho distribution for voice:video:data . Now, lamb ranges from 0-9
+new_arrivalrates = [0.006, 0.006, 0.006, 0.006, 0.001, 0.001, 0.001, 0.001, 0.003, 0.003, 0.003, 0.003]
+# 232 = frame size(256) - overheads size
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(lamb, np.ones((12)))
-servicetime = np.multiply(150, np.ones((12)))
-
+arrivalrate = np.multiply(lamb, new_arrivalrates)
+#servicetime = np.multiply(150, np.ones((12)))
+servicetime = [150, 150, 150, 150, 150, 150, 150, 150, 3.0769, 3.0769, 3.0769, 3.0769]
 # Video,Voice and Data
 connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 1000
+limit = 500
 # Observation from 'start' iteration ?
 start = 5
 
@@ -516,7 +517,7 @@ nodes_slot_success_used = np.zeros((n, n))
 # Total number of unused slots when transmission was successful
 nodes_slot_success_unused = np.zeros((n, n))
 
-# Total number of slots when successful tranmission was successful
+# Total number of slots when successful transmission was successful
 nodes_slot_success_total = np.zeros((n, n))
 
 # ###### Trackers for total packets entering the particular queue on particular node #####
@@ -734,7 +735,7 @@ while(countarrival < limit - 1):
 
         # Flow number for Enhanced Adapted Dijkstra set to 1 for the first flow
         flownumber_new_block = flownumber_new_block + 1
-        flow_duration = np.random.exponential(np.divide(1, call_duration))
+        flow_duration = np.random.exponential(servicetime[I])
 
         ########## ADAPTED DIJSKTRA ROUTING ALGORITHM #########################
 
@@ -802,43 +803,7 @@ while(countarrival < limit - 1):
             count_algo1 = count_algo1 + 1
         blockstate1[countarrival] = blockstate_new
 
-        '''
-        if blockstate[-1] == 1:  # If last call not blocked
 
-            if I < arrivalratesize/connectiontypes:
-                path_final[int(flownumber[-1]) - 1, 3] = 0
-                if int(packet_datarate[I] / 100 / voice_packet_size) < 1:
-                    path_final[int(flownumber[-1])-1, 2] = int(flow_duration) * 1
-                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * 1
-                else:
-                    path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
-                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
-                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I]/100
-
-                # Backward Path Packetisation
-                path_final[int(flownumber[-1]), 3] = 0
-
-                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
-            elif I < 2*arrivalratesize/connectiontypes:
-                # Back Path Packetisation
-                path_final[int(flownumber[-1]) - 1, 3] = 1
-                path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
-                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
-                path_final[int(flownumber[-1]), 3] = 1
-                path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
-                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
-            else:
-                if int(flow_duration*150*1000 / file_packet_size) < 1:
-                    file_limit = 1
-                else:
-                    file_limit = int(flow_duration*150*1000 / file_packet_size)
-                path_final[int(flownumber[-1]) - 1, 2] = file_limit
-                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
-                path_final[int(flownumber[-1]) - 1, 3] = 2
-        '''
-        # print blockstate, "blockstate"
-        # print path_final, "pathfinalstate"
-        # print flow_type1[I]
 
         # Updating the next flowarrivaltime
         flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
@@ -1018,7 +983,7 @@ while(countarrival < limit - 1):
                                         if link_retransmit_prob == 1:
                                             nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                             nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 100:
+                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                         nodeoutsidecounter += 1
                                         nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
@@ -1561,7 +1526,7 @@ while(countarrival < limit - 1):
                                     if link_retransmit_prob == 1:
                                         nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                         nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 100:
+                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                     nodeoutsidecounter += 1
                                     nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                     nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
@@ -2181,7 +2146,7 @@ while(countarrival < limit - 1):
             # Flow number for Enhanced Adapted Dijkstra set to 1 for the first flow
             flownumber_new_block = flownumber_new_block + 1
 
-            flow_duration = np.random.exponential(np.divide(1, call_duration))
+            flow_duration = np.random.exponential(servicetime[I])
             if I < arrivalratesize / connectiontypes:
                 connection_type = 0
             elif I < 2 * arrivalratesize / connectiontypes:

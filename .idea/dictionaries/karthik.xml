@@ -1,9 +1,14 @@
 <component name="ProjectDictionaryState">
   <dictionary name="karthik">
     <words>
+      <w>arrivalrate</w>
+      <w>arrivalrates</w>
+      <w>connectiontypes</w>
+      <w>datarate</w>
       <w>nextnode</w>
       <w>nodeno</w>
       <w>packetization</w>
+      <w>servicetime</w>
     </words>
   </dictionary>
 </component>
