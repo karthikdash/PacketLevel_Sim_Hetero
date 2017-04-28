@@ -6,7 +6,7 @@ import bisect
 from allocaterealupdated1 import allocaterealupdated1
 from allocatenonrealupdated1 import allocatenonrealupdated1
 
-# Adapted Disjktra Packet Simulator 60:30:10
+# Adapted Disjktra Packet Simulator for One Way Video Streaming
 
 # from udpateonentry import updateonentry
 # Network Parameters
@@ -25,7 +25,6 @@ link_src = [1, 1, 2, 2, 3, 4, 4, 5, 5, 5, 6, 7, 8, 9]
 link_dest = [2, 8, 3, 9, 4, 5, 10, 6, 7, 10, 7, 8, 10, 10]
 link_dest12 = [2, 8, 3, 9, 4, 5, 9, 6, 7, 9, 7, 8, 9, 9]
 
-####################### Flow level parameters initialization #######################
 
 # P[i][j],1
 link_onprob1 = [0.3, 0.3, 0.2, 0.2, 0.2, 0.3, 0.2, 0.3, 0.2, 0.2, 0.3, 0.2, 0.2, 0.3]
@@ -40,9 +39,6 @@ link_onprob3 = [0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.3, 0.2,
 # E[i][j],3
 link_errorprob3 = [0.01, 0.02, 0.01, 0.02, 0.02, 0.03, 0.03, 0.01, 0.02, 0.02, 0.03, 0.02, 0.01, 0.01]
 
-# (MB/frameSize * [Linke Rates corresponding to link_src[i],link_dest[j]]
-link_rate = np.multiply((1000000.0/256), [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2])
-pure_link_rate = [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2]
 
 # Defined in source-destination pairs with rate requirements
 source1 = [2, 4, 3, 1]
@@ -50,33 +46,40 @@ destination1 = [6, 8, 7, 5]
 s5 = 1
 s6 = len(source1)
 
+# Network Parameters
+header_size = 48.00
+voice_packet_size = 256.00  # Bits
+video_packet_size = 256.00
+file_packet_size = 256.00
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-# lamb = 0.005
-lamb = input('Lambda:')
-print lamb
+lamb = 0.009
+
+# (MB/frameSize * [Linke Rates corresponding to link_src[i],link_dest[j]]
+link_rate = np.multiply((1000000.0/voice_packet_size), [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2])
+pure_link_rate = [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2]
 
 # Data Rate Requirements
 data_require = [22, 80, 22, 11, 400, 400, 400, 400, 300, 400, 300, 300]
 packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 400000.0, 400000.0, 300000.0, 400000.0, 300000.0, 300000.0]
-# Below constants are calculated with 60:30:10 rho distribution for voice:video:data . Now, lamb ranges from 0-9
-new_arrivalrates = [0.006, 0.006, 0.006, 0.006, 0.001, 0.001, 0.001, 0.001, 0.003, 0.003, 0.003, 0.003]
-# 232 = frame size(256) - overheads size
+
+# 232 = frame size - overheads size
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(lamb, new_arrivalrates)
-#servicetime = np.multiply(150, np.ones((12)))
-servicetime = [150, 150, 150, 150, 150, 150, 150, 150, 3.0769, 3.0769, 3.0769, 3.0769]
+arrivalrate = np.multiply(0.009, np.ones((12)))
+servicetime = np.multiply(150, np.ones((12)))
+
 # Video,Voice and Data
 connectiontypes = 3
 
+
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 500
+limit = 5000
 # Observation from 'start' iteration ?
-start = 5
+start = 2
 
 # Effective weight after factoring in on-off states and frame error probability
 weight_x = ((np.multiply(np.array(link_onprob1), np.subtract(1, link_errorprob1))) +
@@ -103,7 +106,7 @@ a = np.delete(eff_capacity_matx, 0, 0)
 a = np.delete(a, 0, 1)
 
 
-# Original Capacities of Links
+# Origianl Capacities of Links
 B = np.zeros((n, n))
 for i in range(0, m1):
     q = link_src[i] - 1
@@ -126,6 +129,7 @@ c = np.delete(c, 0, 1)
 # To ignore Division by O warnings. /0 taken as Inf
 with np.errstate(divide='ignore', invalid='ignore'):
     # Adapted Dijkstra Weights
+    # wt_matx = np.divide(1.0526, eff_capacity_matx)
     wt_matx = np.divide(1, eff_capacity_matx)
     wt_matx_real = np.divide(1, eff_capacity_matx)
     wt_matx_real1 = np.divide(1.33, eff_capacity_matx)
@@ -218,7 +222,7 @@ countarrival = 0
 countdeparture = 0
 
 # ##
-path_final = np.zeros((3*limit, p+9))
+path_final = np.zeros((3*limit, p+11))
 path_final_multi = np.zeros((3*limit, p+5))
 path_final_block = np.zeros((3*limit, p+5))
 
@@ -326,11 +330,7 @@ path2 = []
 
 # ######################### Packet Level Initialisations ##########################################
 
-# Network Parameters
 
-voice_packet_size = 256.00  # Bits
-video_packet_size = 256.00
-file_packet_size = 256.00
 
 queue_size = []
 queue_time = []
@@ -417,11 +417,8 @@ packets_realtime76 = []
 packets_realtime87 = []
 packets_realtime108 = []
 packets_realtime109 = []
-
 # link_src = [1, 1, 2, 2, 3, 4, 4,  5, 5, 5,  6, 7,  8, 9]
 # link_dest =[2, 8, 3, 9, 4, 5, 10, 6, 7, 10, 7, 8, 10, 10]
-# Node wise connection specification.
-# Eg: 1 is connected to 2 and 8
 node_links = {
     1: [2, 8],
     2: [3, 9, 1],
@@ -503,36 +500,393 @@ nodes_real = {
 
 # Total number of slots for which the slot was active
 nodes_slot_used = np.zeros((n, n))
+nodes_slot_unused = np.zeros((n, n))
+nodes_slot_total = np.zeros((n, n))
+nodes_total_real_packets = np.zeros((n, n))
+nodes_total_nonreal_packets =  np.zeros((n, n))
+nodes_slot_queue_real_len = np.zeros((n, n))
+nodes_slot_queue_nonreal_len = np.zeros((n, n))
+'''
+node_slot_used_12  = 0
+node_slot_used_18  = 0
+node_slot_used_23  = 0
+node_slot_used_29  = 0
+node_slot_used_34  = 0
+node_slot_used_45  = 0
+node_slot_used_410 = 0
+node_slot_used_56  = 0
+node_slot_used_57  = 0
+node_slot_used_510 = 0
+node_slot_used_67  = 0
+node_slot_used_78  = 0
+node_slot_used_810 = 0
+node_slot_used_910 = 0
+node_slot_used_21  = 0
+node_slot_used_81  = 0
+node_slot_used_32  = 0
+node_slot_used_92  = 0
+node_slot_used_43  = 0
+node_slot_used_54  = 0
+node_slot_used_104 = 0
+node_slot_used_65  = 0
+node_slot_used_75  = 0
+node_slot_used_105 = 0
+node_slot_used_76  = 0
+node_slot_used_87  = 0
+node_slot_used_108 = 0
+node_slot_used_109 = 0
+
 
 # Total number of slots for which the slot was inactive i.e,
 # The queue was empty for that particular slot
-nodes_slot_unused = np.zeros((n, n))
+node_slot_unused_12  = 0
+node_slot_unused_18  = 0
+node_slot_unused_23  = 0
+node_slot_unused_29  = 0
+node_slot_unused_34  = 0
+node_slot_unused_45  = 0
+node_slot_unused_410 = 0
+node_slot_unused_56  = 0
+node_slot_unused_57  = 0
+node_slot_unused_510 = 0
+node_slot_unused_67  = 0
+node_slot_unused_78  = 0
+node_slot_unused_810 = 0
+node_slot_unused_910 = 0
+node_slot_unused_21  = 0
+node_slot_unused_81  = 0
+node_slot_unused_32  = 0
+node_slot_unused_92  = 0
+node_slot_unused_43  = 0
+node_slot_unused_54  = 0
+node_slot_unused_104 = 0
+node_slot_unused_65  = 0
+node_slot_unused_75  = 0
+node_slot_unused_105 = 0
+node_slot_unused_76  = 0
+node_slot_unused_87  = 0
+node_slot_unused_108 = 0
+node_slot_unused_109 = 0
 
-# Total occurred slots
-nodes_slot_total = np.zeros((n, n))
+nodes_slot_used = {
+            (1, 2): node_slot_used_12  ,
+            (1, 8): node_slot_used_18  ,
+            (2, 3): node_slot_used_23  ,
+            (2, 9): node_slot_used_29  ,
+            (3, 4): node_slot_used_34  ,
+            (4, 5): node_slot_used_45  ,
+            (4, 10):node_slot_used_410 ,
+            (5, 6): node_slot_used_56  ,
+            (5, 7): node_slot_used_57  ,
+            (5, 10):node_slot_used_510 ,
+            (6, 7): node_slot_used_67  ,
+            (7, 8): node_slot_used_78  ,
+            (8, 10):node_slot_used_810 ,
+            (9, 10):node_slot_used_910 ,
+            (2, 1): node_slot_used_21  ,
+            (8, 1): node_slot_used_81  ,
+            (3, 2): node_slot_used_32  ,
+            (9, 2): node_slot_used_92  ,
+            (4, 3): node_slot_used_43  ,
+            (5, 4): node_slot_used_54  ,
+            (10, 4):node_slot_used_104 ,
+            (6, 5): node_slot_used_65  ,
+            (7, 5): node_slot_used_75  ,
+            (10, 5):node_slot_used_105 ,
+            (7, 6): node_slot_used_76  ,
+            (8, 7): node_slot_used_87  ,
+            (10, 8):node_slot_used_108 ,
+            (10, 9):node_slot_used_109 ,
+}
 
-# Total number of slots used when transmission was successful
-nodes_slot_success_used = np.zeros((n, n))
+nodes_slot_unused = {
+            (1, 2): node_slot_unused_12  ,
+            (1, 8): node_slot_unused_18  ,
+            (2, 3): node_slot_unused_23  ,
+            (2, 9): node_slot_unused_29  ,
+            (3, 4): node_slot_unused_34  ,
+            (4, 5): node_slot_unused_45  ,
+            (4, 10):node_slot_unused_410 ,
+            (5, 6): node_slot_unused_56  ,
+            (5, 7): node_slot_unused_57  ,
+            (5, 10):node_slot_unused_510 ,
+            (6, 7): node_slot_unused_67  ,
+            (7, 8): node_slot_unused_78  ,
+            (8, 10):node_slot_unused_810 ,
+            (9, 10):node_slot_unused_910 ,
+            (2, 1): node_slot_unused_21  ,
+            (8, 1): node_slot_unused_81  ,
+            (3, 2): node_slot_unused_32  ,
+            (9, 2): node_slot_unused_92  ,
+            (4, 3): node_slot_unused_43  ,
+            (5, 4): node_slot_unused_54  ,
+            (10, 4):node_slot_unused_104 ,
+            (6, 5): node_slot_unused_65  ,
+            (7, 5): node_slot_unused_75  ,
+            (10, 5):node_slot_unused_105 ,
+            (7, 6): node_slot_unused_76  ,
+            (8, 7): node_slot_unused_87  ,
+            (10, 8):node_slot_unused_108 ,
+            (10, 9):node_slot_unused_109 ,
+}
 
-# Total number of unused slots when transmission was successful
-nodes_slot_success_unused = np.zeros((n, n))
 
-# Total number of slots when successful transmission was successful
-nodes_slot_success_total = np.zeros((n, n))
 
-# ###### Trackers for total packets entering the particular queue on particular node #####
+
+
+# Total occured slots
+node_slot_total_12  = 0
+node_slot_total_18  = 0
+node_slot_total_23  = 0
+node_slot_total_29  = 0
+node_slot_total_34  = 0
+node_slot_total_45  = 0
+node_slot_total_410 = 0
+node_slot_total_56  = 0
+node_slot_total_57  = 0
+node_slot_total_510 = 0
+node_slot_total_67  = 0
+node_slot_total_78  = 0
+node_slot_total_810 = 0
+node_slot_total_910 = 0
+node_slot_total_21  = 0
+node_slot_total_81  = 0
+node_slot_total_32  = 0
+node_slot_total_92  = 0
+node_slot_total_43  = 0
+node_slot_total_54  = 0
+node_slot_total_104 = 0
+node_slot_total_65  = 0
+node_slot_total_75  = 0
+node_slot_total_105 = 0
+node_slot_total_76  = 0
+node_slot_total_87  = 0
+node_slot_total_108 = 0
+node_slot_total_109 = 0
+
+nodes_slot_total = {
+            (1, 2): node_slot_total_12  ,
+            (1, 8): node_slot_total_18  ,
+            (2, 3): node_slot_total_23  ,
+            (2, 9): node_slot_total_29  ,
+            (3, 4): node_slot_total_34  ,
+            (4, 5): node_slot_total_45  ,
+            (4, 10):node_slot_total_410 ,
+            (5, 6): node_slot_total_56  ,
+            (5, 7): node_slot_total_57  ,
+            (5, 10):node_slot_total_510 ,
+            (6, 7): node_slot_total_67  ,
+            (7, 8): node_slot_total_78  ,
+            (8, 10):node_slot_total_810 ,
+            (9, 10):node_slot_total_910 ,
+            (2, 1): node_slot_total_21  ,
+            (8, 1): node_slot_total_81  ,
+            (3, 2): node_slot_total_32  ,
+            (9, 2): node_slot_total_92  ,
+            (4, 3): node_slot_total_43  ,
+            (5, 4): node_slot_total_54  ,
+            (10, 4):node_slot_total_104 ,
+            (6, 5): node_slot_total_65  ,
+            (7, 5): node_slot_total_75  ,
+            (10, 5):node_slot_total_105 ,
+            (7, 6): node_slot_total_76  ,
+            (8, 7): node_slot_total_87  ,
+            (10, 8):node_slot_total_108 ,
+            (10, 9):node_slot_total_109 ,
+}
+
+
+# ###### Trackers for total packets entering the particular queue on particular node #####3
 # There are two places where packets enter the queue.
 # 1) Packet generation stage
 # 2) Packets are pushed into d_new queue
-nodes_total_real_packets = np.zeros((n, n))
-nodes_total_nonreal_packets =  np.zeros((n, n))
+
+node_total_real_packets12  = 0
+node_total_real_packets18  = 0
+node_total_real_packets23  = 0
+node_total_real_packets29  = 0
+node_total_real_packets34  = 0
+node_total_real_packets45  = 0
+node_total_real_packets410 = 0
+node_total_real_packets56  = 0
+node_total_real_packets57  = 0
+node_total_real_packets510 = 0
+node_total_real_packets67  = 0
+node_total_real_packets78  = 0
+node_total_real_packets810 = 0
+node_total_real_packets910 = 0
+node_total_real_packets21  = 0
+node_total_real_packets81  = 0
+node_total_real_packets32  = 0
+node_total_real_packets92  = 0
+node_total_real_packets43  = 0
+node_total_real_packets54  = 0
+node_total_real_packets104 = 0
+node_total_real_packets65  = 0
+node_total_real_packets75  = 0
+node_total_real_packets105 = 0
+node_total_real_packets76  = 0
+node_total_real_packets87  = 0
+node_total_real_packets108 = 0
+node_total_real_packets109 = 0
+
+node_total_nonreal_packets12  = 0
+node_total_nonreal_packets18  = 0
+node_total_nonreal_packets23  = 0
+node_total_nonreal_packets29  = 0
+node_total_nonreal_packets34  = 0
+node_total_nonreal_packets45  = 0
+node_total_nonreal_packets410 = 0
+node_total_nonreal_packets56  = 0
+node_total_nonreal_packets57  = 0
+node_total_nonreal_packets510 = 0
+node_total_nonreal_packets67  = 0
+node_total_nonreal_packets78  = 0
+node_total_nonreal_packets810 = 0
+node_total_nonreal_packets910 = 0
+node_total_nonreal_packets21  = 0
+node_total_nonreal_packets81  = 0
+node_total_nonreal_packets32  = 0
+node_total_nonreal_packets92  = 0
+node_total_nonreal_packets43  = 0
+node_total_nonreal_packets54  = 0
+node_total_nonreal_packets104 = 0
+node_total_nonreal_packets65  = 0
+node_total_nonreal_packets75  = 0
+node_total_nonreal_packets105 = 0
+node_total_nonreal_packets76  = 0
+node_total_nonreal_packets87  = 0
+node_total_nonreal_packets108 = 0
+node_total_nonreal_packets109 = 0
+
+
+
+
+nodes_total_real_packets = {
+            (1, 2): node_total_real_packets12  ,
+            (1, 8): node_total_real_packets18  ,
+            (2, 3): node_total_real_packets23  ,
+            (2, 9): node_total_real_packets29  ,
+            (3, 4): node_total_real_packets34  ,
+            (4, 5): node_total_real_packets45  ,
+            (4, 10):node_total_real_packets410 ,
+            (5, 6): node_total_real_packets56  ,
+            (5, 7): node_total_real_packets57  ,
+            (5, 10):node_total_real_packets510 ,
+            (6, 7): node_total_real_packets67  ,
+            (7, 8): node_total_real_packets78  ,
+            (8, 10):node_total_real_packets810 ,
+            (9, 10):node_total_real_packets910 ,
+            (2, 1): node_total_real_packets21  ,
+            (8, 1): node_total_real_packets81  ,
+            (3, 2): node_total_real_packets32  ,
+            (9, 2): node_total_real_packets92  ,
+            (4, 3): node_total_real_packets43  ,
+            (5, 4): node_total_real_packets54  ,
+            (10, 4):node_total_real_packets104 ,
+            (6, 5): node_total_real_packets65  ,
+            (7, 5): node_total_real_packets75  ,
+            (10, 5):node_total_real_packets105 ,
+            (7, 6): node_total_real_packets76  ,
+            (8, 7): node_total_real_packets87  ,
+            (10, 8):node_total_real_packets108 ,
+            (10, 9):node_total_real_packets109 ,
+}
+
+nodes_total_nonreal_packets = {
+            (1, 2): node_total_nonreal_packets12  ,
+            (1, 8): node_total_nonreal_packets18  ,
+            (2, 3): node_total_nonreal_packets23  ,
+            (2, 9): node_total_nonreal_packets29  ,
+            (3, 4): node_total_nonreal_packets34  ,
+            (4, 5): node_total_nonreal_packets45  ,
+            (4, 10):node_total_nonreal_packets410 ,
+            (5, 6): node_total_nonreal_packets56  ,
+            (5, 7): node_total_nonreal_packets57  ,
+            (5, 10):node_total_nonreal_packets510 ,
+            (6, 7): node_total_nonreal_packets67  ,
+            (7, 8): node_total_nonreal_packets78  ,
+            (8, 10):node_total_nonreal_packets810 ,
+            (9, 10):node_total_nonreal_packets910 ,
+            (2, 1): node_total_nonreal_packets21  ,
+            (8, 1): node_total_nonreal_packets81  ,
+            (3, 2): node_total_nonreal_packets32  ,
+            (9, 2): node_total_nonreal_packets92  ,
+            (4, 3): node_total_nonreal_packets43  ,
+            (5, 4): node_total_nonreal_packets54  ,
+            (10, 4):node_total_nonreal_packets104 ,
+            (6, 5): node_total_nonreal_packets65  ,
+            (7, 5): node_total_nonreal_packets75  ,
+            (10, 5):node_total_nonreal_packets105 ,
+            (7, 6): node_total_nonreal_packets76  ,
+            (8, 7): node_total_nonreal_packets87  ,
+            (10, 8):node_total_nonreal_packets108 ,
+            (10, 9):node_total_nonreal_packets109 ,
+}
 
 # For average Queue length calculation
 # Queue size is calculated every slot.
 # Since we maintain two queues separately for realtime and nonrealtime data.
-nodes_slot_queue_real_len = np.zeros((n, n))
-nodes_slot_queue_nonreal_len = np.zeros((n, n))
 
+node1_slot_queue_len = 0
+node2_slot_queue_len = 0
+node3_slot_queue_len = 0
+node4_slot_queue_len = 0
+node5_slot_queue_len = 0
+node6_slot_queue_len = 0
+node7_slot_queue_len = 0
+node8_slot_queue_len = 0
+node9_slot_queue_len = 0
+node10_slot_queue_len = 0
+
+node1_slot_queue_nonreal_len = 0
+node2_slot_queue_nonreal_len = 0
+node3_slot_queue_nonreal_len = 0
+node4_slot_queue_nonreal_len = 0
+node5_slot_queue_nonreal_len = 0
+node6_slot_queue_nonreal_len = 0
+node7_slot_queue_nonreal_len = 0
+node8_slot_queue_nonreal_len = 0
+node9_slot_queue_nonreal_len = 0
+node10_slot_queue_nonreal_len = 0
+
+
+nodes_slot_queue_len = {
+    '1': node1_slot_queue_len,
+    '2': node2_slot_queue_len,
+    '3': node3_slot_queue_len,
+    '4': node4_slot_queue_len,
+    '5': node5_slot_queue_len,
+    '6': node6_slot_queue_len,
+    '7': node7_slot_queue_len,
+    '8': node8_slot_queue_len,
+    '9': node9_slot_queue_len,
+    '10': node10_slot_queue_len,
+}
+
+nodes_slot_queue_nonreal_len = {
+    '1': node1_slot_queue_nonreal_len,
+    '2': node2_slot_queue_nonreal_len,
+    '3': node3_slot_queue_nonreal_len,
+    '4': node4_slot_queue_nonreal_len,
+    '5': node5_slot_queue_nonreal_len,
+    '6': node6_slot_queue_nonreal_len,
+    '7': node7_slot_queue_nonreal_len,
+    '8': node8_slot_queue_nonreal_len,
+    '9': node9_slot_queue_nonreal_len,
+    '10': node10_slot_queue_nonreal_len,
+}
+
+
+packets_tracker = {
+                    '0': packets_tracker0,
+                    '1': packets_tracker1,
+                    '2': packets_tracker2,
+                    '3': packets_tracker3,
+                    '4': packets_tracker4
+                  }
+
+'''
 # Voice Mean Delays at each node
 Voice_Mean_Time0 = 0
 Voice_Mean_Time1 = 0
@@ -611,13 +965,13 @@ File_Mean_Time = {
 Voice_Mean = 0
 Video_Mean = 0
 File_Mean = 0
+File_Mean_Speed = 0
+File_Mean_Speed_e2e = 0
 
 Voice_Mean_Total = 0
 Video_Mean_Total = 0
 File_Mean_Total = 0
 
-File_Mean_Speed = 0
-File_Mean_Speed_e2e = 0
 serviceend_time = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 final_packets_tracker = []
 timetracker = []
@@ -627,7 +981,7 @@ bkwdpath = []
 
 call_duration = 1.0 / 150
 
-# ################### End Of Packet level  variables initialization############
+# ################### End Of Packet level Simulation variables############
 
 # Exponential Random distribution at mean 1/lambda
 # All the arrival times are computed here. So each flowarrival[] time corresponds to particular source[]
@@ -665,26 +1019,6 @@ def nonrealnodesHavePackets():
     return False
 
 c = 0
-
-# ################### Explanation of program flow below. It differs slightly from Flow level simulation ##########
-'''
-    while (countarrival < limit - 1) :
-        if countarrival == 0:
-            first flow enters the simulation
-        else
-            if min_arrivaltime < time of next flow arrival (c)
-                Packetization
-                while time_service < time of next flow arrival (c)
-                     node servicing
-                     service 8 mbps slots 3 times
-                     service 2 mbps slots 1 time
-                     if flow is complete:
-                        remove from the simulation and restore resources
-            else
-                add the next flow to the simulation
-
-'''
-
 
 while(countarrival < limit - 1):
     print countarrival, "countarrival", packetcounter , time_service
@@ -735,7 +1069,7 @@ while(countarrival < limit - 1):
 
         # Flow number for Enhanced Adapted Dijkstra set to 1 for the first flow
         flownumber_new_block = flownumber_new_block + 1
-        flow_duration = np.random.exponential(servicetime[I])
+        flow_duration = np.random.exponential(np.divide(1, call_duration))
 
         ########## ADAPTED DIJSKTRA ROUTING ALGORITHM #########################
 
@@ -750,7 +1084,9 @@ while(countarrival < limit - 1):
 
         updateonentry2 = updateonentry1(p, s, d, flow_type, min_rate, flownumber, userpriority, source[I],
                                         destination[I], flow_type1[I], min_rate1[I], flownumber_new, userpriority_new,
-                                        path_final, wt_matx, wt_matx_real, wt_matx_real1, blockstate, flow_duration, flowarrivaltime[I], connection_type, voice_packet_size, packet_datarate[I])
+                                        path_final, wt_matx, wt_matx_real, wt_matx_real1, blockstate, flow_duration,
+                                        flowarrivaltime[I], connection_type, voice_packet_size, packet_datarate[I],
+                                        header_size)
         updateonentry2.execute()
         s = updateonentry2.s
         d = updateonentry2.d
@@ -771,7 +1107,7 @@ while(countarrival < limit - 1):
         new_c = c
 
         # Debugging
-        '''
+
         np.savetxt("updweightmatx.csv", 1/ wt_matx, delimiter=",")
         np.savetxt("updorweightmatxreal.csv", 1/ wt_matx_real, delimiter=",")
         np.savetxt("updorweightmatxreal1.csv", 1/ wt_matx_real1, delimiter=",")
@@ -783,7 +1119,7 @@ while(countarrival < limit - 1):
         weight_diff = 0
         realweight_diff = 0
         while path_final[k][0] != 0:
-            j = 9
+            j = 11
             while path_final[k][j] != 0:
                 weight_diff = weight_diff + path_final[k][4]
                 if path_final[k][1] == 0:
@@ -797,13 +1133,49 @@ while(countarrival < limit - 1):
             print "Oops"
         if (orig_total_real1 - total_real1 - realweight_diff) > 2:
             print "Oops"
-        '''
+
 
         if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
             count_algo1 = count_algo1 + 1
         blockstate1[countarrival] = blockstate_new
 
+        '''
+        if blockstate[-1] == 1:  # If last call not blocked
 
+            if I < arrivalratesize/connectiontypes:
+                path_final[int(flownumber[-1]) - 1, 3] = 0
+                if int(packet_datarate[I] / 100 / voice_packet_size) < 1:
+                    path_final[int(flownumber[-1])-1, 2] = int(flow_duration) * 1
+                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * 1
+                else:
+                    path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
+                    path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I] / 100 / voice_packet_size)
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I]/100
+
+                # Backward Path Packetisation
+                path_final[int(flownumber[-1]), 3] = 0
+
+                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
+            elif I < 2*arrivalratesize/connectiontypes:
+                # Back Path Packetisation
+                path_final[int(flownumber[-1]) - 1, 3] = 1
+                path_final[int(flownumber[-1]) - 1, 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]), 3] = 1
+                path_final[int(flownumber[-1]), 2] = int(flow_duration) * int(packet_datarate[I]/100/video_packet_size)
+                path_final[int(flownumber[-1]), 8] = packet_datarate[I] / 100
+            else:
+                if int(flow_duration*150*1000 / file_packet_size) < 1:
+                    file_limit = 1
+                else:
+                    file_limit = int(flow_duration*150*1000 / file_packet_size)
+                path_final[int(flownumber[-1]) - 1, 2] = file_limit
+                path_final[int(flownumber[-1]) - 1, 8] = packet_datarate[I] / 100
+                path_final[int(flownumber[-1]) - 1, 3] = 2
+        '''
+        # print blockstate, "blockstate"
+        # print path_final, "pathfinalstate"
+        # print flow_type1[I]
 
         # Updating the next flowarrivaltime
         flowarrivaltime[I] = flowarrivaltime[I] + np.random.exponential(np.divide(1, arrivalrate[I]))
@@ -822,9 +1194,11 @@ while(countarrival < limit - 1):
         I1 = departuretime1.argmin()  # Index of the Minimum Value
         if min_arrivaltime < c and path_final[0][0] != 0:  # and nodesHavePackets():
             # Packetization
+            kk = 0
             while min_arrivaltime < c and path_final[0][0] != 0:  # and nodesHavePackets():
                 k = 0
                 l = 0
+                kk += 1
                 while path_final[k][0] != 0:
                     j = 0
                     l += 1
@@ -834,7 +1208,7 @@ while(countarrival < limit - 1):
                         min_arrivaltime = float('inf')
                     po = 0
                     while path_final[j][0] != 0:
-                        if path_final[j][6] < min_arrivaltime and path_final[k][3] != 2:
+                        if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
                         po = po +1
@@ -848,100 +1222,81 @@ while(countarrival < limit - 1):
                         #if path_final[k][3] == 0 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):
                         if path_final[k][3] == 0 and (path_final[k][6] <= time_service + file_packet_size / 20000):
                             '''
-                            bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
+                            bisect.insort_left(nodes_real[str(int(path_final[k][11]))],
                                                Packets(path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                        path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                        path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                        path_final[k][2], True, path_final[k][4]))
                             '''
-                            nodes_real[(int(path_final[k][9]), int(path_final[k][10]))].append(Packets(path_final[k][6], path_final[k][6], path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0], path_final[k][2], True, path_final[k][8], 0, 0))
+                            nodes_real[(int(path_final[k][11]), int(path_final[k][12]))].append(Packets(path_final[k][6], path_final[k][6], path_final[k][7], 0, path_final[k][11:p + 9].tolist(), path_final[k][0], path_final[k][2], True, path_final[k][8], 0, 0))
                             # Total Nodes entering the real queue
-                            # nodes_total_real_packets[int(path_final[k][9])-1][int(path_final[k][10])-1] += 1
+                            nodes_total_real_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
                             if countarrival == 1:
                                 time_service = path_final[k][6]
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
 
                             k += 1
                             '''
-                            bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
+                            bisect.insort_left(nodes_real[str(int(path_final[k][11]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size)),
                                                    path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], False, path_final[k][4]))
                             '''
-                            if (int(path_final[k][9])) != 0:
-                                nodes_real[(int(path_final[k][9]), int(path_final[k][10]))].append(Packets(
+                            if (int(path_final[k][11])) != 0:
+                                nodes_real[(int(path_final[k][11]), int(path_final[k][12]))].append(Packets(
                                     path_final[k][6],
                                     path_final[k][6],
-                                    path_final[k][7], 0, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                    path_final[k][7], 0, path_final[k][11:p + 9].tolist(), path_final[k][0],
                                     path_final[k][2], False, path_final[k][8], 0, 0))
                                 # Total Nodes entering the real queue
-                                # nodes_total_real_packets[int(path_final[k][9])-1][int(path_final[k][10])-1] += 1
+                                nodes_total_real_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
                                 path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / voice_packet_size))) <= (time_service + file_packet_size / 20000):  # Video Calls
-                        elif path_final[k][3] == 1  and (path_final[k][6] <= time_service + file_packet_size / 20000):
+                        elif path_final[k][3] == 1 and (path_final[k][6] <= time_service + file_packet_size / 20000):
                             '''
-                            bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
+                            bisect.insort_left(nodes_real[str(int(path_final[k][11]))],
                                                Packets(
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
                                                    path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
                                                    path_final[k][2], True, path_final[k][4]))
                             '''
-                            nodes_real[(int(path_final[k][9]), int(path_final[k][10]))].append(Packets(
+                            nodes_real[(int(path_final[k][11]), int(path_final[k][12]))].append(Packets(
                                 path_final[k][6],
                                 path_final[k][6],
-                                path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
+                                path_final[k][7], 1, path_final[k][11:p + 9].tolist(), path_final[k][0],
                                 path_final[k][2], True, path_final[k][8], 0, 0))
-                            # nodes_total_real_packets[int(path_final[k][9])-1][int(path_final[k][10])-1] += 1
                             if countarrival == 1:
                                 time_service = path_final[k][6]
+                            path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / voice_packet_size))
+                            k += 1
+                            nodes_real[(int(path_final[k][11]), int(path_final[k][12]))].append(Packets(
+                                path_final[k][6],
+                                path_final[k][6],
+                                path_final[k][7], 1, path_final[k][11:p + 9].tolist(), path_final[k][0],
+                                path_final[k][2], False, path_final[k][8], 0, 0))
+                            nodes_total_real_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
                             path_final[k][6] = path_final[k][6]+ float(1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
-                            '''
-                            bisect.insort_left(nodes_real[str(int(path_final[k][9]))],
-                                               Packets(
-                                                   path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
-                                                   path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size)),
-                                                   path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                                   path_final[k][2], False, path_final[k][4]))
-                            '''
-                            if (int(path_final[k][9])) != 0:
-                                nodes_real[(int(path_final[k][9]), int(path_final[k][10]))].append(Packets(
-                                     path_final[k][6],
-                                     path_final[k][6],
-                                     path_final[k][7], 1, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                     path_final[k][2], False, path_final[k][8], 0, 0))
-                                # nodes_total_real_packets[int(path_final[k][9])-1][int(path_final[k][10])-1] += 1
-                                path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / video_packet_size))
-                            k += 1
                         elif path_final[k][3] == 2:  # Data calls
-                            '''
-                            bisect.insort_left(nodes_nonreal[str(int(path_final[k][9]))],
-                                               Packets(
-                                                   path_final[k][6],
-                                                   path_final[k][6],
-                                                   path_final[k][7], 2, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                                   path_final[k][2], True, path_final[k][4]))
-                            path_final[k][6] = path_final[k][6] + float(
-                                1.0 / ((path_final[k][8]) / video_packet_size)) + float(
-                                1.0 / ((path_final[k][8]) / video_packet_size))
-                            '''
-                            nodes_nonreal[(int(path_final[k][9]), int(path_final[k][10]))].append(Packets(
-                                path_final[k][6],
-                                path_final[k][6],
-                                path_final[k][7], 2, path_final[k][9:p + 9].tolist(), path_final[k][0],
-                                path_final[k][2], True, path_final[k][8]/100.0, 0, 0))
-                            # nodes_total_nonreal_packets[int(path_final[k][9])-1][int(path_final[k][10])-1] += 1
+                            if path_final[k][9] >= path_final[k][10]:
+                                path_final[k][10] += 1
+                                nodes_nonreal[(int(path_final[k][11]), int(path_final[k][12]))].append(Packets(
+                                    path_final[k][6],
+                                    path_final[k][6],
+                                    path_final[k][7], 2, path_final[k][11:p + 9].tolist(), path_final[k][0],
+                                    path_final[k][2], True, path_final[k][8]/100.0, 0, 0))
+                                #nodes_total_nonreal_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
                             path_final[k][6] = path_final[k][6] + float(
                                 1.0 / ((path_final[k][8]) / video_packet_size))
                             k += 1
                             if countarrival == 1:
                                 time_service = path_final[0][6]
                         else:
-                            k += 2
+                            k += 1
                     elif nodesHavePackets() == False:
                         time_service = time_service + file_packet_size / 20000
                         for node_no in range(1, noOfNodes + 1, 1):
@@ -954,7 +1309,7 @@ while(countarrival < limit - 1):
                     if path_final[0][0] != 0:
                         min_arrivaltime = float('inf')
                     while path_final[j][0] != 0:
-                        if path_final[j][6] < min_arrivaltime and path_final[k][3] != 2:
+                        if path_final[j][6] < min_arrivaltime:
                             min_arrivaltime = path_final[j][6]
                         j += 1
                 # if time_service < min_arrivaltime:
@@ -974,22 +1329,22 @@ while(countarrival < limit - 1):
                         if time_service <= min_arrivaltime:
                             for node_no in range(1, noOfNodes + 1, 1):
                                 for next_nodeno in range(0, len(node_links[node_no]), 1):
-                                    # (0,1) :: (probability of failure, probablity of success)
-                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[node_no - 1][node_links[node_no][next_nodeno] - 1], C[node_no - 1][node_links[node_no][next_nodeno] - 1]])
-                                    # link_retransmit_prob = 1
-                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) < 1 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 1:
+                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                         nodes_slot_unused[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        if link_retransmit_prob == 1:
-                                            nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                            nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                     if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                         nodeoutsidecounter += 1
                                         nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                         nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        if link_retransmit_prob == 1:
-                                            nodes_slot_success_used[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                            nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
+                                        # if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time >= max(serviceend_time):
+                                        '''
+                                        arrivaltimes = []
+                                        for nd_no in range(1, noOfNodes + 1, 1):
+                                            if len(nodes_real[str(nd_no)]) == 0:
+                                                arrivaltimes.append(0)
+                                            else:
+                                                arrivaltimes.append(nodes_real[str(nd_no)][0].arrival_time)
+                                        '''
                                         s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                         d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
                                         #if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service and B[s_link - 1][d_link - 1] == 8:
@@ -1002,11 +1357,12 @@ while(countarrival < limit - 1):
                                                 continue  # Continue checking other nodes for servicable packets
                                             s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                             d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-
+                                            link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+                                            # link_retransmit_prob = 1
                                             for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
                                                 nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 80000)
 
-                                            # nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
+                                            nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
                                             nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service(
                                                 max(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),
                                                 B[s_link - 1][d_link - 1], False, link_retransmit_prob,
@@ -1039,11 +1395,11 @@ while(countarrival < limit - 1):
                                                             while path_final[k][0] != 0:
                                                                 if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k][2] -= 1
-                                                                    path_final[k][18] = (path_final[k][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                   #path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                     packetcounter += 1
                                                                     if path_final[k][2] < 1:
                                                                         print "finished"
-                                                                        Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][18]+path_final[k+1][18]) / 2.0)) / 2.0
+                                                                        Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9]+path_final[k+1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                                 flownumber, userpriority,
@@ -1080,7 +1436,7 @@ while(countarrival < limit - 1):
                                                                             weight_diff = 0
                                                                             realweight_diff = 0
                                                                             while path_final[k][0] != 0:
-                                                                                j = 9
+                                                                                j = 11
                                                                                 while path_final[k][j] != 0:
                                                                                     weight_diff = weight_diff + path_final[k][4]
                                                                                     if path_final[k][1] == 0:
@@ -1104,11 +1460,11 @@ while(countarrival < limit - 1):
                                                             while path_final[k][0] != 0:
                                                                 if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k + 1][2] -= 1
-                                                                    path_final[k + 1][18] = (path_final[k + 1][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                    path_final[k + 1][9] = (path_final[k + 1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                     packetcounter += 1
                                                                     if path_final[k + 1][2] < 1:
                                                                         print "finished reverse"
-                                                                        Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][18]+path_final[k+1][18]) / 2.0)) / 2.0
+                                                                        Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9]+path_final[k+1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                                 flownumber, userpriority,
@@ -1145,7 +1501,7 @@ while(countarrival < limit - 1):
                                                                             weight_diff = 0
                                                                             realweight_diff = 0
                                                                             while path_final[k][0] != 0:
-                                                                                j = 9
+                                                                                j = 11
                                                                                 while path_final[k][j] != 0:
                                                                                     weight_diff = weight_diff + path_final[k][4]
                                                                                     if path_final[k][1] == 0:
@@ -1191,11 +1547,11 @@ while(countarrival < limit - 1):
                                                             while path_final[k][0] != 0:
                                                                 if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k][2] -= 1
-                                                                    path_final[k][18] = (path_final[k][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                    #path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                     packetcounter += 1
                                                                     if path_final[k][2] < 1:
                                                                         print "finished"
-                                                                        Video_Mean_Total = (Video_Mean_Total + ((path_final[k][18]+path_final[k+1][18]) / 2.0)) / 2.0
+                                                                        #Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                                 flownumber, userpriority,
@@ -1232,7 +1588,7 @@ while(countarrival < limit - 1):
                                                                             weight_diff = 0
                                                                             realweight_diff = 0
                                                                             while path_final[k][0] != 0:
-                                                                                j = 9
+                                                                                j = 11
                                                                                 while path_final[k][j] != 0:
                                                                                     weight_diff = weight_diff + path_final[k][4]
                                                                                     if path_final[k][1] == 0:
@@ -1256,11 +1612,11 @@ while(countarrival < limit - 1):
                                                             while path_final[k][0] != 0:
                                                                 if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k + 1][2] -= 1
-                                                                    path_final[k + 1][18] = (path_final[k + 1][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                    # path_final[k + 1][9] = (path_final[k + 1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                     packetcounter += 1
                                                                     if path_final[k + 1][2] < 1:
                                                                         print "finished reverse"
-                                                                        Video_Mean_Total = (Video_Mean_Total + ((path_final[k][18]+path_final[k+1][18]) / 2.0)) / 2.0
+                                                                        # Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                                 flownumber, userpriority,
@@ -1297,7 +1653,7 @@ while(countarrival < limit - 1):
                                                                             weight_diff = 0
                                                                             realweight_diff = 0
                                                                             while path_final[k][0] != 0:
-                                                                                j = 9
+                                                                                j = 11
                                                                                 while path_final[k][j] != 0:
                                                                                     weight_diff = weight_diff + path_final[k][4]
                                                                                     if path_final[k][1] == 0:
@@ -1386,7 +1742,7 @@ while(countarrival < limit - 1):
                                                         nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(
                                                             file_packet_size / 80000)
                                                     '''
-                                                    # nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
+                                                    nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
                                                     nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service(
                                                         max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),
                                                         B[s_link - 1][d_link - 1], False, 1, file_packet_size / 80000)
@@ -1408,24 +1764,24 @@ while(countarrival < limit - 1):
                                                             while path_final[k][0] != 0:
                                                                 if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k][2] -= 1
+                                                                    packetcounter += 1
                                                                     '''
                                                                     File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
-                                                                    256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
+                                                                        256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
                                                                     '''
-                                                                    packetcounter += 1
                                                                     if path_final[k][2] < 1:
                                                                         print "finished"
 
                                                                         if File_Mean_Speed == 0:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 1.0
-                                                                            '''
-                                                                            File_Mean_Speed_e2e = 256.0 / (0.01 * (
-                                                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time -
-                                                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                                                    0].initial_arrival_time))
-                                                                            '''
+                                                                            File_Mean_Speed = (File_Mean_Speed + (
+                                                                            path_final[k][7] * path_final[k][
+                                                                                8] * 1000) / (time_service -
+                                                                                              path_final[k][5])) / 1.0
                                                                         else:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 2.0
+                                                                            File_Mean_Speed = (File_Mean_Speed + (
+                                                                            path_final[k][7] * path_final[k][
+                                                                                8] * 1000) / (time_service -
+                                                                                              path_final[k][5])) / 2.0
                                                                             '''
                                                                             File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
                                                                                 0.01 * (
@@ -1469,7 +1825,7 @@ while(countarrival < limit - 1):
                                                                         weight_diff = 0
                                                                         realweight_diff = 0
                                                                         while path_final[k][0] != 0:
-                                                                            j = 9
+                                                                            j = 11
                                                                             while path_final[k][j] != 0:
                                                                                 weight_diff = weight_diff + path_final[k][4]
                                                                                 if path_final[k][1] == 0:
@@ -1517,22 +1873,10 @@ while(countarrival < limit - 1):
                     if time_service <= min_arrivaltime:
                         for node_no in range(1, noOfNodes + 1, 1):
                             for next_nodeno in range(0, len(node_links[node_no]), 1):
-                                link_retransmit_prob = np.random.choice(np.arange(0, 2),
-                                                                        p=[1 - C[node_no - 1][node_links[node_no][next_nodeno] - 1], C[node_no - 1][node_links[node_no][next_nodeno] - 1]])
-
-                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) < 1 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) < 1:
-                                    nodes_slot_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                    nodes_slot_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                    if link_retransmit_prob == 1:
-                                        nodes_slot_success_unused[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                        nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                 if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
                                     nodeoutsidecounter += 1
                                     nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                                     nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                    if link_retransmit_prob == 1:
-                                        nodes_slot_success_used[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
-                                        nodes_slot_success_total[node_no - 1][node_links[node_no][next_nodeno] - 1] += 1
                                     # if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time >= max(serviceend_time):
                                     arrivaltimes = []
                                     '''
@@ -1552,11 +1896,12 @@ while(countarrival < limit - 1):
                                             continue  # Continue checking other nodes for servicable packets
                                         s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                         d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
+                                        link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
                                         # link_retransmit_prob = 1
                                         for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
                                             nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
 
-                                        # nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
+                                        nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
 
                                         nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service(max(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
                                         # Appending to the serving Queue
@@ -1584,11 +1929,11 @@ while(countarrival < limit - 1):
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k][2] -= 1
-                                                                path_final[k][18] = (path_final[k][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                #path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
                                                                 if path_final[k][2] < 1:
                                                                     print "finished"
-                                                                    Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][18] + path_final[k + 1][18]) / 2.0)) / 2.0
+                                                                    #Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                             flownumber, userpriority,
@@ -1624,7 +1969,7 @@ while(countarrival < limit - 1):
                                                                         weight_diff = 0
                                                                         realweight_diff = 0
                                                                         while path_final[k][0] != 0:
-                                                                            j = 9
+                                                                            j = 11
                                                                             while path_final[k][j] != 0:
                                                                                 weight_diff = weight_diff + path_final[k][4]
                                                                                 if path_final[k][1] == 0:
@@ -1648,11 +1993,11 @@ while(countarrival < limit - 1):
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k+1][2] -= 1
-                                                                path_final[k+1][18] = (path_final[k+1][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                #path_final[k+1][9] = (path_final[k+1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
                                                                 if path_final[k+1][2] < 1:
                                                                     print "finished reverse"
-                                                                    Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][18] + path_final[k + 1][18]) / 2.0)) / 2.0
+                                                                    #Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                             flownumber, userpriority,
@@ -1688,7 +2033,7 @@ while(countarrival < limit - 1):
                                                                         weight_diff = 0
                                                                         realweight_diff = 0
                                                                         while path_final[k][0] != 0:
-                                                                            j = 9
+                                                                            j = 11
                                                                             while path_final[k][j] != 0:
                                                                                 weight_diff = weight_diff + path_final[k][4]
                                                                                 if path_final[k][1] == 0:
@@ -1723,11 +2068,11 @@ while(countarrival < limit - 1):
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k][2] -= 1
-                                                                path_final[k][18] = (path_final[k][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                #path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
                                                                 if path_final[k][2] < 1:
                                                                     print "finished"
-                                                                    Video_Mean_Total = (Video_Mean_Total + ((path_final[k][18] + path_final[k + 1][18]) / 2.0)) / 2.0
+                                                                    #Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                             flownumber, userpriority,
@@ -1763,7 +2108,7 @@ while(countarrival < limit - 1):
                                                                         weight_diff = 0
                                                                         realweight_diff = 0
                                                                         while path_final[k][0] != 0:
-                                                                            j = 9
+                                                                            j = 11
                                                                             while path_final[k][j] != 0:
                                                                                 weight_diff = weight_diff + path_final[k][4]
                                                                                 if path_final[k][1] == 0:
@@ -1787,11 +2132,11 @@ while(countarrival < limit - 1):
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k + 1][2] -= 1
-                                                                path_final[k+1][18] = (path_final[k+1][18] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                #path_final[k+1][9] = (path_final[k+1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
                                                                 if path_final[k + 1][2] < 1:
                                                                     print "finished reverse"
-                                                                    Video_Mean_Total = (Video_Mean_Total + ((path_final[k][18] + path_final[k + 1][18]) / 2.0)) / 2.0
+                                                                    #Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                             flownumber, userpriority,
@@ -1827,7 +2172,7 @@ while(countarrival < limit - 1):
                                                                         weight_diff = 0
                                                                         realweight_diff = 0
                                                                         while path_final[k][0] != 0:
-                                                                            j = 9
+                                                                            j = 11
                                                                             while path_final[k][j] != 0:
                                                                                 weight_diff = weight_diff + path_final[k][4]
                                                                                 if path_final[k][1] == 0:
@@ -1907,10 +2252,10 @@ while(countarrival < limit - 1):
                                                 d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])
                                                 if B[s_link - 1][d_link - 1] == 0:
                                                     print "Inf"
-                                                for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
-                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
+                                                # for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
+                                                    # nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(file_packet_size / 20000)
 
-                                                # nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
+                                                nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
 
                                                 nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service(max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, 1, file_packet_size/20000)
 
@@ -1928,23 +2273,23 @@ while(countarrival < limit - 1):
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k][2] -= 1
+                                                                packetcounter += 1
                                                                 '''
                                                                 File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
-                                                                256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
+                                                                    256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
                                                                 '''
-                                                                packetcounter += 1
                                                                 if path_final[k][2] < 1:
                                                                     print "finished"
                                                                     if File_Mean_Speed == 0:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 1.0
-
-                                                                        # File_Mean_Speed_e2e = 256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time))
+                                                                        File_Mean_Speed = (File_Mean_Speed + (
+                                                                        path_final[k][7] * path_final[k][8] * 1000) / (
+                                                                                           time_service - path_final[k][
+                                                                                               5])) / 1.0
                                                                     else:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (path_final[k][7]*path_final[k][8]*1000) / (time_service - path_final[k][5])) / 2.0
-
-                                                                        # File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
-
-
+                                                                        File_Mean_Speed = (File_Mean_Speed + (
+                                                                        path_final[k][7] * path_final[k][8] * 1000) / (
+                                                                                           time_service - path_final[k][
+                                                                                               5])) / 2.0
                                                                     upde = updateonexit(p, s, d, flow_type, min_rate,
                                                                                         flownumber, userpriority,
                                                                                         path_final[k][0], path_final, wt_matx,
@@ -1979,7 +2324,7 @@ while(countarrival < limit - 1):
                                                                     weight_diff = 0
                                                                     realweight_diff = 0
                                                                     while path_final[k][0] != 0:
-                                                                        j = 9
+                                                                        j = 11
                                                                         while path_final[k][j] != 0:
                                                                             weight_diff = weight_diff + path_final[k][4]
                                                                             if path_final[k][1] == 0:
@@ -2146,7 +2491,7 @@ while(countarrival < limit - 1):
             # Flow number for Enhanced Adapted Dijkstra set to 1 for the first flow
             flownumber_new_block = flownumber_new_block + 1
 
-            flow_duration = np.random.exponential(servicetime[I])
+            flow_duration = np.random.exponential(np.divide(1, call_duration))
             if I < arrivalratesize / connectiontypes:
                 connection_type = 0
             elif I < 2 * arrivalratesize / connectiontypes:
@@ -2157,7 +2502,7 @@ while(countarrival < limit - 1):
             # updateonentry1 does routing using Adapted Dijkstra
             ################################################
             if path_final[0][0] == 0:
-                diff = int((flowarrivaltime[I] - time_service) / ( file_packet_size/ 20000))
+                diff = int((flowarrivaltime[I] - time_service) / ( file_packet_size/ 80000))
                 for node_no in range(1, noOfNodes + 1, 1):
                     for next_nodeno in range(0, len(node_links[node_no]), 1):
                         nodes_slot_unused[node_no-1][node_links[node_no][next_nodeno]-1] += diff
@@ -2167,7 +2512,8 @@ while(countarrival < limit - 1):
                                             destination[I], flow_type1[I], min_rate1[I], flownumber_new,
                                             userpriority_new,
                                             path_final, wt_matx, wt_matx_real, wt_matx_real1, blockstate, flow_duration,
-                                            flowarrivaltime[I], connection_type, voice_packet_size, packet_datarate[I])
+                                            flowarrivaltime[I], connection_type, voice_packet_size, packet_datarate[I],
+                                            header_size)
             upde.execute()
             s = upde.s
             d = upde.d
@@ -2202,7 +2548,7 @@ while(countarrival < limit - 1):
             weight_diff = 0
             realweight_diff = 0
             while path_final[k][0] != 0:
-                j = 9
+                j = 11
                 while path_final[k][j] != 0:
                     weight_diff = weight_diff + path_final[k][4]
                     if path_final[k][1] == 0:
@@ -2771,8 +3117,6 @@ print File_Mean
 print "New Calculations"
 print Voice_Mean_Total
 print Video_Mean_Total
-# print File_Mean_Total
-
 print File_Mean_Speed, "FileMeanSpeed"
 print File_Mean_Speed_e2e, "File Mean Speed E2E"
 print node1packetcounter
@@ -2785,13 +3129,9 @@ print time_service, min_arrivaltime
 print sum_c
 
 for nodeno in range(1, noOfNodes + 1, 1):
-    for next_nodeno in range(0, len(node_links[nodeno]), 1):
-        print nodes_slot_used[nodeno-1][node_links[nodeno][next_nodeno]-1]/(nodes_slot_total[nodeno-1][node_links[nodeno][next_nodeno]-1]*1.0)
-        print "success", nodes_slot_success_used[nodeno-1][node_links[nodeno][next_nodeno]-1]/(nodes_slot_success_total[nodeno-1][node_links[nodeno][next_nodeno]-1]*1.0)
-
-        # print "len", len(nodes_nonreal[(nodeno, node_links[nodeno][next_nodeno])])
-        # nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0), nodes_slot_queue_nonreal_len[str(node_no)] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0)
-        # print " "
-        # print "Packets/Sec", nodes_total_real_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c), nodes_total_nonreal_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c)
+    for next_nodeno in range(0, len(node_links[node_no]), 1):
+        print nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1]/(nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0) , nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0), nodes_slot_queue_nonreal_len[str(node_no)] / (nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1]*1.0)
+        print " "
+        print "Packets/Sec", nodes_total_real_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c), nodes_total_nonreal_packets[node_no-1][node_links[node_no][next_nodeno]-1] / (1.0*sum_c)
 # print fracrealtime_algo1
 np.savetxt("results" + str(lamb) + ".csv", [Voice_Mean,Video_Mean,File_Mean,File_Mean_Speed,File_Mean_Speed_e2e,np.nanmax(rho_matx_sum_new)], delimiter=",")

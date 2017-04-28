@@ -20,7 +20,7 @@ class updateonentry1(object):
 
     def __init__(self, p, s, d, flow_type, min_rate, flownumber, userpriority, s_new, d_new,
                  flow_type_new, min_rate_new, flownumber_new, userpriority_new, path_final, wt_matx,
-                 wt_matx_real, wt_matx_real1, blockstate, flow_duration, flowarrival_time, connection_type, voice_packet_size, packet_datarate):
+                 wt_matx_real, wt_matx_real1, blockstate, flow_duration, flowarrival_time, connection_type, voice_packet_size, packet_datarate, header_size):
         self.p = p
         self.s = s
         self.d = d
@@ -44,6 +44,7 @@ class updateonentry1(object):
         self.connection_type = connection_type
         self.packet_size = voice_packet_size
         self.packet_datarate = packet_datarate
+        self.header_size = header_size
 
     def execute(self):
         [s1, s2] = np.shape(self.path_final)
@@ -99,11 +100,11 @@ class updateonentry1(object):
 
                             v = [self.flownumber_new, self.flow_type_new,
                                  no_of_packets, self.connection_type,
-                                 self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
+                                 self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100, 0, 0]
                             self.path_final[loop, :] = np.concatenate((v, path1))
                             v1 = [self.flownumber_new, self.flow_type_new,
                                   no_of_packets, self.connection_type,
-                                  self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
+                                  self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100, 0, 0]
                             self.path_final[loop+1, :] = np.concatenate((v1, path2))
                             # np.savetxt("pathfinal1.csv", self.path_final, delimiter=",")
                             break
@@ -161,7 +162,7 @@ class updateonentry1(object):
                             file_limit = int(self.flow_duration * (self.packet_datarate/100) / self.packet_size)
                         v = [self.flownumber_new, self.flow_type_new,
                              file_limit, self.connection_type,
-                             self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100]
+                             self.min_rate_new, self.flowarrival_time, self.flowarrival_time, self.flow_duration, self.packet_datarate/100, file_limit, 0]
                         self.path_final[loop, :] = np.concatenate((v, path1))
                         break
         else:

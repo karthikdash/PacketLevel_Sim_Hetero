@@ -35,7 +35,9 @@ class Packets:
         if link_retransmit_prob == 1:
             self.pre_arrival = self.arrival_time
             self.s_new = self.path.pop(0)
-            if self.path[1] == 0:
+            if len(self.path) == 2:
+                self.d_new = 99
+            elif self.path[1] == 0:
                 self.d_new = 99
             else:
                 self.d_new = self.path[0]
