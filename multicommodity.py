@@ -79,7 +79,7 @@ connectiontypes = 3
 # limit = 100000
 limit = 10000
 # Observation from 'start' iteration ?
-start = 2
+start = 50
 
 # Effective weight after factoring in on-off states and frame error probability
 weight_x = ((np.multiply(np.array(link_onprob1), np.subtract(1, link_errorprob1))) +
@@ -1735,6 +1735,9 @@ while(countarrival < limit - 1):
                                                         initial_service_end = 1
                                                     s_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                                     d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])
+                                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[
+                                                        1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
+
                                                     if B[s_link - 1][d_link - 1] == 0:
                                                         print "Inf"
 
@@ -1745,130 +1748,131 @@ while(countarrival < limit - 1):
                                                     nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
                                                     nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service(
                                                         max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),
-                                                        B[s_link - 1][d_link - 1], False, 1, file_packet_size / 80000)
+                                                        B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size / 80000)
 
                                                     # Appending to the serving Queue
                                                     # serviceend_time[node_no] = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time
                                                     # packets_tracker[str(node_no)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
                                                     # Appending to the next node receiving Queue
-                                                    File_Mean_Time[node_no] = (File_Mean_Time[node_no] +
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                                                   0].service_end_time -
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                                                   0].arrival_time) / 2.0
-                                                    if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                        0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                                                        ################### Decrementing the packet count from path_final ############
-                                                        k = 0
-                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                            while path_final[k][0] != 0:
-                                                                if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
-                                                                    path_final[k][2] -= 1
-                                                                    packetcounter += 1
-                                                                    '''
-                                                                    File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
-                                                                        256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
-                                                                    '''
-                                                                    if path_final[k][2] < 1:
-                                                                        print "finished"
+                                                    if link_retransmit_prob == 1:
+                                                        File_Mean_Time[node_no] = (File_Mean_Time[node_no] +
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                                                       0].service_end_time -
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                                                       0].arrival_time) / 2.0
+                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                            0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
+                                                            ################### Decrementing the packet count from path_final ############
+                                                            k = 0
+                                                            if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
+                                                                while path_final[k][0] != 0:
+                                                                    if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
+                                                                        path_final[k][2] -= 1
+                                                                        packetcounter += 1
+                                                                        '''
+                                                                        File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
+                                                                            256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
+                                                                        '''
+                                                                        if path_final[k][2] < 1:
+                                                                            print "finished"
 
-                                                                        if File_Mean_Speed == 0:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (
-                                                                            path_final[k][7] * path_final[k][
-                                                                                8] * 1000) / (time_service -
-                                                                                              path_final[k][5])) / 1.0
-                                                                        else:
-                                                                            File_Mean_Speed = (File_Mean_Speed + (
-                                                                            path_final[k][7] * path_final[k][
-                                                                                8] * 1000) / (time_service -
-                                                                                              path_final[k][5])) / 2.0
-                                                                            '''
-                                                                            File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
-                                                                                0.01 * (
-                                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time -
-                                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                                                        0].initial_arrival_time))) / 2.0
-                                                                            '''
+                                                                            if File_Mean_Speed == 0:
+                                                                                File_Mean_Speed = (File_Mean_Speed + (
+                                                                                path_final[k][7] * path_final[k][
+                                                                                    8] * 1000) / (time_service -
+                                                                                                  path_final[k][5])) / 1.0
+                                                                            else:
+                                                                                File_Mean_Speed = (File_Mean_Speed + (
+                                                                                path_final[k][7] * path_final[k][
+                                                                                    8] * 1000) / (time_service -
+                                                                                                  path_final[k][5])) / 2.0
+                                                                                '''
+                                                                                File_Mean_Speed_e2e = (File_Mean_Speed_e2e + 256.0 / (
+                                                                                    0.01 * (
+                                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time -
+                                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                                                            0].initial_arrival_time))) / 2.0
+                                                                                '''
 
-                                                                        upde = updateonexit(p, s, d, flow_type, min_rate,
-                                                                                            flownumber, userpriority,
-                                                                                            path_final[k][0], path_final,
-                                                                                            wt_matx,
-                                                                                            wt_matx_real,
-                                                                                            wt_matx_real1, blockstate)
-                                                                        upde.execute()
-                                                                        s = upde.s
-                                                                        d = upde.d
-                                                                        flow_type = upde.flow_type
-                                                                        min_rate = upde.min_rate
-                                                                        flownumber = upde.flownumber
-                                                                        userpriority = upde.userpriority
-                                                                        wt_matx = upde.wt_matx
-                                                                        wt_matx_real = upde.wt_matx_real
-                                                                        wt_matx_real1 = upde.wt_matx_real1
-                                                                        path_final = upde.path_final
-                                                                        blockstate = upde.blockstate
+                                                                            upde = updateonexit(p, s, d, flow_type, min_rate,
+                                                                                                flownumber, userpriority,
+                                                                                                path_final[k][0], path_final,
+                                                                                                wt_matx,
+                                                                                                wt_matx_real,
+                                                                                                wt_matx_real1, blockstate)
+                                                                            upde.execute()
+                                                                            s = upde.s
+                                                                            d = upde.d
+                                                                            flow_type = upde.flow_type
+                                                                            min_rate = upde.min_rate
+                                                                            flownumber = upde.flownumber
+                                                                            userpriority = upde.userpriority
+                                                                            wt_matx = upde.wt_matx
+                                                                            wt_matx_real = upde.wt_matx_real
+                                                                            wt_matx_real1 = upde.wt_matx_real1
+                                                                            path_final = upde.path_final
+                                                                            blockstate = upde.blockstate
 
-                                                                        # Debugging
-                                                                        np.savetxt("updweightmatx.csv", 1 / wt_matx,
-                                                                                   delimiter=",")
-                                                                        np.savetxt("updorweightmatxreal.csv",
-                                                                                   1 / wt_matx_real, delimiter=",")
-                                                                        np.savetxt("updorweightmatxreal1.csv",
-                                                                                   1 / wt_matx_real1, delimiter=",")
-                                                                        # print("WFIN")
+                                                                            # Debugging
+                                                                            np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                                       delimiter=",")
+                                                                            np.savetxt("updorweightmatxreal.csv",
+                                                                                       1 / wt_matx_real, delimiter=",")
+                                                                            np.savetxt("updorweightmatxreal1.csv",
+                                                                                       1 / wt_matx_real1, delimiter=",")
+                                                                            # print("WFIN")
 
-                                                                        total_matx = np.sum(1 / wt_matx)
-                                                                        total_real = np.sum(1 / wt_matx_real)
-                                                                        total_real1 = np.sum(1 / wt_matx_real1)
-                                                                        k = 0
-                                                                        weight_diff = 0
-                                                                        realweight_diff = 0
-                                                                        while path_final[k][0] != 0:
-                                                                            j = 11
-                                                                            while path_final[k][j] != 0:
-                                                                                weight_diff = weight_diff + path_final[k][4]
+                                                                            total_matx = np.sum(1 / wt_matx)
+                                                                            total_real = np.sum(1 / wt_matx_real)
+                                                                            total_real1 = np.sum(1 / wt_matx_real1)
+                                                                            k = 0
+                                                                            weight_diff = 0
+                                                                            realweight_diff = 0
+                                                                            while path_final[k][0] != 0:
+                                                                                j = 11
+                                                                                while path_final[k][j] != 0:
+                                                                                    weight_diff = weight_diff + path_final[k][4]
+                                                                                    if path_final[k][1] == 0:
+                                                                                        realweight_diff = realweight_diff + \
+                                                                                                          path_final[k][4]
+                                                                                    j += 1
+                                                                                weight_diff = weight_diff - path_final[k][4]
                                                                                 if path_final[k][1] == 0:
-                                                                                    realweight_diff = realweight_diff + \
+                                                                                    realweight_diff = realweight_diff - \
                                                                                                       path_final[k][4]
-                                                                                j += 1
-                                                                            weight_diff = weight_diff - path_final[k][4]
-                                                                            if path_final[k][1] == 0:
-                                                                                realweight_diff = realweight_diff - \
-                                                                                                  path_final[k][4]
-                                                                            k += 1
-                                                                        if (orig_total_matx - total_matx - weight_diff) > 2:
-                                                                            print "Oops"
-                                                                        if (
-                                                                                orig_total_real1 - total_real1 - realweight_diff) > 2:
-                                                                            print "Oops"
+                                                                                k += 1
+                                                                            if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                                print "Oops"
+                                                                            if (
+                                                                                    orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                                print "Oops"
 
-                                                                    break
-                                                                k += 1
-                                                        ################################ File Mean Delay Calculations #############
-                                                        if File_Mean == 0:
-                                                            File_Mean = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time
+                                                                        break
+                                                                    k += 1
+                                                            ################################ File Mean Delay Calculations #############
+                                                            if File_Mean == 0:
+                                                                File_Mean = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time
+                                                            else:
+                                                                File_Mean = (File_Mean + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                                    0].total_slot_time) / 2.0
                                                         else:
-                                                            File_Mean = (File_Mean + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                                0].total_slot_time) / 2.0
-                                                    else:
-                                                        # nodes_nonreal[str(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
-                                                        # nodes_total_nonreal_packets[nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
-                                                        bisect.insort_left(
-                                                            nodes_nonreal[(
-                                                            nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
-                                                            Packets(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
-                                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
-                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])].pop(0)
+                                                            # nodes_nonreal[str(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
+                                                            # nodes_total_nonreal_packets[nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
+                                                            bisect.insort_left(
+                                                                nodes_nonreal[(
+                                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
+                                                                Packets(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
+                                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
+                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])].pop(0)
                             time_service = time_service + file_packet_size / 80000
                     if time_service <= min_arrivaltime:
                         for node_no in range(1, noOfNodes + 1, 1):
@@ -2250,6 +2254,8 @@ while(countarrival < limit - 1):
                                                     initial_service_end = 1
                                                 s_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[0])
                                                 d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])
+                                                link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[
+                                                    1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
                                                 if B[s_link - 1][d_link - 1] == 0:
                                                     print "Inf"
                                                 for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
@@ -2257,112 +2263,113 @@ while(countarrival < limit - 1):
 
                                                 nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
 
-                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service(max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, 1, file_packet_size/20000)
+                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service(max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, link_retransmit_prob, file_packet_size/20000)
 
                                                 # Appending to the serving Queue
                                                 # serviceend_time[node_no] = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time
                                                 # packets_tracker[str(node_no)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
                                                 # Appending to the next node receiving Queue
-                                                File_Mean_Time[node_no] = (File_Mean_Time[node_no] + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
-                                                    0].service_end_time -
-                                                                           nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time) / 2.0
-                                                if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                                                    ################### Decrementing the packet count from path_final ############
-                                                    k = 0
-                                                    if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                        while path_final[k][0] != 0:
-                                                            if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
-                                                                path_final[k][2] -= 1
-                                                                packetcounter += 1
-                                                                '''
-                                                                File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
-                                                                    256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
-                                                                '''
-                                                                if path_final[k][2] < 1:
-                                                                    print "finished"
-                                                                    if File_Mean_Speed == 0:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (
-                                                                        path_final[k][7] * path_final[k][8] * 1000) / (
-                                                                                           time_service - path_final[k][
-                                                                                               5])) / 1.0
-                                                                    else:
-                                                                        File_Mean_Speed = (File_Mean_Speed + (
-                                                                        path_final[k][7] * path_final[k][8] * 1000) / (
-                                                                                           time_service - path_final[k][
-                                                                                               5])) / 2.0
-                                                                    upde = updateonexit(p, s, d, flow_type, min_rate,
-                                                                                        flownumber, userpriority,
-                                                                                        path_final[k][0], path_final, wt_matx,
-                                                                                        wt_matx_real,
-                                                                                        wt_matx_real1, blockstate)
-                                                                    upde.execute()
-                                                                    s = upde.s
-                                                                    d = upde.d
-                                                                    flow_type = upde.flow_type
-                                                                    min_rate = upde.min_rate
-                                                                    flownumber = upde.flownumber
-                                                                    userpriority = upde.userpriority
-                                                                    wt_matx = upde.wt_matx
-                                                                    wt_matx_real = upde.wt_matx_real
-                                                                    wt_matx_real1 = upde.wt_matx_real1
-                                                                    path_final = upde.path_final
-                                                                    blockstate = upde.blockstate
+                                                if link_retransmit_prob == 1:
+                                                    File_Mean_Time[node_no] = (File_Mean_Time[node_no] + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][
+                                                        0].service_end_time -
+                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time) / 2.0
+                                                    if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
+                                                        ################### Decrementing the packet count from path_final ############
+                                                        k = 0
+                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
+                                                            while path_final[k][0] != 0:
+                                                                if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
+                                                                    path_final[k][2] -= 1
+                                                                    packetcounter += 1
+                                                                    '''
+                                                                    File_Mean_Speed_e2e = (File_Mean_Speed_e2e + (
+                                                                        256.0 / (0.01 * (nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time)))) / 2.0
+                                                                    '''
+                                                                    if path_final[k][2] < 1:
+                                                                        print "finished"
+                                                                        if File_Mean_Speed == 0:
+                                                                            File_Mean_Speed = (File_Mean_Speed + (
+                                                                            path_final[k][7] * path_final[k][8] * 1000) / (
+                                                                                               time_service - path_final[k][
+                                                                                                   5])) / 1.0
+                                                                        else:
+                                                                            File_Mean_Speed = (File_Mean_Speed + (
+                                                                            path_final[k][7] * path_final[k][8] * 1000) / (
+                                                                                               time_service - path_final[k][
+                                                                                                   5])) / 2.0
+                                                                        upde = updateonexit(p, s, d, flow_type, min_rate,
+                                                                                            flownumber, userpriority,
+                                                                                            path_final[k][0], path_final, wt_matx,
+                                                                                            wt_matx_real,
+                                                                                            wt_matx_real1, blockstate)
+                                                                        upde.execute()
+                                                                        s = upde.s
+                                                                        d = upde.d
+                                                                        flow_type = upde.flow_type
+                                                                        min_rate = upde.min_rate
+                                                                        flownumber = upde.flownumber
+                                                                        userpriority = upde.userpriority
+                                                                        wt_matx = upde.wt_matx
+                                                                        wt_matx_real = upde.wt_matx_real
+                                                                        wt_matx_real1 = upde.wt_matx_real1
+                                                                        path_final = upde.path_final
+                                                                        blockstate = upde.blockstate
 
-                                                                    # Debugging
-                                                                    np.savetxt("updweightmatx.csv", 1 / wt_matx,
-                                                                               delimiter=",")
-                                                                    np.savetxt("updorweightmatxreal.csv",
-                                                                               1 / wt_matx_real, delimiter=",")
-                                                                    np.savetxt("updorweightmatxreal1.csv",
-                                                                               1 / wt_matx_real1, delimiter=",")
-                                                                    # print("WFIN")
+                                                                        # Debugging
+                                                                        np.savetxt("updweightmatx.csv", 1 / wt_matx,
+                                                                                   delimiter=",")
+                                                                        np.savetxt("updorweightmatxreal.csv",
+                                                                                   1 / wt_matx_real, delimiter=",")
+                                                                        np.savetxt("updorweightmatxreal1.csv",
+                                                                                   1 / wt_matx_real1, delimiter=",")
+                                                                        # print("WFIN")
 
-                                                                    total_matx = np.sum(1 / wt_matx)
-                                                                    total_real = np.sum(1 / wt_matx_real)
-                                                                    total_real1 = np.sum(1 / wt_matx_real1)
-                                                                    k = 0
-                                                                    weight_diff = 0
-                                                                    realweight_diff = 0
-                                                                    while path_final[k][0] != 0:
-                                                                        j = 11
-                                                                        while path_final[k][j] != 0:
-                                                                            weight_diff = weight_diff + path_final[k][4]
+                                                                        total_matx = np.sum(1 / wt_matx)
+                                                                        total_real = np.sum(1 / wt_matx_real)
+                                                                        total_real1 = np.sum(1 / wt_matx_real1)
+                                                                        k = 0
+                                                                        weight_diff = 0
+                                                                        realweight_diff = 0
+                                                                        while path_final[k][0] != 0:
+                                                                            j = 11
+                                                                            while path_final[k][j] != 0:
+                                                                                weight_diff = weight_diff + path_final[k][4]
+                                                                                if path_final[k][1] == 0:
+                                                                                    realweight_diff = realweight_diff + \
+                                                                                                      path_final[k][4]
+                                                                                j += 1
+                                                                            weight_diff = weight_diff - path_final[k][4]
                                                                             if path_final[k][1] == 0:
-                                                                                realweight_diff = realweight_diff + \
-                                                                                                  path_final[k][4]
-                                                                            j += 1
-                                                                        weight_diff = weight_diff - path_final[k][4]
-                                                                        if path_final[k][1] == 0:
-                                                                            realweight_diff = realweight_diff - path_final[k][4]
-                                                                        k += 1
-                                                                    if (orig_total_matx - total_matx - weight_diff) > 2:
-                                                                        print "Oops"
-                                                                    if (orig_total_real1 - total_real1 - realweight_diff) > 2:
-                                                                        print "Oops"
+                                                                                realweight_diff = realweight_diff - path_final[k][4]
+                                                                            k += 1
+                                                                        if (orig_total_matx - total_matx - weight_diff) > 2:
+                                                                            print "Oops"
+                                                                        if (orig_total_real1 - total_real1 - realweight_diff) > 2:
+                                                                            print "Oops"
 
-                                                                break
-                                                            k += 1
-                                                    ################################ File Mean Delay Calculations #############
-                                                    if File_Mean == 0:
-                                                        File_Mean = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time
+                                                                    break
+                                                                k += 1
+                                                        ################################ File Mean Delay Calculations #############
+                                                        if File_Mean == 0:
+                                                            File_Mean = nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time
+                                                        else:
+                                                            File_Mean = (File_Mean + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                     else:
-                                                        File_Mean = (File_Mean + nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
-                                                else:
-                                                    # nodes_nonreal[str(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
-                                                    # nodes_total_nonreal_packets[nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
-                                                    bisect.insort_left(nodes_nonreal[(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
-                                                                       Packets(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
-                                                                               nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
-                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])].pop(0)
+                                                        # nodes_nonreal[str(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0])
+                                                        # nodes_total_nonreal_packets[nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
+                                                        bisect.insort_left(nodes_nonreal[(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
+                                                                           Packets(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].path,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].direction,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
+                                                                                   nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
+                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])].pop(0)
                         time_service = time_service + file_packet_size / 80000
         else:  # Either new flow has arrived or all packets have been served.
             timecurrent = c  # Current Time = Arrival Time
