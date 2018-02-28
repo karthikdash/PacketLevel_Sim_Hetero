@@ -54,7 +54,7 @@ file_packet_size = 256.00
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.001
+lamb = 0.09
 
 # (MB/frameSize * [Linke Rates corresponding to link_src[i],link_dest[j]]
 link_rate = np.multiply((1000000.0/voice_packet_size), [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2])
@@ -68,7 +68,7 @@ packet_datarate = [22000.0, 80000.0, 22000.0, 11000.0, 400000.0, 400000.0, 40000
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]
-arrivalrate = np.multiply(0.001, np.ones((12)))
+arrivalrate = np.multiply(0.009, np.ones((12)))
 servicetime = np.multiply(150, np.ones((12)))
 
 # Video,Voice and Data
@@ -77,7 +77,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 10000
+limit = 50000
 # Observation from 'start' iteration ?
 start = 50
 
@@ -972,6 +972,9 @@ Voice_Mean_Total = 0
 Video_Mean_Total = 0
 File_Mean_Total = 0
 
+Video_e2e = 0
+Video_e2e_Count = 0
+
 serviceend_time = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 final_packets_tracker = []
 timetracker = []
@@ -1022,6 +1025,8 @@ c = 0
 
 while(countarrival < limit - 1):
     print countarrival, "countarrival", packetcounter , time_service
+    if countarrival > 50:
+        print (Video_e2e/100)/Video_e2e_Count
 
     # We find the minimum get the first arriving flow and hence source node for that corresponding time
     c = flowarrivaltime.min()  # Minimum Value
@@ -1549,6 +1554,8 @@ while(countarrival < limit - 1):
                                                                     path_final[k][2] -= 1
                                                                     path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                     packetcounter += 1
+                                                                    Video_e2e += time_service - nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time
+                                                                    Video_e2e_Count += 1
                                                                     if path_final[k][2] < 1:
                                                                         print "finished"
                                                                         Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
@@ -1613,6 +1620,8 @@ while(countarrival < limit - 1):
                                                                 if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                     path_final[k + 1][2] -= 1
                                                                     path_final[k + 1][9] = (path_final[k + 1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                    Video_e2e += time_service - nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time
+                                                                    Video_e2e_Count += 1
                                                                     packetcounter += 1
                                                                     if path_final[k + 1][2] < 1:
                                                                         print "finished reverse"
@@ -2073,6 +2082,8 @@ while(countarrival < limit - 1):
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
                                                                 path_final[k][2] -= 1
                                                                 path_final[k][9] = (path_final[k][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
+                                                                Video_e2e += time_service - nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time
+                                                                Video_e2e_Count += 1
                                                                 packetcounter += 1
                                                                 if path_final[k][2] < 1:
                                                                     print "finished"
@@ -2135,6 +2146,8 @@ while(countarrival < limit - 1):
                                                     else:
                                                         while path_final[k][0] != 0:
                                                             if path_final[k][0] == nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber:
+                                                                Video_e2e += time_service - nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time
+                                                                Video_e2e_Count += 1
                                                                 path_final[k + 1][2] -= 1
                                                                 path_final[k+1][9] = (path_final[k+1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
