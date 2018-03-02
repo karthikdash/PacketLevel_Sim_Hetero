@@ -6,13 +6,35 @@ class dijkstra(object):
     visited = []
     parent = []
 
-    def __init__(self, s, d, wt_matx):
+    def __init__(self, s, d, wt_matx, min_rate):
         self.s = np.array(s, dtype=np.int)
         self.d = np.array(d, dtype=np.int)
         self.wt_matx = wt_matx
+        self.min_rate = min_rate
 
     def execute(self):
         # print (self.wt_matx), "lordvader"
+        # path = []
+        # k11 = np.genfromtxt('K8.csv', delimiter=',', dtype=int)
+        # [m1, n1] = np.shape(k11)
+        # for i in range(0, m1):
+        #     if k11[i][0] == self.s:
+        #         for j in range(0, n1):
+        #             if k11[i][j] == self.d:
+        #                 path = k11[i]
+        #                 break
+        #
+        # for k in range(1, n1-1):
+        #     if path[k] != 0:
+        #         if self.wt_matx[path[k-1]-1][path[k]-1] <= 0:
+        #             return []
+        # path = filter(lambda a: a != 0, path)
+        # return path
+        # if path[-1] == 0:
+        #     return path[:-1]
+        # return path
+
+
         [m, n] = np.shape(self.wt_matx)
         visited = np.zeros((n))
         parent = np.zeros((n))
