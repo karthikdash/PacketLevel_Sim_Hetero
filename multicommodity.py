@@ -80,7 +80,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 20000
+limit = 1000
 # Observation from 'start' iteration ?
 start = 50
 scale = 100.0

@@ -5,7 +5,7 @@ import numpy as np
 # 0.02 + 0.001*8
 # 0.02 + 0.005*9
 # 0.001 + 0.001*10
-lamb = np.arange(0.002, 0.01, 0.001)
+lamb = np.arange(0.001, 0.01, 0.001)
 
 print lamb
 final_csv = np.zeros((len(lamb),8))
