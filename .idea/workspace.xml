@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="41" mnemonic="0" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1255" mnemonic="3" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2671" mnemonic="9" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1078" mnemonic="2" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="113" mnemonic="0" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="995" mnemonic="3" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="812" mnemonic="2" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2250" mnemonic="7" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2032" mnemonic="8" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2465" mnemonic="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2957740d-62cf-4df3-9d86-404251eb1ae1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/csvgen.py" afterPath="$PROJECT_DIR$/csvgen.py" />
       <change beforePath="$PROJECT_DIR$/multicommodity.py" afterPath="$PROJECT_DIR$/multicommodity.py" />
-      <change beforePath="$PROJECT_DIR$/packet_new.csv" afterPath="$PROJECT_DIR$/packet_new.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.001.csv" afterPath="$PROJECT_DIR$/results0.001.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.003.csv" afterPath="$PROJECT_DIR$/results0.003.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.004.csv" afterPath="$PROJECT_DIR$/results0.004.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.005.csv" afterPath="$PROJECT_DIR$/results0.005.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.006.csv" afterPath="$PROJECT_DIR$/results0.006.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.007.csv" afterPath="$PROJECT_DIR$/results0.007.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.008.csv" afterPath="$PROJECT_DIR$/results0.008.csv" />
+      <change beforePath="$PROJECT_DIR$/results0.009.csv" afterPath="$PROJECT_DIR$/results0.009.csv" />
+      <change beforePath="$PROJECT_DIR$/updateonentry1.py" afterPath="$PROJECT_DIR$/updateonentry1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,19 +45,12 @@
       <file leaf-file-name="multicommodity.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/multicommodity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="34" column="11" lean-forward="true" selection-start-line="34" selection-start-column="11" selection-end-line="34" selection-end-column="11" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="csvgen.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/csvgen.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="196">
+              <caret line="680" column="40" lean-forward="false" selection-start-line="680" selection-start-column="40" selection-end-line="680" selection-end-column="40" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#103496#139327#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -68,7 +68,7 @@
       <file leaf-file-name="dijkstra.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dijkstra.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="990">
+            <state relative-caret-position="1386">
               <caret line="77" column="0" lean-forward="false" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
               <folding />
             </state>
@@ -78,8 +78,8 @@
       <file leaf-file-name="updateonentry1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/updateonentry1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3096">
-              <caret line="175" column="25" lean-forward="false" selection-start-line="175" selection-start-column="25" selection-end-line="175" selection-end-column="25" />
+            <state relative-caret-position="-257">
+              <caret line="145" column="40" lean-forward="false" selection-start-line="145" selection-start-column="40" selection-end-line="145" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -88,7 +88,7 @@
       <file leaf-file-name="Packets.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Packets.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="864">
+            <state relative-caret-position="395">
               <caret line="50" column="50" lean-forward="false" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="50" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -101,13 +101,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>print</find>
-      <find>9:p+9</find>
-      <find>p+9</find>
-      <find>finished</find>
-      <find>voice_mean</find>
-      <find>path_final[k]]</find>
-      <find>path_final[k + 1][18]</find>
       <find>path_final[k][11:p + 11]</find>
       <find>path_final[k+1][18]</find>
       <find>path_final[k+1][20]</find>
@@ -131,6 +124,13 @@
       <find>232</find>
       <find>File_e2e</find>
       <find>csv</find>
+      <find>File_e2e_Count</find>
+      <find>servicetime</find>
+      <find>source1</find>
+      <find>noOfNodes</find>
+      <find>initial_service_end</find>
+      <find>File_Mean_Total_Time_Satellite</find>
+      <find>continue</find>
     </findStrings>
     <replaceStrings>
       <replace>call1</replace>
@@ -154,21 +154,21 @@
       <list>
         <option value="$PROJECT_DIR$/call12.py" />
         <option value="$PROJECT_DIR$/Packets.py" />
-        <option value="$PROJECT_DIR$/updateonentry1.py" />
         <option value="$PROJECT_DIR$/call1.py" />
         <option value="$PROJECT_DIR$/updateonexit.py" />
         <option value="$PROJECT_DIR$/dijkstra.py" />
-        <option value="$PROJECT_DIR$/multicommodity.py" />
         <option value="$PROJECT_DIR$/csvgen.py" />
         <option value="$PROJECT_DIR$/results0.001.csv" />
+        <option value="$PROJECT_DIR$/updateonentry1.py" />
+        <option value="$PROJECT_DIR$/multicommodity.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2216" />
-    <option name="y" value="156" />
-    <option name="width" value="1391" />
-    <option name="height" value="756" />
+    <option name="x" value="1984" />
+    <option name="y" value="-4" />
+    <option name="width" value="1857" />
+    <option name="height" value="1085" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -188,7 +188,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -201,11 +200,12 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../IFTTT/New/10_nodes" />
+    <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/WebScrapping" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -224,7 +224,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.csvgen">
+  <component name="RunManager" selected="Python.multicommodity">
     <configuration name="csvgen" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -390,8 +390,8 @@
     </list>
     <recent_temporary>
       <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Python.csvgen" />
-        <item index="1" class="java.lang.String" itemvalue="Python.multicommodity" />
+        <item index="0" class="java.lang.String" itemvalue="Python.multicommodity" />
+        <item index="1" class="java.lang.String" itemvalue="Python.csvgen" />
       </list>
     </recent_temporary>
   </component>
@@ -422,15 +422,16 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14465065" sideWeight="0.4941003" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32150313" sideWeight="0.49811321" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29227558" sideWeight="0.5032751" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.4967249" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32879582" sideWeight="0.4967249" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2052356" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2052356" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3497382" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13591704" sideWeight="0.5058997" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -471,68 +472,78 @@
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1464</line>
+          <line>1204</line>
           <option name="timeStamp" value="396" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1557</line>
+          <line>1297</line>
           <option name="timeStamp" value="399" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1617</line>
+          <line>1357</line>
           <option name="timeStamp" value="402" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1867</line>
+          <line>1622</line>
           <option name="timeStamp" value="406" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2257</line>
+          <line>2012</line>
           <option name="timeStamp" value="408" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2445</line>
+          <line>2211</line>
           <option name="timeStamp" value="414" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1615</line>
+          <line>1355</line>
           <option name="timeStamp" value="418" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1555</line>
+          <line>1295</line>
           <option name="timeStamp" value="419" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1462</line>
+          <line>1202</line>
           <option name="timeStamp" value="420" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1405</line>
+          <line>1145</line>
           <option name="timeStamp" value="422" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1407</line>
+          <line>1147</line>
           <option name="timeStamp" value="423" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1577</line>
+          <line>1317</line>
           <option name="timeStamp" value="429" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2440</line>
+          <line>2206</line>
           <option name="timeStamp" value="431" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/multicommodity.py</url>
+          <line>1524</line>
+          <option name="timeStamp" value="446" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/multicommodity.py</url>
+          <line>2031</line>
+          <option name="timeStamp" value="447" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -545,7 +556,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="437" />
+      <option name="time" value="448" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -559,60 +570,53 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>'./results' + str(round(lam, 3)) + '.csv'</expression-string>
+        <expression-string>time_service - nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].initial_arrival_time</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>res1</expression-string>
+        <expression-string>nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].initial_arrival_time</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>final_csv[i,:] = res1</expression-string>
+        <expression-string>time_service - path_final[k][5]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>res1.shape</expression-string>
+        <expression-string>File_e2e/File_e2e_Count</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(Video_e2e1/100)/Video_e2e_Count1</expression-string>
+        <expression-string>File_Mean_Total_Time_WO_Satellite/File_Mean_Total_Time_Count_WO_Satellite</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(Video_e2e/100)/Video_e2e_Count</expression-string>
+        <expression-string>File_Mean_Total_Time_All/File_Mean_Total_Time_Count_All</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time</expression-string>
+        <expression-string>File_Mean_Total_Time_Satellite/File_Mean_Total_Time_Count_Satellite</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time_service</expression-string>
+        <expression-string>servicetime</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slots</expression-string>
+        <expression-string>min_rate1</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/dijkstra.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-150">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/call1.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -624,7 +628,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="25" column="11" lean-forward="false" selection-start-line="25" selection-start-column="11" selection-end-line="25" selection-end-column="11" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -642,7 +649,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -667,7 +677,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -692,7 +705,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -710,7 +726,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -728,7 +747,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -746,7 +768,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -781,7 +806,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="435">
           <caret line="57" column="31" lean-forward="false" selection-start-line="57" selection-start-column="31" selection-end-line="57" selection-end-column="31" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -789,7 +817,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -814,7 +845,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -839,7 +873,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -857,7 +894,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -875,7 +915,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -893,7 +936,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -921,7 +967,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -943,9 +992,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
           <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -953,11 +999,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2610">
           <caret line="148" column="0" lean-forward="false" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
-          <folding>
-            <marker date="1520829724101" expanded="true" signature="1197:1341" ph="..." />
-            <marker date="1520829724101" expanded="true" signature="1251:1341" ph="..." />
-            <marker date="1520829724101" expanded="true" signature="1320:1341" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -969,28 +1011,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Packets.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="864">
-          <caret line="50" column="50" lean-forward="false" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dijkstra.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
+        <state relative-caret-position="1386">
           <caret line="77" column="0" lean-forward="false" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/updateonentry1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3096">
-          <caret line="175" column="25" lean-forward="false" selection-start-line="175" selection-start-column="25" selection-end-line="175" selection-end-column="25" />
           <folding />
         </state>
       </provider>
@@ -999,7 +1023,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1007,7 +1030,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="103" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="103" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1015,7 +1037,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="103" lean-forward="false" selection-start-line="0" selection-start-column="103" selection-end-line="0" selection-end-column="103" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1023,7 +1044,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1031,15 +1051,42 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
           <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xfractions9.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/updateonentry1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-257">
+          <caret line="145" column="40" lean-forward="false" selection-start-line="145" selection-start-column="40" selection-end-line="145" selection-end-column="40" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Packets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="50" column="50" lean-forward="false" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/multicommodity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="34" column="11" lean-forward="true" selection-start-line="34" selection-start-column="11" selection-end-line="34" selection-end-column="11" />
-          <folding />
+        <state relative-caret-position="196">
+          <caret line="680" column="40" lean-forward="false" selection-start-line="680" selection-start-column="40" selection-end-line="680" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#103496#139327#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

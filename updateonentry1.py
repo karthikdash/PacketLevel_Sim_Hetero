@@ -96,7 +96,7 @@ class updateonentry1(object):
                             if self.path_final[loop][0] == 0:
                                 # print self.path_final
                                 # print path1
-                                if int(self.packet_datarate / scale / self.packet_size) < 1:
+                                if int(self.flow_duration) * int(self.packet_datarate / scale / (self.packet_size - self.header_size)) < 1:
                                     no_of_packets = int(self.flow_duration) * 1
                                 else:
                                     no_of_packets = int(self.flow_duration) * int(self.packet_datarate / scale / (self.packet_size - self.header_size))
@@ -140,7 +140,7 @@ class updateonentry1(object):
                         if self.path_final[loop][0] == 0:
                             # print self.path_final
                             # print path1
-                            if int(self.packet_datarate / scale / self.packet_size) < 1:
+                            if int(self.flow_duration) * int(self.packet_datarate / scale / (self.packet_size - self.header_size)) < 1:
                                 no_of_packets = int(self.flow_duration) * 1
                             else:
                                 no_of_packets = int(self.flow_duration) * int(self.packet_datarate / scale / (self.packet_size - self.header_size))
@@ -200,7 +200,7 @@ class updateonentry1(object):
                     # Not sure about this loop[0] or loop[1]
                     if self.path_final[loop][0] == 0:
                         # if int(self.flow_duration * (self.packet_datarate/scale) / self.packet_size) < 1:
-                        if int(self.flow_duration/self.packet_size/scale) < 1:
+                        if (self.flow_duration/(self.packet_size - self.header_size)/scale) < 1:
                             file_limit = 1
                         else:
                             file_limit = int(self.flow_duration/(self.packet_size - self.header_size)/scale)
