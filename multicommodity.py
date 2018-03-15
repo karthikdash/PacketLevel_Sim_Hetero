@@ -7,7 +7,9 @@ from allocaterealupdated1 import allocaterealupdated1
 from allocatenonrealupdated1 import allocatenonrealupdated1
 
 # Adapted Disjktra Packet Simulator for One Way Video Streaming
-
+lamb = 0.009
+limit = 20000
+hetero = False
 # from udpateonentry import updateonentry
 # Network Parameters
 connection_type = 0
@@ -135,7 +137,7 @@ file_packet_size = 256.00
 # Service Time is exponentially distributed with mean T
 T = 150
 # Arrival Rate
-lamb = 0.009
+
 scale = 100.0
 # (MB/frameSize * [Link Rates corresponding to link_src[i],link_dest[j]]
 link_rate = np.multiply((1000000.0/file_packet_size), link_rate_orig)
@@ -155,7 +157,10 @@ packet_datarate = np.multiply(data_require, 1000)
 min_rate1 = np.multiply(1000.0/232, data_require)
 min_rate2 = np.multiply(T*lamb*(1000.0/232), data_require)
 flow_type1 = [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2]*2 + [2]
-arrivalrate = np.multiply(lamb, np.ones((12+12+1)))
+if hetero:
+    arrivalrate = np.multiply(lamb, np.ones((12+12+1)))
+else:
+    arrivalrate = np.multiply(lamb, np.ones((12)))
 servicetime = np.append(np.multiply(150, np.ones((8))), np.multiply(7000000, np.ones((4))))
 servicetime = servicetime.tolist()*2 + [7000000]
 # Video,Voice and Data
@@ -164,7 +169,7 @@ connectiontypes = 3
 
 # Iterations (Higher value can lead to long execution times)
 # limit = 100000
-limit = 10000
+
 # Observation from 'start' iteration ?
 start = 50
 scale = 100.0
@@ -771,9 +776,10 @@ while(countarrival < limit - 1):
         voice_endtoend = (Voice_e2e / (scale)) / Voice_e2e_Count
         file_endtoend = (File_e2e / (scale)) / File_e2e_Count
         print lamb, fracvoice_algo1, fracvideo_algo1, fracnonreal_algo1, voice_endtoend, video_endtoend, file_endtoend, sj_time
-        print (File_Mean_Total_Time_Satellite/ (scale)) / File_Mean_Total_Time_Count_Satellite, \
-            (File_Mean_Total_Time_WO_Satellite / (scale)) / File_Mean_Total_Time_Count_WO_Satellite, \
-            (File_Mean_Total_Time_All / (scale)) / File_Mean_Total_Time_Count_All
+        if hetero:
+            print (File_Mean_Total_Time_Satellite/ (scale)) / File_Mean_Total_Time_Count_Satellite, \
+                (File_Mean_Total_Time_WO_Satellite / (scale)) / File_Mean_Total_Time_Count_WO_Satellite, \
+                (File_Mean_Total_Time_All / (scale)) / File_Mean_Total_Time_Count_All
 
 
     # We find the minimum get the first arriving flow and hence source node for that corresponding time
@@ -1152,7 +1158,7 @@ while(countarrival < limit - 1):
                                                                     Voice_e2e_Count += 1
                                                                     packetcounter += 1
                                                                     if path_final[k][2] < 1:
-                                                                        print "finished"
+                                                                        # print "finished"
                                                                         Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9]+path_final[k+1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1216,7 +1222,7 @@ while(countarrival < limit - 1):
                                                                     Voice_e2e_Count += 1
                                                                     packetcounter += 1
                                                                     if path_final[k + 1][2] < 1:
-                                                                        print "finished reverse"
+                                                                        # print "finished reverse"
                                                                         Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9]+path_final[k+1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1305,7 +1311,7 @@ while(countarrival < limit - 1):
                                                                     Video_e2e1 += nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time
                                                                     Video_e2e_Count1 += 1
                                                                     if path_final[k][2] < 1:
-                                                                        print "finished"
+                                                                        # print "finished"
                                                                         Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1369,7 +1375,7 @@ while(countarrival < limit - 1):
                                                                     Video_e2e_Count += 1
                                                                     packetcounter += 1
                                                                     if path_final[k + 1][2] < 1:
-                                                                        print "finished reverse"
+                                                                        # print "finished reverse"
                                                                         Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                         if True:
                                                                             upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1541,7 +1547,7 @@ while(countarrival < limit - 1):
                                                                             # if time_service - path_final[k][5] < 5:
                                                                             #     print "pop"
                                                                             number_soujorn += 1
-                                                                            print "finished"
+                                                                            # print "finished"
 
                                                                             if File_Mean_Speed == 0:
                                                                                 File_Mean_Speed = (File_Mean_Speed + (
@@ -1677,7 +1683,7 @@ while(countarrival < limit - 1):
                                                                 Voice_e2e_Count += 1
                                                                 packetcounter += 1
                                                                 if path_final[k][2] < 1:
-                                                                    print "finished"
+                                                                    # print "finished"
                                                                     Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1740,7 +1746,7 @@ while(countarrival < limit - 1):
                                                                 Voice_e2e_Count += 1
                                                                 packetcounter += 1
                                                                 if path_final[k+1][2] < 1:
-                                                                    print "finished reverse"
+                                                                    # print "finished reverse"
                                                                     Voice_Mean_Total = (Voice_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1817,7 +1823,7 @@ while(countarrival < limit - 1):
                                                                 Video_e2e_Count1 += 1
                                                                 packetcounter += 1
                                                                 if path_final[k][2] < 1:
-                                                                    print "finished"
+                                                                    # print "finished"
                                                                     Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -1880,7 +1886,7 @@ while(countarrival < limit - 1):
                                                                 path_final[k+1][9] = (path_final[k+1][9] + nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time) / 2.0
                                                                 packetcounter += 1
                                                                 if path_final[k + 1][2] < 1:
-                                                                    print "finished reverse"
+                                                                    # print "finished reverse"
                                                                     Video_Mean_Total = (Video_Mean_Total + ((path_final[k][9] + path_final[k + 1][9]) / 2.0)) / 2.0
                                                                     if True:
                                                                         upde = updateonexit(p, s, d, flow_type, min_rate,
@@ -2048,7 +2054,7 @@ while(countarrival < limit - 1):
                                                                         # if time_service - path_final[k][5] < 5:
                                                                         #     print "pop"
                                                                         number_soujorn += 1
-                                                                        print "finished"
+                                                                        # print "finished"
                                                                         if File_Mean_Speed == 0:
                                                                             File_Mean_Speed = (File_Mean_Speed + (
                                                                             path_final[k][7] * path_final[k][8] * 1000) / (
@@ -2459,17 +2465,24 @@ sj_time = sum_soujorn/number_soujorn*1.0
 video_endtoend = (Video_e2e/(scale))/Video_e2e_Count
 voice_endtoend = (Voice_e2e / (scale)) / Voice_e2e_Count
 file_endtoend = (File_e2e/(scale)) / File_e2e_Count
+if hetero:
+    file_endtoend_onlySatellite = (File_Mean_Total_Time_Satellite / (scale)) / File_Mean_Total_Time_Count_Satellite
+    file_endtoend_withoutSatellite = (File_Mean_Total_Time_WO_Satellite / (scale)) / File_Mean_Total_Time_Count_WO_Satellite
+    file_endtoend_combined = (File_Mean_Total_Time_All / (scale)) / File_Mean_Total_Time_Count_All
 print "Soujorn Time", sj_time
 print fracvoice_algo1, fracvideo_algo1, fracnonreal_algo1
 print "lambda", lamb
 print voice_endtoend, video_endtoend, file_endtoend
-print File_Mean_Total_Time_Satellite/1.0*File_Mean_Total_Time_Count_Satellite, \
-    File_Mean_Total_Time_WO_Satellite/1.0*File_Mean_Total_Time_Count_WO_Satellite, \
-    File_Mean_Total_Time_All/1.0*File_Mean_Total_Time_Count_All
 
 
-
-np.savetxt("results" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
-                                                      fracvideo_algo1, fracnonreal_algo1, sj_time,
-                                                      voice_endtoend,video_endtoend,file_endtoend
-                                                      ]]), delimiter=",", fmt="%.10f")
+if hetero:
+    np.savetxt("resultsHetero" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
+                                                          fracvideo_algo1, fracnonreal_algo1, sj_time,
+                                                          voice_endtoend,video_endtoend,file_endtoend, file_endtoend_onlySatellite, file_endtoend_withoutSatellite, file_endtoend_combined
+                                                          ]]), delimiter=",", fmt="%.10f")
+    print file_endtoend_onlySatellite, file_endtoend_withoutSatellite, file_endtoend_combined
+else:
+    np.savetxt("resultsHetero" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
+                                                                fracvideo_algo1, fracnonreal_algo1, sj_time,
+                                                                voice_endtoend, video_endtoend, file_endtoend
+                                                                ]]), delimiter=",", fmt="%.10f")

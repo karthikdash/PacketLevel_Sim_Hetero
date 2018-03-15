@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="113" mnemonic="0" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="995" mnemonic="3" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="812" mnemonic="2" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2250" mnemonic="7" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2032" mnemonic="8" />
-    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2465" mnemonic="9" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="115" mnemonic="0" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="1001" mnemonic="3" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="818" mnemonic="2" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2256" mnemonic="7" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2038" mnemonic="8" />
+    <bookmark url="file://$PROJECT_DIR$/multicommodity.py" line="2473" mnemonic="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2957740d-62cf-4df3-9d86-404251eb1ae1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/multicommodity.py" afterPath="$PROJECT_DIR$/multicommodity.py" />
-      <change beforePath="$PROJECT_DIR$/results0.003.csv" afterPath="$PROJECT_DIR$/results0.003.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.004.csv" afterPath="$PROJECT_DIR$/results0.004.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.005.csv" afterPath="$PROJECT_DIR$/results0.005.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.006.csv" afterPath="$PROJECT_DIR$/results0.006.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.007.csv" afterPath="$PROJECT_DIR$/results0.007.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.008.csv" afterPath="$PROJECT_DIR$/results0.008.csv" />
-      <change beforePath="$PROJECT_DIR$/results0.009.csv" afterPath="$PROJECT_DIR$/results0.009.csv" />
-      <change beforePath="$PROJECT_DIR$/updateonentry1.py" afterPath="$PROJECT_DIR$/updateonentry1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -45,11 +37,11 @@
       <file leaf-file-name="multicommodity.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/multicommodity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="680" column="40" lean-forward="false" selection-start-line="680" selection-start-column="40" selection-end-line="680" selection-end-column="40" />
+            <state relative-caret-position="162">
+              <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#103496#139327#0" expanded="false" />
+                <element signature="e#103625#139464#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -78,7 +70,7 @@
       <file leaf-file-name="updateonentry1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/updateonentry1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-257">
+            <state relative-caret-position="2556">
               <caret line="145" column="40" lean-forward="false" selection-start-line="145" selection-start-column="40" selection-end-line="145" selection-end-column="40" />
               <folding />
             </state>
@@ -88,7 +80,7 @@
       <file leaf-file-name="Packets.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Packets.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="395">
+            <state relative-caret-position="864">
               <caret line="50" column="50" lean-forward="false" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="50" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -101,7 +93,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>path_final[k][11:p + 11]</find>
       <find>path_final[k+1][18]</find>
       <find>path_final[k+1][20]</find>
       <find>asd</find>
@@ -131,6 +122,7 @@
       <find>initial_service_end</find>
       <find>File_Mean_Total_Time_Satellite</find>
       <find>continue</find>
+      <find>finished</find>
     </findStrings>
     <replaceStrings>
       <replace>call1</replace>
@@ -165,8 +157,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1984" />
-    <option name="y" value="-4" />
+    <option name="x" value="64" />
+    <option name="y" value="1076" />
     <option name="width" value="1857" />
     <option name="height" value="1085" />
   </component>
@@ -205,7 +197,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/WebScrapping" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -421,13 +413,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
+    <frame x="64" y="1076" width="1857" height="1085" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14465065" sideWeight="0.4941003" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14410481" sideWeight="0.4941003" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32150313" sideWeight="0.49811321" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29227558" sideWeight="0.5032751" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32879582" sideWeight="0.4967249" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.4967249" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -472,77 +464,77 @@
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1204</line>
+          <line>1210</line>
           <option name="timeStamp" value="396" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1297</line>
+          <line>1303</line>
           <option name="timeStamp" value="399" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1357</line>
+          <line>1363</line>
           <option name="timeStamp" value="402" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1622</line>
+          <line>1628</line>
           <option name="timeStamp" value="406" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2012</line>
+          <line>2018</line>
           <option name="timeStamp" value="408" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2211</line>
+          <line>2217</line>
           <option name="timeStamp" value="414" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1355</line>
+          <line>1361</line>
           <option name="timeStamp" value="418" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1295</line>
+          <line>1301</line>
           <option name="timeStamp" value="419" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1202</line>
+          <line>1208</line>
           <option name="timeStamp" value="420" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1145</line>
+          <line>1151</line>
           <option name="timeStamp" value="422" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1147</line>
+          <line>1153</line>
           <option name="timeStamp" value="423" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1317</line>
+          <line>1323</line>
           <option name="timeStamp" value="429" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2206</line>
+          <line>2212</line>
           <option name="timeStamp" value="431" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>1524</line>
+          <line>1530</line>
           <option name="timeStamp" value="446" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/multicommodity.py</url>
-          <line>2031</line>
+          <line>2037</line>
           <option name="timeStamp" value="447" />
         </line-breakpoint>
       </breakpoints>
@@ -630,7 +622,7 @@
           <caret line="25" column="11" lean-forward="false" selection-start-line="25" selection-start-column="11" selection-end-line="25" selection-end-column="11" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -651,7 +643,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -679,7 +671,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -707,7 +699,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -728,7 +720,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -749,7 +741,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -770,7 +762,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -808,7 +800,7 @@
           <caret line="57" column="31" lean-forward="false" selection-start-line="57" selection-start-column="31" selection-end-line="57" selection-end-column="31" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -819,7 +811,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -847,7 +839,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -875,7 +867,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -896,7 +888,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -917,7 +909,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -938,7 +930,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -969,7 +961,7 @@
           <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -999,7 +991,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2610">
           <caret line="148" column="0" lean-forward="false" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1063,7 +1054,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/updateonentry1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-257">
+        <state relative-caret-position="2556">
           <caret line="145" column="40" lean-forward="false" selection-start-line="145" selection-start-column="40" selection-end-line="145" selection-end-column="40" />
           <folding />
         </state>
@@ -1071,7 +1062,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Packets.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="395">
+        <state relative-caret-position="864">
           <caret line="50" column="50" lean-forward="false" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="50" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
@@ -1081,11 +1072,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/multicommodity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="680" column="40" lean-forward="false" selection-start-line="680" selection-start-column="40" selection-end-line="680" selection-end-column="40" />
+        <state relative-caret-position="162">
+          <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#103496#139327#0" expanded="false" />
+            <element signature="e#103625#139464#0" expanded="false" />
           </folding>
         </state>
       </provider>
