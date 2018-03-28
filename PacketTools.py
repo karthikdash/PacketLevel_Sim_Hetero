@@ -50,7 +50,7 @@ def currentNonrealQueue(source, dest, nodes_nonreal):
     return np.random.choice(active_indices)
 
 
-def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
+def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal, time_service):
     flag = 1
     for jj in range(1, len(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])])):
         if len(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])][jj]) != 0:
@@ -60,6 +60,10 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                     init_arrival_time_add = 25  # adding 250 ms (250 ms * 100 because of scale factor) propogation delay for satellite
                 else:
                     init_arrival_time_add = 0
+                if nodes_nonreal[(source, dest)][inde][0].addedAtSource:
+                    timeToBeAdded = time_service
+                else:
+                    timeToBeAdded = nodes_nonreal[(source, dest)][inde][0].noofpackets
                 bisect.insort_left(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])][jj],
                                    Packets(nodes_nonreal[(source, dest)][inde][0].initial_arrival_time,
                                            nodes_nonreal[(source, dest)][inde][0].service_end_time + init_arrival_time_add,
@@ -67,11 +71,12 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                                            nodes_nonreal[(source, dest)][inde][0].flow_tag,
                                            nodes_nonreal[(source, dest)][inde][0].path,
                                            nodes_nonreal[(source, dest)][inde][0].flownumber,
-                                           nodes_nonreal[(source, dest)][inde][0].noofpackets,
+                                           timeToBeAdded,
                                            nodes_nonreal[(source, dest)][inde][0].direction,
                                            nodes_nonreal[(source, dest)][inde][0].node_service_rate,
                                            nodes_nonreal[(source, dest)][inde][0].total_slot_time,
-                                           nodes_nonreal[(source, dest)][inde][0].total_slots))
+                                           nodes_nonreal[(source, dest)][inde][0].total_slots,
+                                           False))
                 return nodes_nonreal
             # else:
             #     if len(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])][jj + 1]) == 0:
@@ -96,6 +101,10 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                     init_arrival_time_add = 25  # adding 250 ms (250 ms * 100 because of scale factor) propogation delay for satellite
                 else:
                     init_arrival_time_add = 0
+                if nodes_nonreal[(source, dest)][inde][0].addedAtSource:
+                    timeToBeAdded = time_service
+                else:
+                    timeToBeAdded = nodes_nonreal[(source, dest)][inde][0].noofpackets
                 bisect.insort_left(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])][jj],
                                    Packets(nodes_nonreal[(source, dest)][inde][0].initial_arrival_time,
                                            nodes_nonreal[(source, dest)][inde][0].service_end_time + init_arrival_time_add,
@@ -103,11 +112,12 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                                            nodes_nonreal[(source, dest)][inde][0].flow_tag,
                                            nodes_nonreal[(source, dest)][inde][0].path,
                                            nodes_nonreal[(source, dest)][inde][0].flownumber,
-                                           nodes_nonreal[(source, dest)][inde][0].noofpackets,
+                                           timeToBeAdded,
                                            nodes_nonreal[(source, dest)][inde][0].direction,
                                            nodes_nonreal[(source, dest)][inde][0].node_service_rate,
                                            nodes_nonreal[(source, dest)][inde][0].total_slot_time,
-                                           nodes_nonreal[(source, dest)][inde][0].total_slots))
+                                           nodes_nonreal[(source, dest)][inde][0].total_slots,
+                                           False))
                 return nodes_nonreal
     # print "nononon"
     for jj in range(1, len(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])])):
@@ -116,6 +126,10 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                 init_arrival_time_add = 25  # adding 250 ms (250 ms * 100 because of scale factor) propogation delay for satellite
             else:
                 init_arrival_time_add = 0
+            if nodes_nonreal[(source, dest)][inde][0].addedAtSource:
+                timeToBeAdded = time_service
+            else:
+                timeToBeAdded = nodes_nonreal[(source, dest)][inde][0].noofpackets
             bisect.insort_left(nodes_nonreal[(nodes_nonreal[(source, dest)][current_nr_index][0].d_new, nodes_nonreal[(source, dest)][inde][0].path[1])][jj],
                                Packets(nodes_nonreal[(source, dest)][inde][0].initial_arrival_time,
                                        nodes_nonreal[(source, dest)][inde][0].service_end_time + init_arrival_time_add,
@@ -123,11 +137,12 @@ def appendNonRealQueue(source, dest, inde, current_nr_index, nodes_nonreal):
                                        nodes_nonreal[(source, dest)][inde][0].flow_tag,
                                        nodes_nonreal[(source, dest)][inde][0].path,
                                        nodes_nonreal[(source, dest)][inde][0].flownumber,
-                                       nodes_nonreal[(source, dest)][inde][0].noofpackets,
+                                       timeToBeAdded,
                                        nodes_nonreal[(source, dest)][inde][0].direction,
                                        nodes_nonreal[(source, dest)][inde][0].node_service_rate,
                                        nodes_nonreal[(source, dest)][inde][0].total_slot_time,
-                                       nodes_nonreal[(source, dest)][inde][0].total_slots))
+                                       nodes_nonreal[(source, dest)][inde][0].total_slots,
+                                       False))
             return nodes_nonreal
 
 def removeFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
@@ -196,7 +211,7 @@ def removeFileFlow(path_final, nodes_nonreal, node_no, node_links, next_nodeno, 
     while path_final[k][0] != 0:
         if path_final[k][0] == nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].flownumber:
             path_final[k][2] -= 1
-            File_e2e += time_service - nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].initial_arrival_time
+            File_e2e += time_service - nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].noofpackets
             File_e2e_Count += 1
 
             if path_final[k][2] < 1:

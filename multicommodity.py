@@ -2,15 +2,15 @@ import numpy as np
 from updateonentry1 import findRoute
 from Packets import Packets
 import bisect
-from debugTools import checkSystemResources, displayStats
-from PacketTools import nodesHavePackets, realnodesHavePackets, nonrealnodesHavePackets, dataPacketsAvailable, currentNonrealQueue, appendNonRealQueue, removeFlow, removeReverseFlow, removeFileFlow
+from debugTools import checkSystemResources, displayStats, makeCSV
+from PacketTools import *
 from allocaterealupdated1 import allocaterealupdated1
 from allocatenonrealupdated1 import allocatenonrealupdated1
-
+from PacketSimulation import packetSimulation
 # Adapted Dijkstra Packet Simulator for One Way Video Streaming
 
 lamb = 0.009  # Arrival lambda at the source
-limit = 20000  # Total number of flows the simulation will execute
+limit = 10000  # Total number of flows the simulation will execute
 start = 50  # Statistics are computes from this flow arrival
 
 # In order to increase the number of flows simulated for a given time,
@@ -35,17 +35,18 @@ link_dest = [2, 8, 3, 9, 4, 5, 10, 6, 7, 10, 7, 8, 10, 10]
 
 link_factor = 1  # Useful for increasing the link capacities
 
-numberOfLinks = len(link_src) * 2  # Becuase we take bidrection links, we reverse each link
+numberOfLinks = len(link_src)  # Becuase we take bidrection links, we reverse each link
 
 caps = [2] * numberOfLinks  # Link rate in Mbps
+caps = [2, 2, 8, 8, 2, 8, 2, 8, 8, 2, 2, 2, 8, 2]  # Link rate in Mbps
 link_rate_orig = np.multiply(link_factor, caps)
 
-packet_size = 500.00  # Bits
+packet_size = 512.00  # Bits
 header_size = 48.00  # Bits
 
 link_onprob1 = [0.3] * numberOfLinks
 
-link_errorprob1 = [0.05] * numberOfLinks 
+link_errorprob1 = [0.05] * numberOfLinks
 
 link_onprob2 = [0.3] * numberOfLinks
 
@@ -152,7 +153,7 @@ with np.errstate(divide='ignore', invalid='ignore'):
     # Adapted Dijkstra Weights. This is equivalent to 1/ (u - F)
     wt_matx = np.divide(1, eff_capacity_matx)
     wt_matx_real = np.divide(1, eff_capacity_matx)
-    wt_matx_real1 = np.divide(1.33, eff_capacity_matx)
+    wt_matx_real1 = np.divide(10.0/8.5, eff_capacity_matx)
 
 source = []
 destination = []
@@ -495,7 +496,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6],
                                 path_final[k][6],
                                 path_final[k][7], 0, path_final[k][15:25].tolist() + [0], path_final[k][0],
-                                path_final[k][2], True, path_final[k][8], 0, 0))
+                                path_final[k][2], True, path_final[k][8], 0, 0, True))
                             if countarrival == 1:
                                 time_service = path_final[k][6]
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / packet_size))
@@ -506,7 +507,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6],
                                 path_final[k][6],
                                 path_final[k][7], 0, path_final[k][15:25].tolist() + [0], path_final[k][0],
-                                path_final[k][2], False, path_final[k][8], 0, 0))
+                                path_final[k][2], False, path_final[k][8], 0, 0, True))
                             path_final[k][6] = path_final[k][6] + float(1.0 / ((path_final[k][8]) / packet_size))
                             k += 1
                         #elif path_final[k][3] == 1 and (path_final[k][6] - float(1.0 / ((path_final[k][8]) / packet_size))) <= (time_service + packet_size / 20000):  # Video Calls
@@ -515,7 +516,7 @@ while(countarrival < limit - 1):
                                 path_final[k][6],
                                 path_final[k][6],
                                 path_final[k][7], 1, path_final[k][15:25].tolist() + [0], path_final[k][0],
-                                path_final[k][2], True, path_final[k][8], 0, 0))
+                                path_final[k][2], True, path_final[k][8], 0, 0, True))
                             # nodes_total_real_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
                             if countarrival == 1:
                                 time_service = path_final[k][6]
@@ -535,7 +536,7 @@ while(countarrival < limit - 1):
                                                 path_final[k][6],
                                                 path_final[k][6],
                                                 path_final[k][7], 2, path_final[k][15:25].tolist(), path_final[k][0],
-                                                path_final[k][2], True, path_final[k][8] / 100.0, 0, 0))
+                                                path_final[k][2], True, path_final[k][8] / 100.0, 0, 0, True))
                                         path_final[k][14] = 1  # Complete flow packets have been added to the queue
                                         break
                                 # nodes_total_nonreal_packets[int(path_final[k][11])-1][int(path_final[k][12])-1] += 1
@@ -585,259 +586,24 @@ while(countarrival < limit - 1):
                                 nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
                         break
                     for i in range(0, 3, 1):
-                        if time_service <= min_arrivaltime:
-                            for node_no in range(1, noOfNodes + 1, 1):
-                                for next_nodeno in range(0, len(node_links[node_no]), 1):
-                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0 and len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) > 0:
-                                        nodes_slot_unused[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                    if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
-                                        nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
+                        min_arrivaltime, noOfNodes, B, C, packet_size, path_final, nodes_real, node_links, time_service, Voice_e2e, Voice_e2e_Count,\
+                        Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, \
+                        wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, scale, nodes_nonreal, \
+                        sum_soujorn, number_soujorn = \
+                        packetSimulation(min_arrivaltime, noOfNodes, B, C, packet_size, path_final, nodes_real, node_links, time_service, Voice_e2e, Voice_e2e_Count,
+                                         Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
+                                         wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, scale, nodes_nonreal,
+                                         sum_soujorn, number_soujorn, False)
 
-                                        s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
-                                        d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-                                        #if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service and B[s_link - 1][d_link - 1] == 8:
-                                        if B[s_link - 1][d_link - 1] == 8:
-                                            if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) == 0:
-                                                continue  # Continue checking other nodes for servicable packets
-                                            s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
-                                            d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-                                            link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                            # link_retransmit_prob = 1
-                                            for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
-                                                nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(packet_size / 80000)
-
-                                            nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
-                                            nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service(
-                                                max(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),
-                                                B[s_link - 1][d_link - 1], False, link_retransmit_prob,
-                                                packet_size / 80000)
-
-                                            if link_retransmit_prob == 1:
-                                                # Appending to the next node receiving Queue
-                                                if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new == 99:
-                                                    cur_connection_type = nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag
-                                                    if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag == 0:
-                                                        ################### Decrementing the packet count from path_final ############
-                                                        if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                            # path_final[nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber ][2] -= 1
-                                                            path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                                removeFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                       Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                       wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                        else:
-                                                            path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                                removeReverseFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                              Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                              wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                    else:
-                                                        ################### Decrementing the packet count from path_final ############
-                                                        if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                            path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                                removeFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                       Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                       wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                        else:
-                                                            path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                                removeReverseFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                              Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                              wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-
-                                                else:
-                                                    # nodes_real[str(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(nodes_real[(node_no, node_links[node_no][next_nodeno])][0])
-                                                    # nodes_real[str(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new)].append(Packets(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_duration, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber))
-                                                    # nodes_total_real_packets[nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new-1][nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1]-1] += 1
-                                                    bisect.insort_left(nodes_real[(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
-                                                                       Packets(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
-                                                                               nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
-                                                nodes_real[(node_no, node_links[node_no][next_nodeno])].pop(0)
-                                    else:
-                                        # for i in range(0, int(node_service_rate/packet_size) - 1, 1):
-                                        if dataPacketsAvailable(node_no, node_links[node_no][next_nodeno], nodes_nonreal):
-                                            current_nr_index = 0
-                                            current_nr_index = currentNonrealQueue(node_no, node_links[node_no][next_nodeno], nodes_nonreal)
-                                            nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                            nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-
-                                            #if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service and B[s_link - 1][d_link - 1] == 8:
-                                            s_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[0])
-                                            d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[1])
-                                            if B[s_link - 1][d_link - 1] == 8:
-                                                if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].flow_tag == 2:
-
-                                                    # Servicing for each individual node
-                                                    if len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) == 0:
-                                                        continue  # Continue for other servicable nodes
-
-                                                    if serviceend_time[node_no] == 0:
-                                                        initial_service_end = 1
-                                                    s_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[0])
-                                                    d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[1])
-                                                    link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-
-                                                    if node_no == 8 and node_links[node_no][next_nodeno] == 13:
-                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].arrival_time > time_service:
-                                                            link_retransmit_prob = 0
-                                                    if B[s_link - 1][d_link - 1] == 0:
-                                                        print "Inf"
-
-                                                    nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
-                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].service(
-                                                        max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].arrival_time, time_service), B[s_link - 1][d_link - 1],
-                                                        False, link_retransmit_prob, packet_size / (2000000 / scale))
-                                                    # Appending to the next node receiving Queue
-                                                    if link_retransmit_prob == 1:
-                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                                                            ################### Decrementing the packet count from path_final ############
-                                                            k = 0
-                                                            if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].direction == True:
-                                                                path_final, nodes_nonreal, node_no, node_links, next_nodeno, time_service, File_e2e, sum_soujorn, number_soujorn, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, current_nr_index, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1 = \
-                                                                    removeFileFlow(path_final, nodes_nonreal, node_no, node_links, next_nodeno, time_service, File_e2e, sum_soujorn, number_soujorn,
-                                                                               File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, current_nr_index,
-                                                                               wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1)
-                                                        else:
-                                                            nodes_nonreal = appendNonRealQueue(node_no, node_links[node_no][next_nodeno],current_nr_index, current_nr_index, nodes_nonreal)
-                                                        nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index].pop(0)
-                            time_service = time_service + packet_size / 80000
                     if time_service <= min_arrivaltime:
-                        for node_no in range(1, noOfNodes + 1, 1):
-                            for next_nodeno in range(0, len(node_links[node_no]), 1):
-                                if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) > 0:
-                                    nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                    nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                    # if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time >= max(serviceend_time):
-                                    arrivaltimes = []
-
-                                    #if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service:
-                                    if True:
-                                        # initial_service_end = serviceend_time[node_no]
-                                        # if serviceend_time[node_no] == 0:
-                                        #     initial_service_end = 1
-                                        # Each node gets serviced here
-                                        if len(nodes_real[(node_no, node_links[node_no][next_nodeno])]) == 0:
-                                            continue  # Continue checking other nodes for servicable packets
-                                        s_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[0])
-                                        d_link = int(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])
-                                        link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-                                        # link_retransmit_prob = 1
-
-                                        for packetno in range(0, len(nodes_real[(node_no, node_links[node_no][next_nodeno])]), 1):
-                                            nodes_real[(node_no, node_links[node_no][next_nodeno])][packetno].addSlotDelay(packet_size / 20000)
-
-                                        nodes_slot_queue_real_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_real[(node_no, node_links[node_no][next_nodeno])])
-
-                                        nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service(max(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].arrival_time, time_service),B[s_link - 1][d_link - 1], False, link_retransmit_prob, packet_size/20000)
-                                        # Appending to the serving Queue
-                                        # serviceend_time[node_no] = nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time
-                                        # packets_tracker[str(node_no)].append(nodes_real[(node_no, node_links[node_no][next_nodeno])][0])
-                                        if link_retransmit_prob == 1:
-
-                                                # if Voice_Mean_Time[node_no] > 1:
-                                                    # print "no"
-                                            # Appending to the next node receiving Queue
-                                            if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new == 99:
-                                                cur_connection_type = nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag
-                                                if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag == 0:
-                                                    if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                        path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                            removeFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                   Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                   wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                    else:
-                                                        path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                            removeReverseFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                          Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                          wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                else:
-                                                    ################### Decrementing the packet count from path_final ############
-                                                    if nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction == True:
-                                                        path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                            removeFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                   Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                   wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                                    else:
-                                                        path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count, Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, connection_type = \
-                                                            removeReverseFlow(path_final, nodes_real, node_no, node_links, next_nodeno, time_service, Voice_e2e, Voice_e2e_Count,
-                                                                          Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
-                                                                          wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, cur_connection_type)
-                                            else:
-                                                bisect.insort_left(nodes_real[(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].d_new, nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path[1])],
-                                                                   Packets(nodes_real[(node_no, node_links[node_no][next_nodeno])][0].initial_arrival_time,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].service_end_time,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_duration,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flow_tag,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].path,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].flownumber,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].noofpackets,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].direction,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].node_service_rate,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slot_time,
-                                                                           nodes_real[(node_no, node_links[node_no][next_nodeno])][0].total_slots))
-                                            nodes_real[(node_no, node_links[node_no][next_nodeno])].pop(0)
-                                else:
-                                    # for i in range(0, int(node_service_rate/packet_size) - 1, 1):
-                                    if dataPacketsAvailable(node_no, node_links[node_no][next_nodeno], nodes_nonreal):
-                                        current_nr_index = 0
-                                        current_nr_index = currentNonrealQueue(node_no, node_links[node_no][next_nodeno], nodes_nonreal)
-                                        nodes_slot_used[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        nodes_slot_total[node_no-1][node_links[node_no][next_nodeno]-1] += 1
-                                        arrivaltimes = []
-
-                                        #if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][0].arrival_time <= time_service:
-                                        if True:
-                                            if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].flow_tag == 2:
-                                                # initial_service_end = serviceend_time[node_no]
-                                                # if serviceend_time[node_no] == 0:
-                                                #     initial_service_end = 1
-                                                # Servicing for each individual node
-                                                if len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]) == 0:
-                                                    continue  # Continue for other servicable nodes
-
-                                                # if serviceend_tim///////////e[node_no] == 0:
-                                                #     initial_service_end = 1
-                                                if len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index]) == 0:
-                                                    print "trouble"
-                                                s_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[0])
-                                                d_link = int(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].path[1])
-                                                link_retransmit_prob = np.random.choice(np.arange(0, 2), p=[
-                                                    1 - C[s_link - 1][d_link - 1], C[s_link - 1][d_link - 1]])
-
-                                                if node_no == 8 and node_links[node_no][next_nodeno] == 13:
-                                                    if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].arrival_time > time_service:
-                                                        link_retransmit_prob = 0
-
-                                                if B[s_link - 1][d_link - 1] == 0:
-                                                    print "Inf"
-                                                # for packetno in range(0, len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])]), 1):
-                                                #     nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][packetno].addSlotDelay(packet_size / 20000)
-
-                                                nodes_slot_queue_nonreal_len[node_no-1][node_links[node_no][next_nodeno]-1] += len(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])])
-
-                                                nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].service(max(nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].arrival_time, time_service), B[s_link - 1][d_link - 1], False, link_retransmit_prob, packet_size/20000)
-
-                                                # Appending to the next node receiving Queue
-                                                if link_retransmit_prob == 1:
-                                                    if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].d_new == 99:  # If packet reached destination we add to the end-to-end final tracker
-                                                        ################### Decrementing the packet count from path_final ############
-                                                        if nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index][0].direction == True:
-                                                            path_final, nodes_nonreal, node_no, node_links, next_nodeno, time_service, File_e2e, sum_soujorn, number_soujorn, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, current_nr_index, wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1 = \
-                                                                removeFileFlow(path_final, nodes_nonreal, node_no, node_links, next_nodeno, time_service, File_e2e, sum_soujorn, number_soujorn,
-                                                                          File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, current_nr_index,
-                                                                          wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1)
-                                                    else:
-                                                        nodes_nonreal = appendNonRealQueue(node_no, node_links[node_no][next_nodeno], current_nr_index, current_nr_index, nodes_nonreal)
-                                                    nodes_nonreal[(node_no, node_links[node_no][next_nodeno])][current_nr_index].pop(0)
-                        time_service = time_service + packet_size / 80000
+                        min_arrivaltime, noOfNodes, B, C, packet_size, path_final, nodes_real, node_links, time_service, Voice_e2e, Voice_e2e_Count, \
+                        Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority, \
+                        wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, scale, nodes_nonreal, \
+                        sum_soujorn, number_soujorn = \
+                        packetSimulation(min_arrivaltime, noOfNodes, B, C, packet_size, path_final, nodes_real, node_links, time_service, Voice_e2e, Voice_e2e_Count,
+                                     Video_e2e, Video_e2e_Count, File_e2e, File_e2e_Count, p, s, d, flow_type, min_rate, flownumber, userpriority,
+                                     wt_matx, wt_matx_real, wt_matx_real1, blockstate, orig_total_matx, orig_total_real1, scale, nodes_nonreal,
+                                     sum_soujorn, number_soujorn, True)
         else:  # Either new flow has arrived or all packets have been served.
             timecurrent = c  # Current Time = Arrival Time
             # print departuretime1, "departuretime1"
@@ -912,33 +678,9 @@ while(countarrival < limit - 1):
             sum_c = sum_c + (new_c - old_c)
             print (np.nanmin(rho_matx))
             print (np.nanmax(rho_matx))
-            # Debugging
-            # np.savetxt("updweightmatx.csv", 1/wt_matx, delimiter=",")
-            # np.savetxt("updorweightmatxreal.csv", 1/wt_matx_real, delimiter=",")
-            # np.savetxt("updorweightmatxreal1.csv", 1/wt_matx_real1, delimiter=",")
-            # print("INSERT")
 
-            total_matx = np.sum(1 / wt_matx)
-            total_real = np.sum(1 / wt_matx_real)
-            total_real1 = np.sum(1 / wt_matx_real1)
-            k = 0
-            weight_diff = 0
-            realweight_diff = 0
-            while path_final[k][0] != 0:
-                j = 15
-                while path_final[k][j] != 0 and j != 26:
-                    weight_diff = weight_diff + path_final[k][4]
-                    if path_final[k][1] == 0:
-                        realweight_diff = realweight_diff + path_final[k][4]
-                    j += 1
-                weight_diff = weight_diff - path_final[k][4]
-                if path_final[k][1] == 0:
-                    realweight_diff = realweight_diff - path_final[k][4]
-                k += 1
-            if (orig_total_matx - total_matx - weight_diff) > 2 or (orig_total_matx - total_matx - weight_diff) < -2:
-                print "Oops"
-            if (orig_total_real1 - total_real1 - realweight_diff) > 2:
-                print "Oops"
+            # Debugging
+            checkSystemResources(wt_matx, wt_matx_real, wt_matx_real1, path_final, orig_total_matx, orig_total_real1)
 
             if blockstate_new == 0:  # If call is blocked by apadted Dijkstra
                 count_algo1 = count_algo1 + 1  # Increase count_algo1 counter and below counters for voice/video/data if tracking statistics started
@@ -966,73 +708,6 @@ while(countarrival < limit - 1):
             blockstate1[countarrival] = blockstate_new  # blockstate1 counter is updated
 
             # ########################################## End of Adapted Dijkstra ##########################
-            '''
-            # ########################################## Routing using multicommodity #####################
-            if I <= noSD - 1:
-                if I == 0:
-                    chosenprob1 = probabilities[0:paths[I]]
-                    chosenprob2 = probabilities[3 * total:3 * total + paths[I]]
-                else:
-                    chosenprob1 = probabilities[paths[I - 1]:paths[I]]
-                    chosenprob2 = probabilities[3 * total + paths[I - 1]:3 * total + paths[I]]
-            elif I <= 2 * noSD - 1:
-                if I == 4:
-                    chosenprob1 = probabilities[total:total + paths[I - noSD]]
-                    chosenprob2 = probabilities[4 * total:4 * total + paths[I - noSD]]
-                else:
-                    chosenprob1 = probabilities[total + paths[I - noSD - 1]:total + paths[I - noSD]]
-                    chosenprob2 = probabilities[4 * total + paths[I - noSD - 1]:4 * total + paths[I - noSD]]
-            else:
-                if I == 8:
-                    chosenprob1 = probabilities[2 * total:2 * total + paths[I - 2 * noSD]]
-                else:
-                    chosenprob1 = probabilities[2 * total + paths[I - 2 * noSD - 1]:2 * total + paths[I - 2 * noSD]]
-            # ######################################## Routing begins here #################################
-            if flow_type1[I] == 0:  # For realtime flow routing ( Voice and Video)
-                allo = allocaterealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi,userpriority_multi, source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,userpriority_new_multi, path_final_multi, wt_matx_multi, wt_matx_real1_multi, wt_matx_real_multi, blockstate_multi, a11, b11, c11, d11, g11, h11, i11, j11, I, chosenprob1, chosenprob2)
-                allo.service()
-                s_multi = allo.s_multi
-                d_multi = allo.d_multi
-                flow_type_multi = allo.flow_type_multi
-                min_rate_multi = allo.min_rate_multi
-                flownumber_multi = allo.flownumber_multi
-                userpriority_multi = allo.userpriority_multi
-                wt_matx_multi = allo.wt_matx
-                wt_matx_real1_multi = allo.wt_matx_real1
-                wt_matx_real_multi = allo.wt_matx_real
-                blockstate_new_multi = allo.callblock
-                path_final_multi = allo.path_final
-                blockstate_multi = allo.blockstate_multi
-
-            else:
-                aln = allocatenonrealupdated1(p, s_multi, d_multi, flow_type_multi, min_rate_multi, flownumber_multi, userpriority_multi,
-                                              source[I], destination[I], flow_type1[I], min_rate1[I], flownumber_new_multi,
-                                              userpriority_new_multi, path_final_multi, wt_matx_multi,
-                                              blockstate_multi, a11, b11, c11, d11, I, chosenprob1)
-                aln.service()
-                s_multi = aln.s_multi
-                d_multi = aln.d_multi
-                flow_type_multi = aln.flow_type_multi
-                min_rate_multi = aln.min_rate_multi
-                flownumber_multi = aln.flownumber_multi
-                userpriority_multi = aln.userpriority_multi
-                wt_matx_multi = aln.wt_matx
-                blockstate_new_multi = aln.callblock
-                path_final_multi = aln.path_final
-                blockstate_multi = aln.blockstate_multi
-
-            if blockstate_new_multi == 0:  # If call is blocked by apadted Dijkstra
-                count_multi = count_multi + 1  # Increase count_algo1 counter and below counters for voice/video/data if tracking statistics started
-                if countarrival > start:  # If tracking statistics started
-                    if I <= arrivalratesize / connectiontypes:
-                        blockedvoice_multi = blockedvoice_multi + 1
-                    elif I <= 2 * arrivalratesize / connectiontypes:
-                        blockedvideo_multi = blockedvideo_multi + 1
-                    else:
-                        blocekednonrealtime_multi = blocekednonrealtime_multi + 1
-
-            blockstate1_multi[countarrival] = blockstate_new_multi  # blockstate1 counter is updated
-            '''
             ##############################################
             if countarrival > start:  # Tracking starts here
                 # Total counts of various call types arrived so flowarrivaltime
@@ -1067,33 +742,7 @@ while(countarrival < limit - 1):
             new_c = flowarrivaltime.min()
 
 
-# print avgcost1
-totalrealtime = totalvoice + totalvideo
-fracvoice_algo1 = float(blockedvoice_alog1*1.0/totalvoice)
-fracvideo_algo1 = float(blockedvideo_algo1*1.0/totalvideo)
-fracnonreal_algo1 = float(blocekednonrealtime_algo1*1.0/totalnonrealtime)
-sj_time = sum_soujorn/number_soujorn*1.0
-video_endtoend = (Video_e2e/(scale))/Video_e2e_Count
-voice_endtoend = (Voice_e2e / (scale)) / Voice_e2e_Count
-file_endtoend = (File_e2e/(scale)) / File_e2e_Count
-if hetero:
-    file_endtoend_onlySatellite = (File_Mean_Total_Time_Satellite / (scale)) / File_Mean_Total_Time_Count_Satellite
-    file_endtoend_withoutSatellite = (File_Mean_Total_Time_WO_Satellite / (scale)) / File_Mean_Total_Time_Count_WO_Satellite
-    file_endtoend_combined = (File_Mean_Total_Time_All / (scale)) / File_Mean_Total_Time_Count_All
-print "Soujorn Time", sj_time
-print fracvoice_algo1, fracvideo_algo1, fracnonreal_algo1
-print "lambda", lamb
-print voice_endtoend, video_endtoend, file_endtoend
-
-
-if hetero:
-    np.savetxt("resultsHetero" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
-                                                          fracvideo_algo1, fracnonreal_algo1, sj_time,
-                                                          voice_endtoend,video_endtoend,file_endtoend, file_endtoend_onlySatellite, file_endtoend_withoutSatellite, file_endtoend_combined
-                                                          ]]), delimiter=",", fmt="%.10f")
-    print file_endtoend_onlySatellite, file_endtoend_withoutSatellite, file_endtoend_combined
-else:
-    np.savetxt("resultsHetero" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
-                                                                fracvideo_algo1, fracnonreal_algo1, sj_time,
-                                                                voice_endtoend, video_endtoend, file_endtoend
-                                                                ]]), delimiter=",", fmt="%.10f")
+makeCSV(blockedvoice_alog1, totalvoice, blockedvideo_algo1,
+        totalvideo, blocekednonrealtime_algo1, totalnonrealtime,
+        sum_soujorn, number_soujorn, Video_e2e, Video_e2e_Count,
+        Voice_e2e, Voice_e2e_Count, File_e2e, File_e2e_Count, scale, lamb)

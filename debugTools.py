@@ -36,3 +36,19 @@ def displayStats(blockedvoice_alog1, totalvoice, blockedvideo_algo1,
     voice_endtoend = (Voice_e2e / (scale)) / Voice_e2e_Count
     file_endtoend = (File_e2e / (scale)) / File_e2e_Count
     print lamb, fracvoice_algo1, fracvideo_algo1, fracnonreal_algo1, voice_endtoend, video_endtoend, file_endtoend, sj_time
+
+def makeCSV(blockedvoice_alog1, totalvoice, blockedvideo_algo1,
+                 totalvideo, blocekednonrealtime_algo1, totalnonrealtime,
+                 sum_soujorn, number_soujorn, Video_e2e, Video_e2e_Count,
+                 Voice_e2e, Voice_e2e_Count, File_e2e, File_e2e_Count, scale, lamb):
+    fracvoice_algo1 = float(blockedvoice_alog1 * 1.0 / totalvoice)
+    fracvideo_algo1 = float(blockedvideo_algo1 * 1.0 / totalvideo)
+    fracnonreal_algo1 = float(blocekednonrealtime_algo1 * 1.0 / totalnonrealtime)
+    sj_time = sum_soujorn / number_soujorn * 1.0
+    video_endtoend = (Video_e2e / (scale)) / Video_e2e_Count
+    voice_endtoend = (Voice_e2e / (scale)) / Voice_e2e_Count
+    file_endtoend = (File_e2e / (scale)) / File_e2e_Count
+    np.savetxt("resultsHetero" + str(lamb) + ".csv", np.array([[lamb, fracvoice_algo1,
+                                                                fracvideo_algo1, fracnonreal_algo1, sj_time,
+                                                                voice_endtoend, video_endtoend, file_endtoend
+                                                                ]]), delimiter=",", fmt="%.10f")
